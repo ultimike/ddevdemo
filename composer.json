@@ -1,6 +1,6 @@
 {
-    "name": "drupal-composer/drupal-project",
-    "description": "Project template for Drupal 8 projects with composer",
+    "name": "DDEV Demo site for DrupalEasy workshop",
+    "description": "Full Drupal 8 site including database backup, files/ directory backup, and Pantheon configuration.",
     "type": "project",
     "license": "GPL-2.0-or-later",
     "authors": [
