@@ -1,4 +1,4 @@
-APIVersion: v0.18.0
+APIVersion: v0.19.0
 name: ddevdemo
 type: drupal8
 docroot: web
@@ -7,13 +7,13 @@ router_http_port: "80"
 router_https_port: "443"
 xdebug_enabled: false
 additional_hostnames: []
-provider: pantheon
+provider: default
 
 
-# This config.yaml was created with ddev version v0.18.0 
-# webimage: drud/nginx-php-fpm-local:v1.3.0
-# dbimage: drud/mariadb-local:v0.9.0
-# dbaimage: drud/phpmyadmin:v0.2.0
+# This config.yaml was created with ddev version v0.19.0 
+# webimage: drud/nginx-php-fpm-local:v0.19.0
+# dbimage: drud/mariadb-local:v0.19.0
+# dbaimage: drud/phpmyadmin:v0.19.0
 # However we do not recommend explicitly wiring these images into the
 # config.yaml as they may break future versions of ddev.
 # You can update this config.yaml using 'ddev config'.
