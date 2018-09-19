@@ -63,7 +63,7 @@ class Utils {
    * @see http://php.net/manual/en/language.oop5.basic.php
    */
   public static function validateClassName($value) {
-    if (!preg_match('/^[A-Z][a-zA-Z0-0][a-zA-Z0-9]*$/', $value)) {
+    if (!preg_match('/^[A-Z][a-zA-Z0-9]+$/', $value)) {
       throw new \UnexpectedValueException('The value is not correct class name.');
     }
     return $value;
@@ -154,7 +154,7 @@ class Utils {
     $extension_root = FALSE;
     for ($i = 1; $i <= 5; $i++) {
       $info_file = $directory . '/' . basename($directory) . '.info';
-      if (file_exists($info_file) || file_exists($info_file . '.yml')) {
+      if ((file_exists($info_file) && basename($directory) !== 'drush') || file_exists($info_file . '.yml')) {
         $extension_root = $directory;
         break;
       }
