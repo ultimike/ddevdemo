@@ -23,3 +23,6 @@
 
 # Ignore .env files as they are personal
 /.env
+
+# Ignore DDEV database snapshots
+.ddev/db_snapshots/
