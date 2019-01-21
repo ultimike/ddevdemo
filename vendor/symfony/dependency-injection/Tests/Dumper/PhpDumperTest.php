@@ -752,7 +752,7 @@ class PhpDumperTest extends TestCase
             ->setPublic(false);
         $container->register('public_foo', 'stdClass')
             ->setPublic(true)
-            ->addArgument(new Expression('service("private_foo")'));
+            ->addArgument(new Expression('service("private_foo").bar'));
 
         $container->compile();
         $dumper = new PhpDumper($container);
@@ -833,6 +833,8 @@ class PhpDumperTest extends TestCase
 
         $foo6 = $container->get('foo6');
         $this->assertEquals((object) array('bar6' => (object) array()), $foo6);
+
+        $this->assertInstanceOf(\stdClass::class, $container->get('root'));
     }
 
     public function provideAlmostCircular()
