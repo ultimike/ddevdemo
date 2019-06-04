@@ -24,9 +24,16 @@ class ExampleService {
   }
 
   /**
-   * t() should not be used, translation service should be injected.
+   * Global function should not be used, we should use an injected service.
    */
   public function test3() {
+    return format_date(time());
+  }
+
+  /**
+   * t() should not be used, instead we should use the StringTranslationTrait.
+   */
+  public function test4() {
     return t('Test');
   }
 

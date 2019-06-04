@@ -15,7 +15,7 @@
 	position: relative;
 	margin: 0 auto;
 	overflow: hidden;
-	background: transparent url(/sites/default/files/slider-cupcakes.jpg) repeat 0% 0%;
+	background: transparent url(../images/slider-ny2.jpg) repeat 0% 0%;
 	border-bottom: 5px solid #f6f6f6 !important;
 	-webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,.25);
 	-moz-box-shadow: inset 0px 0px 5px rgba(0,0,0,.25);

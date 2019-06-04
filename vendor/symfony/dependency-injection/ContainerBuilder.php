@@ -868,6 +868,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $alias = $this->normalizeId($alias);
 
+        if ('' === $alias || '\\' === substr($alias, -1) || \strlen($alias) !== strcspn($alias, "\0\r\n'")) {
+            throw new InvalidArgumentException(sprintf('Invalid alias id: "%s"', $alias));
+        }
+
         if (\is_string($id)) {
             $id = new Alias($this->normalizeId($id));
         } elseif (!$id instanceof Alias) {
@@ -1020,6 +1024,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $id = $this->normalizeId($id);
+
+        if ('' === $id || '\\' === substr($id, -1) || \strlen($id) !== strcspn($id, "\0\r\n'")) {
+            throw new InvalidArgumentException(sprintf('Invalid service id: "%s"', $id));
+        }
 
         unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
 
@@ -1519,13 +1527,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Adds a removed binding id.
+     * Removes bindings for a service.
      *
-     * @param int $id
+     * @param string $id The service identifier
      *
      * @internal
      */
-    public function addRemovedBindingIds($id)
+    public function removeBindings($id)
     {
         if ($this->hasDefinition($id)) {
             foreach ($this->getDefinition($id)->getBindings() as $key => $binding) {

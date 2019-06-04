@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
+class ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
@@ -123,6 +123,10 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
         array (
             'League\\Container\\' => 17,
         ),
+        'J' => 
+        array (
+            'JsonSchema\\' => 11,
+        ),
         'I' => 
         array (
             'Interop\\Container\\' => 18,
@@ -135,6 +139,10 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
             'Grasmash\\YamlExpander\\' => 22,
             'Grasmash\\Expander\\' => 18,
             'Goutte\\' => 7,
+        ),
+        'E' => 
+        array (
+            'Egulias\\EmailValidator\\' => 23,
         ),
         'D' => 
         array (
@@ -391,6 +399,10 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
         array (
             0 => __DIR__ . '/..' . '/league/container/src',
         ),
+        'JsonSchema\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
         'Interop\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
@@ -418,6 +430,10 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
         'Goutte\\' => 
         array (
             0 => __DIR__ . '/..' . '/fabpot/goutte/Goutte',
+        ),
+        'Egulias\\EmailValidator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/egulias/email-validator/EmailValidator',
         ),
         'Drush\\Internal\\' => 
         array (
@@ -581,6 +597,10 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
             array (
                 0 => __DIR__ . '/..' . '/phpspec/prophecy/src',
             ),
+            'PEAR' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/pear_exception',
+            ),
         ),
         'J' => 
         array (
@@ -595,10 +615,6 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
         ),
         'E' => 
         array (
-            'Egulias\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/egulias/email-validator/src',
-            ),
             'EasyRdf_' => 
             array (
                 0 => __DIR__ . '/..' . '/easyrdf/easyrdf/lib',
@@ -631,6 +647,24 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
                 0 => __DIR__ . '/..' . '/dflydev/dot-access-configuration/src',
             ),
         ),
+        'C' => 
+        array (
+            'Console' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/console_getopt',
+            ),
+        ),
+        'A' => 
+        array (
+            'Archive_Tar' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/archive_tar',
+            ),
+        ),
+    );
+
+    public static $fallbackDirsPsr0 = array (
+        0 => __DIR__ . '/..' . '/pear/pear-core-minimal/src',
     );
 
     public static $classMap = array (
@@ -1197,10 +1231,11 @@ class ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitb0cbe409434d9e587ea5b8f18ddeea7d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit5bcd4a0b88884a142ba3e1a2c85a8ea9::$classMap;
 
         }, null, ClassLoader::class);
     }
