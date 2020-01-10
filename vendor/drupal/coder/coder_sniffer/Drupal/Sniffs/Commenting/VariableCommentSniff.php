@@ -9,10 +9,8 @@
 
 namespace Drupal\Sniffs\Commenting;
 
-use Drupal\Sniffs\Commenting\FunctionCommentSniff;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\AbstractVariableSniff;
-use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Parses and verifies class property doc comments.
@@ -39,14 +37,25 @@ class VariableCommentSniff extends AbstractVariableSniff
      */
     public function processMemberVar(File $phpcsFile, $stackPtr)
     {
-        $tokens       = $phpcsFile->getTokens();
-        $commentToken = [
-            T_COMMENT,
-            T_DOC_COMMENT_CLOSE_TAG,
+        $tokens = $phpcsFile->getTokens();
+        $ignore = [
+            T_PUBLIC,
+            T_PRIVATE,
+            T_PROTECTED,
+            T_VAR,
+            T_STATIC,
+            T_WHITESPACE,
+            T_STRING,
+            T_NS_SEPARATOR,
+            T_NULLABLE,
         ];
 
-        $commentEnd = $phpcsFile->findPrevious($commentToken, $stackPtr);
-        if ($commentEnd === false) {
+        $commentEnd = $phpcsFile->findPrevious($ignore, ($stackPtr - 1), null, true);
+        if ($commentEnd === false
+            || ($tokens[$commentEnd]['code'] !== T_DOC_COMMENT_CLOSE_TAG
+            && $tokens[$commentEnd]['code'] !== T_COMMENT)
+        ) {
+            $phpcsFile->addError('Missing member variable doc comment', $stackPtr, 'Missing');
             return;
         }
 
@@ -78,8 +87,11 @@ class VariableCommentSniff extends AbstractVariableSniff
 
         $commentStart = $tokens[$commentEnd]['comment_opener'];
 
+        // Ignore variable comments that use inheritdoc, allow both variants.
         $commentContent = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart));
-        if (strpos($commentContent, '{@inheritdoc}') !== false) {
+        if (strpos($commentContent, '{@inheritdoc}') !== false
+            || strpos($commentContent, '{@inheritDoc}') !== false
+        ) {
             return;
         }
 

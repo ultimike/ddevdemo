@@ -48,6 +48,7 @@ class FunctionCommentSniff implements Sniff
         'Bool'      => 'bool',
         'Int'       => 'int',
         'Integer'   => 'int',
+        'TRUEFALSE' => 'bool',
     ];
 
     /**
@@ -205,15 +206,26 @@ class FunctionCommentSniff implements Sniff
                 $return = $tag;
                 // Any strings until the next tag belong to this comment.
                 if (isset($tokens[$commentStart]['comment_tags'][($pos + 1)]) === true) {
-                    $end = $tokens[$commentStart]['comment_tags'][($pos + 1)];
+                    $skipTags = [
+                        '@code',
+                        '@endcode',
+                    ];
+                    $skipPos  = ($pos + 1);
+                    while (isset($tokens[$commentStart]['comment_tags'][$skipPos]) === true
+                        && in_array($tokens[$commentStart]['comment_tags'][$skipPos], $skipTags) === true
+                    ) {
+                        $skipPos++;
+                    }
+
+                    $end = $tokens[$commentStart]['comment_tags'][$skipPos];
                 } else {
                     $end = $tokens[$commentStart]['comment_closer'];
                 }
-            }
-        }
+            }//end if
+        }//end foreach
 
         $type = null;
-        if ($isSpecialMethod === false && $methodName !== $className) {
+        if ($isSpecialMethod === false) {
             if ($return !== null) {
                 $type = trim($tokens[($return + 2)]['content']);
                 if (empty($type) === true || $tokens[($return + 2)]['code'] !== T_DOC_COMMENT_STRING) {
@@ -358,12 +370,6 @@ class FunctionCommentSniff implements Sniff
                     }
                 }//end if
             }//end if
-        } else {
-            // No return tag for constructor and destructor.
-            if ($return !== null) {
-                $error = '@return tag is not required for constructor and destructor';
-                $phpcsFile->addError($error, $return, 'ReturnNotRequired');
-            }
         }//end if
 
     }//end processReturn()
@@ -432,7 +438,7 @@ class FunctionCommentSniff implements Sniff
                 }
 
                 // Starts with a capital letter and ends with a fullstop.
-                $firstChar = $comment{0};
+                $firstChar = $comment[0];
                 if (strtoupper($firstChar) !== $firstChar) {
                     $error = '@throws tag comment must start with a capital letter';
                     $phpcsFile->addError($error, $throwStart, 'ThrowsNotCapital');
@@ -531,16 +537,44 @@ class FunctionCommentSniff implements Sniff
 
                 // Any strings until the next tag belong to this comment.
                 if (isset($tokens[$commentStart]['comment_tags'][($pos + 1)]) === true) {
-                    $end = $tokens[$commentStart]['comment_tags'][($pos + 1)];
+                    // Ignore code tags and include them within this comment.
+                    $skipTags = [
+                        '@code',
+                        '@endcode',
+                        '@link',
+                    ];
+                    $skipPos  = $pos;
+                    while (isset($tokens[$commentStart]['comment_tags'][($skipPos + 1)]) === true) {
+                        $skipPos++;
+                        if (in_array($tokens[$tokens[$commentStart]['comment_tags'][$skipPos]]['content'], $skipTags) === false
+                            // Stop when we reached the next tag on the outer @param level.
+                            && $tokens[$tokens[$commentStart]['comment_tags'][$skipPos]]['column'] === $tokens[$tag]['column']
+                        ) {
+                            break;
+                        }
+                    }
+
+                    if ($tokens[$tokens[$commentStart]['comment_tags'][$skipPos]]['column'] === ($tokens[$tag]['column'] + 2)) {
+                        $end = $tokens[$commentStart]['comment_closer'];
+                    } else {
+                        $end = $tokens[$commentStart]['comment_tags'][$skipPos];
+                    }
                 } else {
                     $end = $tokens[$commentStart]['comment_closer'];
-                }
+                }//end if
 
                 for ($i = ($tag + 3); $i < $end; $i++) {
                     if ($tokens[$i]['code'] === T_DOC_COMMENT_STRING) {
                         $indent = 0;
                         if ($tokens[($i - 1)]['code'] === T_DOC_COMMENT_WHITESPACE) {
                             $indent = strlen($tokens[($i - 1)]['content']);
+                            // There can be @code or @link tags within an @param comment.
+                            if ($tokens[($i - 2)]['code'] === T_DOC_COMMENT_TAG) {
+                                $indent = 0;
+                                if ($tokens[($i - 3)]['code'] === T_DOC_COMMENT_WHITESPACE) {
+                                    $indent = strlen($tokens[($i - 3)]['content']);
+                                }
+                            }
                         }
 
                         $comment       .= ' '.$tokens[$i]['content'];
@@ -556,7 +590,7 @@ class FunctionCommentSniff implements Sniff
                                 $phpcsFile->fixer->replaceToken(($i - 1), '   ');
                             }
                         }
-                    }
+                    }//end if
                 }//end for
 
                 // The first line of the comment must be indented no more than 3
@@ -735,7 +769,12 @@ class FunctionCommentSniff implements Sniff
                     && isset($realParams[$checkPos]) === true
                 ) {
                     $typeHint = $realParams[$checkPos]['type_hint'];
-                    if ($typeHint !== '' && $typeHint !== 'stdClass' && $typeHint !== '\stdClass') {
+                    if ($typeHint !== ''
+                        && $typeHint !== 'stdClass'
+                        && $typeHint !== '\stdClass'
+                        // As of PHP 7.2, object is a valid type hint.
+                        && $typeHint !== 'object'
+                    ) {
                         $error = 'Unknown type hint "%s" found for %s';
                         $data  = [
                             $typeHint,
@@ -847,10 +886,14 @@ class FunctionCommentSniff implements Sniff
                     $commentToken = $lastLine['token'];
                 }
 
-                $fix = $phpcsFile->addFixableError($error, $commentToken, 'ParamCommentFullStop');
-                if ($fix === true) {
-                    // Add a full stop as the last character of the comment.
-                    $phpcsFile->fixer->addContent($commentToken, '.');
+                // Don't show an error if the end of the comment is in a code
+                // example.
+                if ($this->isInCodeExample($phpcsFile, $commentToken, $param['tag']) === false) {
+                    $fix = $phpcsFile->addFixableError($error, $commentToken, 'ParamCommentFullStop');
+                    if ($fix === true) {
+                        // Add a full stop as the last character of the comment.
+                        $phpcsFile->fixer->addContent($commentToken, '.');
+                    }
                 }
             }
         }//end foreach
@@ -1010,6 +1053,39 @@ class FunctionCommentSniff implements Sniff
         return false;
 
     }//end isAliasedType()
+
+
+    /**
+     * Determines if a comment line is part of an @code/@endcode example.
+     *
+     * @param \PHP_CodeSniffer\Files\File $phpcsFile    The file being scanned.
+     * @param int                         $stackPtr     The position of the current token
+     *                                                  in the stack passed in $tokens.
+     * @param int                         $commentStart The position of the start of the comment
+     *                                                  in the stack passed in $tokens.
+     *
+     * @return boolean Returns true if the comment line is within a @code block,
+     *                 false otherwise.
+     */
+    protected function isInCodeExample(File $phpcsFile, $stackPtr, $commentStart)
+    {
+        $tokens = $phpcsFile->getTokens();
+        if (strpos($tokens[$stackPtr]['content'], '@code') !== false) {
+            return true;
+        }
+
+        $prevTag = $phpcsFile->findPrevious([T_DOC_COMMENT_TAG], ($stackPtr - 1), $commentStart);
+        if ($prevTag === false) {
+            return false;
+        }
+
+        if ($tokens[$prevTag]['content'] === '@code') {
+            return true;
+        }
+
+        return false;
+
+    }//end isInCodeExample()
 
 
 }//end class

@@ -25,6 +25,8 @@ class InputHandler extends Helper {
     return 'dcg_input_handler';
   }
 
+  protected $askedQuestions = [];
+
   /**
    * Interacts with the user and returns variables for templates.
    *
@@ -59,6 +61,12 @@ class InputHandler extends Helper {
     $directory = $command->getDirectory();
 
     foreach ($questions as $name => $question) {
+
+      if (in_array($name, $this->askedQuestions)) {
+        continue;
+      }
+      $this->askedQuestions[] = $name;
+
       /** @var \Symfony\Component\Console\Question\Question $question */
       $default_value = $question->getDefault();
 
@@ -93,6 +101,10 @@ class InputHandler extends Helper {
       if ($answers) {
         if (array_key_exists($name, $answers)) {
           $answer = $answers[$name];
+          // Validate provided answer.
+          if ($validator = $question->getValidator()) {
+            $validator($answer);
+          }
           // Turn 'yes/no' string into boolean.
           if ($question instanceof ConfirmationQuestion && !is_bool($answer)) {
             $answer = strcasecmp($answer, 'yes') == 0;

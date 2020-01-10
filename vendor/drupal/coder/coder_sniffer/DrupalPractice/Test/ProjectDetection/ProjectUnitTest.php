@@ -3,11 +3,12 @@
 namespace DrupalPractice\ProjectDetection;
 
 use DrupalPractice\Project;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests that project and version detection works.
  */
-class ProjectUnitTest extends \PHPUnit_Framework_TestCase
+class ProjectUnitTest extends TestCase
 {
 
     /**
@@ -42,9 +43,9 @@ class ProjectUnitTest extends \PHPUnit_Framework_TestCase
     {
         $this->phpcsFile->expects($this->any())
             ->method('getFilename')
-            ->will($this->returnValue(dirname(__FILE__).'/modules/drupal6/test.php'));
+            ->will($this->returnValue(__DIR__.'/drupal6/test.php'));
 
-        $this->assertEquals(Project::getInfoFile($this->phpcsFile), dirname(__FILE__).'/modules/drupal6/testmodule.info');
+        $this->assertEquals(Project::getInfoFile($this->phpcsFile), __DIR__.'/drupal6/testmodule.info');
 
     }//end testInfoFileDetection()
 
@@ -58,9 +59,9 @@ class ProjectUnitTest extends \PHPUnit_Framework_TestCase
     {
         $this->phpcsFile->expects($this->any())
             ->method('getFilename')
-            ->will($this->returnValue(dirname(__FILE__).'/modules/drupal6/nested/test.php'));
+            ->will($this->returnValue(__DIR__.'/drupal6/nested/test.php'));
 
-        $this->assertEquals(Project::getInfoFile($this->phpcsFile), dirname(__FILE__).'/modules/drupal6/testmodule.info');
+        $this->assertEquals(Project::getInfoFile($this->phpcsFile), __DIR__.'/drupal6/testmodule.info');
 
     }//end testInfoFileNestedDetection()
 
@@ -95,20 +96,93 @@ class ProjectUnitTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                dirname(__FILE__).'/modules/drupal6/nested/test.php',
-                '6.x',
+                __DIR__.'/drupal6/nested/test.php',
+                6,
             ],
             [
-                dirname(__FILE__).'/modules/drupal7/test.php',
-                '7.x',
+                __DIR__.'/drupal7/test.php',
+                7,
             ],
             [
-                dirname(__FILE__).'/modules/drupal8/test.php',
-                '8.x',
+                __DIR__.'/drupal8/test.php',
+                8,
+            ],
+            [
+                'invalid',
+                8,
+            ],
+            [
+                __DIR__.'/directory.info/test.php',
+                8,
             ],
         ];
 
     }//end coreVersionProvider()
+
+
+    /**
+     * Tests the extending classes Sniff class.
+     *
+     * @param string $filename    Name of the file that will be checked.
+     * @param string $projectname Expected project name for the file.
+     *
+     * @dataProvider projectNameDetectionProvider
+     *
+     * @return void
+     */
+    public function testProjectNameDetection($filename, $projectname)
+    {
+        $this->phpcsFile->expects($this->any())
+            ->method('getFilename')
+            ->will($this->returnValue($filename));
+
+        $this->assertEquals(Project::getName($this->phpcsFile), $projectname);
+
+    }//end testProjectNameDetection()
+
+
+    /**
+     * Data provider for testProjectNameDetection().
+     *
+     * @return array
+     *   An array of test cases, each test case an array with two elements:
+     *   - The filename to check.
+     *   - The expected project name.
+     */
+    public function projectNameDetectionProvider()
+    {
+        return [
+            [
+                __DIR__.'/drupal6/testmodule.info',
+                'testmodule',
+            ],
+            [
+                __DIR__.'/drupal6/nested/test.php',
+                'testmodule',
+            ],
+            [
+                __DIR__.'/drupal7/testmodule.info',
+                'testmodule',
+            ],
+            [
+                __DIR__.'/drupal8/testmodule.info.yml',
+                'testmodule',
+            ],
+            [
+                __DIR__.'/drupal8/testtheme/testtheme.info.yml',
+                'testtheme',
+            ],
+            [
+                __DIR__.'/drupal8/testtheme/testtheme.theme',
+                'testtheme',
+            ],
+            [
+                'invalid',
+                false,
+            ],
+        ];
+
+    }//end projectNameDetectionProvider()
 
 
 }//end class

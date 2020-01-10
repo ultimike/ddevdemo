@@ -221,7 +221,10 @@ class DocCommentSniff implements Sniff
         // Remove any trailing white spaces which are detected by other sniffs.
         $shortContent = trim($shortContent);
 
-        if (preg_match('|\p{Lu}|u', $shortContent[0]) === 0 && $shortContent !== '{@inheritdoc}'
+        if (preg_match('|\p{Lu}|u', $shortContent[0]) === 0
+            // Allow both variants of inheritdoc comments.
+            && $shortContent !== '{@inheritdoc}'
+            && $shortContent !== '{@inheritDoc}'
             // Ignore Features module export files that just use the file name as
             // comment.
             && $shortContent !== basename($phpcsFile->getFilename())
@@ -240,7 +243,10 @@ class DocCommentSniff implements Sniff
         }
 
         $lastChar = substr($shortContent, -1);
-        if (in_array($lastChar, ['.', '!', '?', ')']) === false && $shortContent !== '{@inheritdoc}'
+        if (in_array($lastChar, ['.', '!', '?', ')']) === false
+            // Allow both variants of inheritdoc comments.
+            && $shortContent !== '{@inheritdoc}'
+            && $shortContent !== '{@inheritDoc}'
             // Ignore Features module export files that just use the file name as
             // comment.
             && $shortContent !== basename($phpcsFile->getFilename())
@@ -369,6 +375,12 @@ class DocCommentSniff implements Sniff
         $currentTag   = null;
         $previousTag  = null;
         $isNewGroup   = null;
+        $checkTags    = [
+            '@param',
+            '@return',
+            '@throws',
+            '@ingroup',
+        ];
         foreach ($tokens[$commentStart]['comment_tags'] as $pos => $tag) {
             if ($pos > 0) {
                 $prev = $phpcsFile->findPrevious(
@@ -405,8 +417,8 @@ class DocCommentSniff implements Sniff
                 // The @param, @return and @throws tag sections should be
                 // separated by a blank line both before and after these sections.
             } else if ($isNewGroup === false
-                && (in_array($currentTag, ['@param', '@return', '@throws']) === true
-                || in_array($previousTag, ['@param', '@return', '@throws']) === true)
+                && in_array($currentTag, $checkTags) === true
+                && in_array($previousTag, $checkTags) === true
                 && $previousTag !== $currentTag
             ) {
                 $error = 'Separate the %s and %s sections by a blank line.';
@@ -489,19 +501,24 @@ class DocCommentSniff implements Sniff
         }
 
         $foundTags = [];
+        $lastPos   = 0;
         foreach ($tokens[$stackPtr]['comment_tags'] as $pos => $tag) {
             $tagName = $tokens[$tag]['content'];
+            // Skip code tags, they can be anywhere.
+            if (in_array($tagName, $checkTags) === false) {
+                continue;
+            }
+
             if (isset($foundTags[$tagName]) === true) {
-                $lastTag = $tokens[$stackPtr]['comment_tags'][($pos - 1)];
+                $lastTag = $tokens[$stackPtr]['comment_tags'][$lastPos];
                 if ($tokens[$lastTag]['content'] !== $tagName) {
                     $error = 'Tags must be grouped together in a doc comment';
                     $phpcsFile->addError($error, $tag, 'TagsNotGrouped');
                 }
-
-                continue;
             }
 
             $foundTags[$tagName] = true;
+            $lastPos = $pos;
         }
 
     }//end process()

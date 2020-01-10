@@ -57,7 +57,7 @@ class FileCache implements CacheInterface
             foreach ($cids as $cid) {
                 $filename = $this->getFilePath($cid);
                 if (!file_exists($filename)) {
-                    throw new \Exception;
+                    return [];
                 }
 
                 $item = $this->readFile($filename);
@@ -94,8 +94,8 @@ class FileCache implements CacheInterface
         $cache->created = $created;
         if ($expire == DRUSH_CACHE_TEMPORARY) {
             $cache->expire = $created + 2591999;
-        } // Expire time is in seconds if less than 30 days, otherwise is a timestamp.
-        elseif ($expire != DRUSH_CACHE_PERMANENT && $expire < 2592000) {
+        } elseif ($expire != DRUSH_CACHE_PERMANENT && $expire < 2592000) {
+        // Expire time is in seconds if less than 30 days, otherwise is a timestamp.
             $cache->expire = $created + $expire;
         } else {
             $cache->expire = $expire;

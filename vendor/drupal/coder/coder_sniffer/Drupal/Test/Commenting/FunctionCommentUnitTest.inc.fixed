@@ -479,3 +479,56 @@ function test34($a, $b) {
 function test35(\stdClass $name, \stdClass $param2) {
 
 }
+
+/**
+ * Allow "object" as real type hint (PHP 7.2).
+ *
+ * @param object $arg
+ *   Something here.
+ * @param object $blarg
+ *   Another thing.
+ */
+function test36(object $arg, object $blarg) {
+  return $arg;
+}
+
+/**
+ * A class with a method that has the same name as the class.
+ */
+class Small {
+
+  /**
+   * Our small constructor.
+   */
+  public function __construct() {
+  }
+
+  /**
+   * Return tag should be allowed here.
+   *
+   * @return string
+   *   Something small.
+   */
+  public function small() {
+    return 'string';
+  }
+
+}
+
+/**
+ * Some short comment.
+ *
+ * @param array $matches
+ *   An array of matches by a preg_replace_callback() call that scans for
+ *   @import-ed CSS files, except for external CSS files.
+ * @param array $sub_key
+ *   An array containing the sub-keys specifying the library asset, e.g.
+ *   @code['js']@endcode or @code['css', 'component']@endcode
+ * @param string $to
+ *   The email address or addresses where the message will be sent to. The
+ *   formatting of this string will be validated with the
+ *   @link http://php.net/manual/filter.filters.validate.php PHP email @endlink.
+ */
+function test37(array $matches, array $sub_key, $to) {
+
+}

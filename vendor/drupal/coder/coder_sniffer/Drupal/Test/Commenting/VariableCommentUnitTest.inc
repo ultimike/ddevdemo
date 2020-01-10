@@ -44,4 +44,11 @@ class Test {
   // Wrong style with var keyword.
   var $varStyle;
 
+  protected $missingComment;
+
+  /**
+   * A typed property should still contain a variable comment.
+   */
+  public ?Bar $bar;
+
 }

@@ -65,9 +65,10 @@ class {{ class_prefix }}ListBuilder extends EntityListBuilder {
   public function render() {
     $build['table'] = parent::render();
 
-    $total = \Drupal::database()
-      ->query('SELECT COUNT(*) FROM {{ '{' }}{{ entity_type_id }}{{ '}' }}')
-      ->fetchField();
+    $total = $this->getStorage()
+      ->getQuery()
+      ->count()
+      ->execute();
 
     $build['summary']['#markup'] = $this->t('Total {{ entity_type_label|lower|plural }}: @total', ['@total' => $total]);
     return $build;
@@ -100,10 +101,10 @@ class {{ class_prefix }}ListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\{{ machine_name }}\Entity\{{ class_prefix }} */
+    /* @var $entity \Drupal\{{ machine_name }}\{{ class_prefix }}Interface */
     $row['id'] = $entity->{{ title_base_field ? 'id' : 'link' }}();
 {% if title_base_field %}
-    $row['title'] = $entity->link();
+    $row['title'] = $entity->toLink();
 {% endif %}
 {% if status_base_field %}
     $row['status'] = $entity->isEnabled() ? $this->t('Enabled') : $this->t('Disabled');

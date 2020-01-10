@@ -137,6 +137,17 @@ class DocCommentAlignmentSniff implements Sniff
                 }
             } else if ($tokens[($i + 2)]['code'] === T_DOC_COMMENT_TAG
                 && $tokens[($i + 1)]['content'] !== ' '
+                // Special @code/@endcode/@see tags can have more than 1 space.
+                && in_array(
+                    $tokens[($i + 2)]['content'],
+                    [
+                        '@param',
+                        '@return',
+                        '@throws',
+                        '@ingroup',
+                        '@var',
+                    ]
+                ) === true
             ) {
                 $error = 'Expected 1 space after asterisk; %s found';
                 $data  = [strlen($tokens[($i + 1)]['content'])];
@@ -144,7 +155,7 @@ class DocCommentAlignmentSniff implements Sniff
                 if ($fix === true) {
                     $phpcsFile->fixer->replaceToken(($i + 1), ' ');
                 }
-            }
+            }//end if
         }//end for
 
     }//end process()

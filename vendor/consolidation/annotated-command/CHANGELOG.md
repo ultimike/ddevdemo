@@ -1,6 +1,36 @@
 # Change Log
 
-### 2.9.0 - 18 Sept 2018
+### 2.12.0 - 8 Mar 2019
+
+- Allow annotated args and options to specify their default values in their descriptions. (#186)
+
+### 2.11.2 - 1 Feb 2019
+
+- Fix handling of old caches from 2.11.1 that introduced upgrade errors.
+
+### 2.11.1 - 31 Jan 2019
+
+- Cache injected classes (#182)
+
+### 2.11.0 - 27 Jan 2019
+
+- Make injection of InputInterface / OutputInterface general-purpose (#179)
+
+### 2.10.2 - 20 Dec 2018
+
+- Fix commands that have a @param annotation for their InputInterface/OutputInterface params (#176)
+
+### 2.10.1 - 13 Dec 2018
+
+- Add stdin handler convenience class
+- Add setter to AnnotationData to suppliment existing array acces
+- Update to Composer Test Scenarios 3
+
+### 2.10.0 - 14 Nov 2018
+
+- Add a new data type, CommandResult (#167)
+
+### 2.9.0 & 2.9.1 - 19 Sept 2018
 
 - Improve commandfile discovery for extensions installed via Composer. (#156)
 

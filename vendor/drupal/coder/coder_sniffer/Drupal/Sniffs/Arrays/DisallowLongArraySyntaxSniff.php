@@ -9,8 +9,6 @@
 
 namespace Drupal\Sniffs\Arrays;
 
-require_once __DIR__.'/../../../DrupalPractice/Project.php';
-
 use PHP_CodeSniffer\Files\File;
 use DrupalPractice\Project;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\Arrays\DisallowLongArraySyntaxSniff as GenericDisallowLongArraySyntaxSniff;
@@ -38,7 +36,7 @@ class DisallowLongArraySyntaxSniff extends GenericDisallowLongArraySyntaxSniff
     public function process(File $phpcsFile, $stackPtr)
     {
         $drupalVersion = Project::getCoreVersion($phpcsFile);
-        if ($drupalVersion !== '8.x') {
+        if ($drupalVersion < 8) {
             // No need to check this file again, mark it as done.
             return ($phpcsFile->numTokens + 1);
         }

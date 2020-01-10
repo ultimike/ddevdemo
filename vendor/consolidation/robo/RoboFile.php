@@ -59,8 +59,9 @@ class RoboFile extends \Robo\Tasks
     /**
      * Generate a new Robo task that wraps an existing utility class.
      *
-     * @param $className The name of the existing utility class to wrap.
-     * @param $wrapperClassName The name of the wrapper class to create. Optional.
+     * @param string $className The name of the existing utility class to wrap.
+     * @param string $wrapperClassName The name of the wrapper class to create. Optional.
+     *
      * @usage generate:task 'Symfony\Component\Filesystem\Filesystem' FilesystemStack
      */
     public function generateTask($className, $wrapperClassName = "")
@@ -94,17 +95,14 @@ class RoboFile extends \Robo\Tasks
             ->push()
             ->run();
 
-        if ($stable) {
-            $this->pharPublish();
-        }
         $this->publish();
-
         $this->taskGitStack()
             ->tag($version)
-            ->push('origin master --tags')
+            ->push('origin 1.x --tags')
             ->run();
 
         if ($stable) {
+            $this->pharPublish();
             $version = $this->incrementVersion($version) . '-dev';
             $this->writeVersion($version);
 
@@ -320,7 +318,7 @@ class RoboFile extends \Robo\Tasks
         return $this->collectionBuilder()
             ->taskGitStack()
                 ->checkout('site')
-                ->merge('master')
+                ->merge('1.x')
             ->completion($this->taskGitStack()->checkout($current_branch))
             ->taskFilesystemStack()
                 ->copy('CHANGELOG.md', 'docs/changelog.md')
@@ -467,7 +465,7 @@ class RoboFile extends \Robo\Tasks
                 ->add('robotheme/robo.phar')
                 ->commit('Update robo.phar to ' . \Robo\Robo::VERSION)
                 ->push('origin site')
-                ->checkout('master')
+                ->checkout('1.x')
                 ->run();
     }
 }

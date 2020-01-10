@@ -3,9 +3,10 @@
   "description": "Drupal code generator",
   "require": {
     "php": ">=5.5.9",
-    "symfony/console": "~2.7|^3",
-    "symfony/filesystem": "~2.7|^3",
-    "twig/twig": "^1.23.1"
+    "ext-json": "*",
+    "symfony/console": "^3.4 || ^4.0",
+    "symfony/filesystem": "^2.7 || ^3.4 || ^4.0",
+    "twig/twig": "^1.41 || ^2.12"
   },
   "bin": [
     "bin/dcg"
