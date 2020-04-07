@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Sniffs\Classes;
+namespace Drupal\Test\Classes;
 
 use Drupal\Test\CoderSniffUnitTest;
 
@@ -16,20 +16,16 @@ class ClassFileNameUnitTest extends CoderSniffUnitTest
      *
      * @param string $testFile The name of the file being tested.
      *
-     * @return array(int => int)
+     * @return array<int, int>
      */
-    public function getErrorList($testFile=null)
+    protected function getErrorList(string $testFile): array
     {
         switch ($testFile) {
         case 'ClassFileNameUnitTest.php':
             return [3 => 1];
-        case 'drupal8.behat.inc':
-            return [];
-        case 'class_fle_name_test.module':
-            return [];
-        case 'markdownFile.md':
-            return [];
         }
+
+        return [];
 
     }//end getErrorList()
 
@@ -40,9 +36,11 @@ class ClassFileNameUnitTest extends CoderSniffUnitTest
      * The key of the array should represent the line number and the value
      * should represent the number of warnings that should occur on that line.
      *
-     * @return array(int => int)
+     * @param string $testFile The name of the file being tested.
+     *
+     * @return array<int, int>
      */
-    public function getWarningList()
+    protected function getWarningList(string $testFile): array
     {
         return [];
 
@@ -54,9 +52,9 @@ class ClassFileNameUnitTest extends CoderSniffUnitTest
      *
      * @param string $testFileBase The base path that the unit tests files will have.
      *
-     * @return array The list of test files.
+     * @return array<string>
      */
-    protected function getTestFiles($testFileBase)
+    protected function getTestFiles($testFileBase): array
     {
         return [
             __DIR__.'/drupal8/ClassFileNameUnitTest.php',

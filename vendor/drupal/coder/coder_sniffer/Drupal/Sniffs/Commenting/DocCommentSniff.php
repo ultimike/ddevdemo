@@ -26,21 +26,11 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 class DocCommentSniff implements Sniff
 {
 
-    /**
-     * A list of tokenizers this sniff supports.
-     *
-     * @var array
-     */
-    public $supportedTokenizers = [
-        'PHP',
-        'JS',
-    ];
-
 
     /**
      * Returns an array of tokens this test wants to listen for.
      *
-     * @return array
+     * @return array<int|string>
      */
     public function register()
     {
@@ -435,6 +425,7 @@ class DocCommentSniff implements Sniff
         foreach ($tagGroups as $group) {
             $maxLength = 0;
             $paddings  = [];
+            $pos       = 0;
             foreach ($group as $pos => $tag) {
                 $tagLength = strlen($tokens[$tag]['content']);
                 if ($tagLength > $maxLength) {

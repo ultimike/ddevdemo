@@ -27,7 +27,7 @@ class FunctionCommentSniff implements Sniff
     /**
      * A map of invalid data types to valid ones for param and return documentation.
      *
-     * @var array
+     * @var array<string, string>
      */
     public static $invalidTypes = [
         'Array'     => 'array',
@@ -54,7 +54,7 @@ class FunctionCommentSniff implements Sniff
     /**
      * An array of variable types for param/var we will check.
      *
-     * @var array(string)
+     * @var array<string>
      */
     public $allowedTypes = [
         'array',
@@ -68,7 +68,7 @@ class FunctionCommentSniff implements Sniff
     /**
      * Returns an array of tokens this test wants to listen for.
      *
-     * @return array
+     * @return array<int|string>
      */
     public function register()
     {
@@ -195,6 +195,7 @@ class FunctionCommentSniff implements Sniff
         $methodName      = strtolower(ltrim($methodName, '_'));
 
         $return = null;
+        $end    = $stackPtr;
         foreach ($tokens[$commentStart]['comment_tags'] as $pos => $tag) {
             if ($tokens[$tag]['content'] === '@return') {
                 if ($return !== null) {
@@ -278,7 +279,7 @@ class FunctionCommentSniff implements Sniff
                             $searchStart        = $stackPtr;
                             $foundNonVoidReturn = false;
                             do {
-                                $returnToken = $phpcsFile->findNext([T_RETURN, T_YIELD], $searchStart, $endToken);
+                                $returnToken = $phpcsFile->findNext([T_RETURN, T_YIELD, T_YIELD_FROM], $searchStart, $endToken);
                                 if ($returnToken === false && $foundReturnToken === false) {
                                     $error = '@return doc comment specified, but function has no return statement';
                                     $phpcsFile->addError($error, $return, 'InvalidNoReturn');
@@ -718,6 +719,8 @@ class FunctionCommentSniff implements Sniff
                 }
             }
 
+            $suggestedName = '';
+            $typeName      = '';
             if (count($typeNames) === 1) {
                 $typeName      = $param['type'];
                 $suggestedName = static::suggestType($typeName);
@@ -1049,8 +1052,6 @@ class FunctionCommentSniff implements Sniff
             // We found a use statement that aliases the used type hint!
             return true;
         }//end while
-
-        return false;
 
     }//end isAliasedType()
 

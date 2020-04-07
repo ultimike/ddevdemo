@@ -28,21 +28,11 @@ use PHP_CodeSniffer\Util\Tokens;
 class InlineCommentSniff implements Sniff
 {
 
-    /**
-     * A list of tokenizers this sniff supports.
-     *
-     * @var array
-     */
-    public $supportedTokenizers = [
-        'PHP',
-        'JS',
-    ];
-
 
     /**
      * Returns an array of tokens this test wants to listen for.
      *
-     * @return array
+     * @return array<int|string>
      */
     public function register()
     {
@@ -61,7 +51,7 @@ class InlineCommentSniff implements Sniff
      * @param int                         $stackPtr  The position of the current token in the
      *                                               stack passed in $tokens.
      *
-     * @return void
+     * @return int|void
      */
     public function process(File $phpcsFile, $stackPtr)
     {
@@ -216,7 +206,8 @@ class InlineCommentSniff implements Sniff
             $lastComment     = $nextComment;
         }//end while
 
-        $commentText = '';
+        $commentText      = '';
+        $lastCommentToken = $stackPtr;
         foreach ($commentTokens as $lastCommentToken) {
             $comment = rtrim($tokens[$lastCommentToken]['content']);
 
