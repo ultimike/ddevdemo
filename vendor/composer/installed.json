@@ -3889,6 +3889,47 @@
         ]
     },
     {
+        "name": "pantheon-systems/drupal-integrations",
+        "version": "8.0.3",
+        "version_normalized": "8.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pantheon-systems/drupal-integrations.git",
+            "reference": "0d352e1167a5b3575d886128c8f1fa796603ed9b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pantheon-systems/drupal-integrations/zipball/0d352e1167a5b3575d886128c8f1fa796603ed9b",
+            "reference": "0d352e1167a5b3575d886128c8f1fa796603ed9b",
+            "shasum": ""
+        },
+        "conflict": {
+            "drupal/core": "<8.5"
+        },
+        "time": "2020-03-11T18:20:13+00:00",
+        "type": "project",
+        "extra": {
+            "drupal-scaffold": {
+                "file-mapping": {
+                    "[project-root]/.drush-lock-update": "assets/drush-lock-update",
+                    "[web-root]/sites/default/default.services.pantheon.preproduction.yml": "assets/default.services.pantheon.preproduction.yml",
+                    "[web-root]/sites/default/settings.pantheon.php": "assets/settings.pantheon.php",
+                    "[web-root]/sites/default/settings.php": {
+                        "mode": "replace",
+                        "path": "assets/initial.settings.php",
+                        "overwrite": false
+                    }
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Add this project to any Drupal distribution based on drupal/core-composer-scaffold to enable it for use on Pantheon."
+    },
+    {
         "name": "paragonie/random_compat",
         "version": "v9.99.99",
         "version_normalized": "9.99.99.0",
