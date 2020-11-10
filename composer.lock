@@ -663,17 +663,17 @@
         },
         {
             "name": "drupal/admin_toolbar",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/admin_toolbar.git",
-                "reference": "8.x-2.3"
+                "reference": "8.x-2.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/admin_toolbar-8.x-2.3.zip",
-                "reference": "8.x-2.3",
-                "shasum": "cf8ee1aa8adfc604db4394655e3ba4c423d5f24a"
+                "url": "https://ftp.drupal.org/files/projects/admin_toolbar-8.x-2.4.zip",
+                "reference": "8.x-2.4",
+                "shasum": "6240047b8d91ac78f98d861ba8282af971fa0b38"
             },
             "require": {
                 "drupal/core": "^8.8.0 || ^9.0"
@@ -681,8 +681,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-2.3",
-                    "datestamp": "1592535714",
+                    "version": "8.x-2.4",
+                    "datestamp": "1601999178",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -741,16 +741,16 @@
         },
         {
             "name": "drupal/core",
-            "version": "8.9.5",
+            "version": "8.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "c9b9643663b80f02c038f9dea15b8717a22c3339"
+                "reference": "e16f650e7bd7f0cfb4ff4dd8ed753625313cdfdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/c9b9643663b80f02c038f9dea15b8717a22c3339",
-                "reference": "c9b9643663b80f02c038f9dea15b8717a22c3339",
+                "url": "https://api.github.com/repos/drupal/core/zipball/e16f650e7bd7f0cfb4ff4dd8ed753625313cdfdb",
+                "reference": "e16f650e7bd7f0cfb4ff4dd8ed753625313cdfdb",
                 "shasum": ""
             },
             "require": {
@@ -968,11 +968,11 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
-            "time": "2020-09-03T21:07:45+00:00"
+            "time": "2020-11-05T16:34:55+00:00"
         },
         {
             "name": "drupal/core-composer-scaffold",
-            "version": "8.9.5",
+            "version": "8.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-composer-scaffold.git",
@@ -1019,7 +1019,7 @@
         },
         {
             "name": "drupal/core-project-message",
-            "version": "8.9.5",
+            "version": "8.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-project-message.git",
@@ -1057,16 +1057,16 @@
         },
         {
             "name": "drupal/core-recommended",
-            "version": "8.9.5",
+            "version": "8.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-recommended.git",
-                "reference": "2d320331187e2e5e4945b34fc608263ffb93e2a1"
+                "reference": "561766436ccc17aa03362d740b004375fcc4d514"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/2d320331187e2e5e4945b34fc608263ffb93e2a1",
-                "reference": "2d320331187e2e5e4945b34fc608263ffb93e2a1",
+                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/561766436ccc17aa03362d740b004375fcc4d514",
+                "reference": "561766436ccc17aa03362d740b004375fcc4d514",
                 "shasum": ""
             },
             "require": {
@@ -1078,7 +1078,7 @@
                 "doctrine/common": "v2.7.3",
                 "doctrine/inflector": "v1.2.0",
                 "doctrine/lexer": "1.0.2",
-                "drupal/core": "8.9.5",
+                "drupal/core": "8.9.8",
                 "easyrdf/easyrdf": "0.9.1",
                 "egulias/email-validator": "2.1.17",
                 "guzzlehttp/guzzle": "6.5.4",
@@ -1135,7 +1135,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Locked core dependencies; require this project INSTEAD OF drupal/core.",
-            "time": "2020-09-03T21:07:45+00:00"
+            "time": "2020-11-05T16:34:55+00:00"
         },
         {
             "name": "drupal/ctools",
@@ -3123,27 +3123,22 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v5.1.5",
+            "version": "v5.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "2b765f0cf6612b3636e738c0689b29aa63088d5d"
+                "reference": "e70eb5a69c2ff61ea135a13d2266e8914a67b3a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/2b765f0cf6612b3636e738c0689b29aa63088d5d",
-                "reference": "2b765f0cf6612b3636e738c0689b29aa63088d5d",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/e70eb5a69c2ff61ea135a13d2266e8914a67b3a0",
+                "reference": "e70eb5a69c2ff61ea135a13d2266e8914a67b3a0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.1-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\Finder\\": ""
@@ -3182,7 +3177,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-08-17T10:01:29+00:00"
+            "time": "2020-10-24T12:01:57+00:00"
         },
         {
             "name": "symfony/http-foundation",
