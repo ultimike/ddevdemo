@@ -28,4 +28,4 @@
 .ddev/db_snapshots/
 
 # Ignore Config Splits
-config_split/
+/config_split/
