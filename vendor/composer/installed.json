@@ -753,6 +753,436 @@
         }
     },
     {
+        "name": "drupal/chosen",
+        "version": "3.0.1",
+        "version_normalized": "3.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/chosen.git",
+            "reference": "3.0.1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/chosen-3.0.1.zip",
+            "reference": "3.0.1",
+            "shasum": "088cb5bfb3872e217cff5300bc5884e022bd08d4"
+        },
+        "require": {
+            "drupal/chosen_lib": "*",
+            "drupal/core": "^8.8 || ^9",
+            "harvesthq/chosen": "^1.8.7"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "3.0.1",
+                "datestamp": "1603473892",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Cyclodex",
+                "homepage": "https://www.drupal.org/user/1305230"
+            },
+            {
+                "name": "Dave Reid",
+                "homepage": "https://www.drupal.org/user/53892"
+            },
+            {
+                "name": "Hydra",
+                "homepage": "https://www.drupal.org/user/647364"
+            },
+            {
+                "name": "Pol",
+                "homepage": "https://www.drupal.org/user/47194"
+            },
+            {
+                "name": "aidanlis",
+                "homepage": "https://www.drupal.org/user/502018"
+            },
+            {
+                "name": "arshadcn",
+                "homepage": "https://www.drupal.org/user/571032"
+            },
+            {
+                "name": "kalman.hosszu",
+                "homepage": "https://www.drupal.org/user/267481"
+            },
+            {
+                "name": "nagy.balint",
+                "homepage": "https://www.drupal.org/user/1763952"
+            },
+            {
+                "name": "supercabbageuk",
+                "homepage": "https://www.drupal.org/user/235438"
+            }
+        ],
+        "description": "Makes select elements more friendly using the Chosen jQuery plugin",
+        "homepage": "https://www.drupal.org/project/chosen",
+        "keywords": [
+            "Chosen",
+            "Drupal"
+        ],
+        "support": {
+            "source": "https://drupal.org/project/chosen",
+            "issues": "https://drupal.org/project/issues/chosen"
+        }
+    },
+    {
+        "name": "drupal/chosen_lib",
+        "version": "3.0.1",
+        "version_normalized": "3.0.1.0",
+        "require": {
+            "drupal/chosen": "self.version",
+            "drupal/core": "^8 || ^9",
+            "php": ">=5.6.0"
+        },
+        "type": "metapackage",
+        "extra": {
+            "drupal": {
+                "version": "3.0.1",
+                "datestamp": "1603473892",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            },
+            "drush": {
+                "services": {
+                    "drush.services.yml": "^9"
+                }
+            }
+        },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Cyclodex",
+                "homepage": "https://www.drupal.org/user/1305230"
+            },
+            {
+                "name": "Dave Reid",
+                "homepage": "https://www.drupal.org/user/53892"
+            },
+            {
+                "name": "Hydra",
+                "homepage": "https://www.drupal.org/user/647364"
+            },
+            {
+                "name": "Pol",
+                "homepage": "https://www.drupal.org/user/47194"
+            },
+            {
+                "name": "aidanlis",
+                "homepage": "https://www.drupal.org/user/502018"
+            },
+            {
+                "name": "arshadcn",
+                "homepage": "https://www.drupal.org/user/571032"
+            },
+            {
+                "name": "kalman.hosszu",
+                "homepage": "https://www.drupal.org/user/267481"
+            },
+            {
+                "name": "nagy.balint",
+                "homepage": "https://www.drupal.org/user/1763952"
+            },
+            {
+                "name": "supercabbageuk",
+                "homepage": "https://www.drupal.org/user/235438"
+            }
+        ],
+        "description": "This module provides the basic integration with the Chosen jQuery plugin.",
+        "homepage": "https://www.drupal.org/project/chosen",
+        "support": {
+            "source": "https://git.drupalcode.org/project/chosen"
+        }
+    },
+    {
+        "name": "drupal/config_filter",
+        "version": "1.8.0",
+        "version_normalized": "1.8.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/config_filter.git",
+            "reference": "8.x-1.8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/config_filter-8.x-1.8.zip",
+            "reference": "8.x-1.8",
+            "shasum": "5def5f97e79d6f5af6bb7007f012443475c90bfe"
+        },
+        "require": {
+            "drupal/core": "^8 || ^9"
+        },
+        "suggest": {
+            "drupal/config_split": "Split site configuration for different environments."
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "8.x-1.8",
+                "datestamp": "1603870062",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Fabian Bircher",
+                "homepage": "https://www.drupal.org/u/bircher",
+                "email": "opensource@fabianbircher.com",
+                "role": "Maintainer"
+            },
+            {
+                "name": "Nuvole Web",
+                "homepage": "http://nuvole.org",
+                "email": "info@nuvole.org",
+                "role": "Maintainer"
+            },
+            {
+                "name": "pescetti",
+                "homepage": "https://www.drupal.org/user/436244"
+            }
+        ],
+        "description": "Config Filter allows other modules to interact with a ConfigStorage through filter plugins.",
+        "homepage": "https://www.drupal.org/project/config_filter",
+        "keywords": [
+            "Drupal",
+            "configuration",
+            "configuration management"
+        ],
+        "support": {
+            "source": "https://git.drupalcode.org/project/config_filter",
+            "issues": "https://www.drupal.org/project/issues/config_filter",
+            "slack": "https://drupal.slack.com/archives/C45342CDD"
+        }
+    },
+    {
+        "name": "drupal/config_ignore",
+        "version": "2.2.0",
+        "version_normalized": "2.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/config_ignore.git",
+            "reference": "8.x-2.2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/config_ignore-8.x-2.2.zip",
+            "reference": "8.x-2.2",
+            "shasum": "18af5772087b90dd4b83c2c6e292d8ea2f8834e0"
+        },
+        "require": {
+            "drupal/config_filter": "1.*",
+            "drupal/core": "~8.0"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "8.x-2.2",
+                "datestamp": "1576528386",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "Tommy Lynge Jørgensen",
+                "homepage": "https://www.drupal.org/u/tlyngej",
+                "email": "tlyngej@gmail.com",
+                "role": "Maintainer"
+            },
+            {
+                "name": "Fabian Bircher",
+                "homepage": "https://www.drupal.org/u/bircher",
+                "role": "Maintainer"
+            },
+            {
+                "name": "tlyngej",
+                "homepage": "https://www.drupal.org/user/413139"
+            }
+        ],
+        "description": "Ignore certain configuration during import.",
+        "homepage": "http://drupal.org/project/config_ignore",
+        "support": {
+            "source": "http://cgit.drupalcode.org/config_ignore",
+            "issues": "http://drupal.org/project/config_ignore",
+            "irc": "irc://irc.freenode.org/drupal-contribute"
+        }
+    },
+    {
+        "name": "drupal/config_readonly",
+        "version": "1.0.0-beta4",
+        "version_normalized": "1.0.0.0-beta4",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/config_readonly.git",
+            "reference": "8.x-1.0-beta4"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/config_readonly-8.x-1.0-beta4.zip",
+            "reference": "8.x-1.0-beta4",
+            "shasum": "5c178125865692ec356aefcaef731f1fd4aa6f2c"
+        },
+        "require": {
+            "drupal/core": "^8.7.12 || ^9"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "8.x-1.0-beta4",
+                "datestamp": "1596658248",
+                "security-coverage": {
+                    "status": "not-covered",
+                    "message": "Beta releases are not covered by Drupal security advisories."
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "beejeebus",
+                "homepage": "https://www.drupal.org/user/38580"
+            },
+            {
+                "name": "effulgentsia",
+                "homepage": "https://www.drupal.org/user/78040"
+            },
+            {
+                "name": "moshe weitzman",
+                "homepage": "https://www.drupal.org/user/23"
+            },
+            {
+                "name": "pwolanin",
+                "homepage": "https://www.drupal.org/user/49851"
+            },
+            {
+                "name": "scor",
+                "homepage": "https://www.drupal.org/user/52142"
+            },
+            {
+                "name": "wheatpenny",
+                "homepage": "https://www.drupal.org/user/1128182"
+            }
+        ],
+        "description": "Enables making the active configuration store read-only to prevent configuration changes on a Drupal site.",
+        "homepage": "https://www.drupal.org/project/config_readonly",
+        "support": {
+            "source": "https://git.drupalcode.org/project/config_readonly"
+        }
+    },
+    {
+        "name": "drupal/config_split",
+        "version": "1.7.0",
+        "version_normalized": "1.7.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/config_split.git",
+            "reference": "8.x-1.7"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/config_split-8.x-1.7.zip",
+            "reference": "8.x-1.7",
+            "shasum": "3cd524ebc0b52db31a6bef2c55693f4e62890b4f"
+        },
+        "require": {
+            "drupal/config_filter": "^1",
+            "drupal/core": "^8.8 || ^9"
+        },
+        "conflict": {
+            "drupal/console": "<1.3.2"
+        },
+        "suggest": {
+            "drupal/chosen": "Chosen uses the Chosen jQuery plugin to make the <select> elements more user-friendly.",
+            "drupal/select2_all": "Applies the Select2 library to all select fields on the site similar to the Chosen module."
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "8.x-1.7",
+                "datestamp": "1603782947",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            },
+            "drush": {
+                "services": {
+                    "drush.services.yml": "^9 || ^10"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Fabian Bircher",
+                "homepage": "https://www.drupal.org/u/bircher",
+                "email": "opensource@fabianbircher.com",
+                "role": "Maintainer"
+            },
+            {
+                "name": "Nuvole Web",
+                "homepage": "http://nuvole.org",
+                "email": "info@nuvole.org",
+                "role": "Maintainer"
+            },
+            {
+                "name": "pescetti",
+                "homepage": "https://www.drupal.org/user/436244"
+            }
+        ],
+        "description": "Configuration filter for importing and exporting extra config",
+        "homepage": "https://www.drupal.org/project/config_split",
+        "keywords": [
+            "Drupal",
+            "configuration",
+            "configuration management"
+        ],
+        "support": {
+            "source": "https://git.drupalcode.org/project/config_split",
+            "issues": "https://www.drupal.org/project/issues/config_split",
+            "slack": "https://drupal.slack.com/archives/C45342CDD"
+        }
+    },
+    {
         "name": "drupal/core",
         "version": "8.9.11",
         "version_normalized": "8.9.11.0",
@@ -1253,6 +1683,145 @@
         }
     },
     {
+        "name": "drupal/devel",
+        "version": "4.0.1",
+        "version_normalized": "4.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/devel.git",
+            "reference": "4.0.1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/devel-4.0.1.zip",
+            "reference": "4.0.1",
+            "shasum": "cf2458de1cbac00a88ed26ae3da2cf331e1bc047"
+        },
+        "require": {
+            "doctrine/common": "^2.7",
+            "drupal/core": "^8.8 || ^9",
+            "symfony/var-dumper": "^4 || ^5"
+        },
+        "conflict": {
+            "kint-php/kint": "<3"
+        },
+        "require-dev": {
+            "composer/installers": "^1",
+            "cweagans/composer-patches": "~1.0",
+            "drupal/core-composer-scaffold": "^8.0",
+            "drupal/core-dev": "^8.0",
+            "drupal/core-recommended": "^8.0",
+            "drush/drush": "^10",
+            "mglaman/phpstan-drupal": "^0.12",
+            "php-parallel-lint/php-parallel-lint": "^1.2",
+            "phpstan/phpstan-deprecation-rules": "^0.12",
+            "zaporylie/composer-drupal-optimizations": "^1.0"
+        },
+        "suggest": {
+            "kint-php/kint": "Kint provides an informative display of arrays/objects. Useful for debugging and developing."
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "4.0.1",
+                "datestamp": "1600300079",
+                "security-coverage": {
+                    "status": "covered",
+                    "message": "Covered by Drupal's security advisory policy"
+                }
+            },
+            "installer-paths": {
+                "web/core": [
+                    "type:drupal-core"
+                ],
+                "web/libraries/{$name}": [
+                    "type:drupal-library"
+                ],
+                "web/modules/contrib/{$name}": [
+                    "type:drupal-module"
+                ],
+                "web/profiles/{$name}": [
+                    "type:drupal-profile"
+                ],
+                "web/themes/{$name}": [
+                    "type:drupal-theme"
+                ],
+                "drush/{$name}": [
+                    "type:drupal-drush"
+                ]
+            },
+            "drupal-scaffold": {
+                "locations": {
+                    "web-root": "web/"
+                }
+            },
+            "drush": {
+                "services": {
+                    "drush.services.yml": "^9 || ^10"
+                }
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ".spoons/ScriptHandler.php"
+            ]
+        },
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "scripts": {
+            "si": [
+                "drush si -v --db-url=${SIMPLETEST_DB:-mysql://root:password@mariadb/db}"
+            ],
+            "phpcs": [
+                "phpcs --runtime-set ignore_warnings_on_exit 1 --runtime-set ignore_errors_on_exit 1 web/modules/custom"
+            ],
+            "lint": [
+                "parallel-lint --exclude web --exclude vendor ."
+            ],
+            "webserver": [
+                "cd web && php -S 0.0.0.0:8888 .ht.router.php"
+            ],
+            "chromedriver": [
+                "chromedriver --port=9515 --verbose --whitelisted-ips --log-path=/tmp/chromedriver.log --no-sandbox"
+            ],
+            "unit": [
+                "phpunit --verbose web/modules/custom"
+            ],
+            "phpstan": [
+                "phpstan analyse web/modules/custom"
+            ],
+            "stylelint": [
+                "yarn --silent --cwd web/core stylelint --formatter verbose --config ./.stylelintrc.json ../modules/custom/**/*.css"
+            ],
+            "eslint": [
+                "yarn --silent --cwd web/core eslint -c ./.eslintrc.json ../modules/custom"
+            ],
+            "post-update-cmd": [
+                "Spoons\\ScriptHandler::createSymlinks"
+            ]
+        },
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "drupalspoons",
+                "homepage": "https://www.drupal.org/user/3647684"
+            },
+            {
+                "name": "moshe weitzman",
+                "homepage": "https://www.drupal.org/user/23"
+            }
+        ],
+        "description": "Various blocks, pages, and functions for developers.",
+        "homepage": "https://www.drupal.org/project/devel",
+        "support": {
+            "source": "https://gitlab.com/drupalspoons/devel",
+            "issues": "https://gitlab.com/drupalspoons/devel/-/issues",
+            "slack": "https://drupal.slack.com/archives/C012WAW1MH6"
+        }
+    },
+    {
         "name": "drupal/pathauto",
         "version": "1.8.0",
         "version_normalized": "1.8.0.0",
@@ -1427,6 +1996,68 @@
         "homepage": "https://www.drupal.org/project/redirect",
         "support": {
             "source": "https://git.drupalcode.org/project/redirect"
+        }
+    },
+    {
+        "name": "drupal/select2_all",
+        "version": "1.0.0-alpha6",
+        "version_normalized": "1.0.0.0-alpha6",
+        "source": {
+            "type": "git",
+            "url": "https://git.drupalcode.org/project/select2_all.git",
+            "reference": "8.x-1.0-alpha6"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://ftp.drupal.org/files/projects/select2_all-8.x-1.0-alpha6.zip",
+            "reference": "8.x-1.0-alpha6",
+            "shasum": "792c27528491feccf5d04780bdaf7ec5c7531edd"
+        },
+        "require": {
+            "drupal/core": "^8.8 || ^9"
+        },
+        "type": "drupal-module",
+        "extra": {
+            "drupal": {
+                "version": "8.x-1.0-alpha6",
+                "datestamp": "1590186679",
+                "security-coverage": {
+                    "status": "not-covered",
+                    "message": "Alpha releases are not covered by Drupal security advisories."
+                }
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packages.drupal.org/8/downloads",
+        "license": [
+            "GPL-2.0-or-later"
+        ],
+        "authors": [
+            {
+                "name": "Dave Reid",
+                "homepage": "https://www.drupal.org/user/53892"
+            },
+            {
+                "name": "Jtporter9",
+                "homepage": "https://www.drupal.org/user/3626837"
+            },
+            {
+                "name": "MWingert",
+                "homepage": "https://www.drupal.org/user/3369026"
+            },
+            {
+                "name": "adam-delaney",
+                "homepage": "https://www.drupal.org/user/1805556"
+            },
+            {
+                "name": "msauber28",
+                "homepage": "https://www.drupal.org/user/3571270"
+            }
+        ],
+        "description": "Convert select fields to select2.",
+        "homepage": "https://www.drupal.org/project/select2_all",
+        "support": {
+            "source": "https://git.drupalcode.org/project/select2_all"
         }
     },
     {
@@ -1817,6 +2448,57 @@
             "stream",
             "uri",
             "url"
+        ]
+    },
+    {
+        "name": "harvesthq/chosen",
+        "version": "v1.8.7",
+        "version_normalized": "1.8.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/harvesthq/chosen-package.git",
+            "reference": "ad86732b668627c131e61ee8f0e6e9ed52e4db8d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
+            "reference": "ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
+            "shasum": ""
+        },
+        "time": "2018-06-28T20:32:51+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Koen Punt",
+                "homepage": "https://github.com/koenpunt"
+            },
+            {
+                "name": "Patrick Filler",
+                "homepage": "https://github.com/pfiller"
+            },
+            {
+                "name": "Christophe Coevoet",
+                "homepage": "https://github.com/stof"
+            },
+            {
+                "name": "Ken Earley",
+                "homepage": "https://github.com/kenearley"
+            }
+        ],
+        "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
+        "homepage": "https://harvesthq.github.io/chosen/",
+        "keywords": [
+            "dropdown",
+            "form",
+            "input",
+            "multiselect",
+            "select",
+            "ui"
         ]
     },
     {
@@ -3964,6 +4646,88 @@
         ]
     },
     {
+        "name": "symfony/polyfill-php80",
+        "version": "v1.20.0",
+        "version_normalized": "1.20.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/polyfill-php80.git",
+            "reference": "e70aa8b064c5b72d3df2abd5ab1e90464ad009de"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/e70aa8b064c5b72d3df2abd5ab1e90464ad009de",
+            "reference": "e70aa8b064c5b72d3df2abd5ab1e90464ad009de",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=7.1"
+        },
+        "time": "2020-10-23T14:02:19+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-main": "1.20-dev"
+            },
+            "thanks": {
+                "name": "symfony/polyfill",
+                "url": "https://github.com/symfony/polyfill"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Polyfill\\Php80\\": ""
+            },
+            "files": [
+                "bootstrap.php"
+            ],
+            "classmap": [
+                "Resources/stubs"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Ion Bazan",
+                "email": "ion.bazan@gmail.com"
+            },
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions",
+        "homepage": "https://symfony.com",
+        "keywords": [
+            "compatibility",
+            "polyfill",
+            "portable",
+            "shim"
+        ],
+        "funding": [
+            {
+                "url": "https://symfony.com/sponsor",
+                "type": "custom"
+            },
+            {
+                "url": "https://github.com/fabpot",
+                "type": "github"
+            },
+            {
+                "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                "type": "tidelift"
+            }
+        ]
+    },
+    {
         "name": "symfony/polyfill-util",
         "version": "v1.17.0",
         "version_normalized": "1.17.0.0",
@@ -4521,6 +5285,94 @@
         ],
         "description": "Symfony Validator Component",
         "homepage": "https://symfony.com",
+        "funding": [
+            {
+                "url": "https://symfony.com/sponsor",
+                "type": "custom"
+            },
+            {
+                "url": "https://github.com/fabpot",
+                "type": "github"
+            },
+            {
+                "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                "type": "tidelift"
+            }
+        ]
+    },
+    {
+        "name": "symfony/var-dumper",
+        "version": "v4.4.17",
+        "version_normalized": "4.4.17.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/var-dumper.git",
+            "reference": "65c6f1e848cda840ef7278686c8e30a7cc353c93"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/var-dumper/zipball/65c6f1e848cda840ef7278686c8e30a7cc353c93",
+            "reference": "65c6f1e848cda840ef7278686c8e30a7cc353c93",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=7.1.3",
+            "symfony/polyfill-mbstring": "~1.0",
+            "symfony/polyfill-php72": "~1.5",
+            "symfony/polyfill-php80": "^1.15"
+        },
+        "conflict": {
+            "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
+            "symfony/console": "<3.4"
+        },
+        "require-dev": {
+            "ext-iconv": "*",
+            "symfony/console": "^3.4|^4.0|^5.0",
+            "symfony/process": "^4.4|^5.0",
+            "twig/twig": "^1.34|^2.4|^3.0"
+        },
+        "suggest": {
+            "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
+            "ext-intl": "To show region name in time zone dump",
+            "symfony/console": "To use the ServerDumpCommand and/or the bin/var-dump-server script"
+        },
+        "time": "2020-11-24T09:55:37+00:00",
+        "bin": [
+            "Resources/bin/var-dump-server"
+        ],
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "Resources/functions/dump.php"
+            ],
+            "psr-4": {
+                "Symfony\\Component\\VarDumper\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony mechanism for exploring and dumping PHP variables",
+        "homepage": "https://symfony.com",
+        "keywords": [
+            "debug",
+            "dump"
+        ],
         "funding": [
             {
                 "url": "https://symfony.com/sponsor",

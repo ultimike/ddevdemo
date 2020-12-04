@@ -1,0 +1,27 @@
+drupal.select2:
+  css:
+    theme:
+      css/select2.css: {}
+  js:
+    js/select2.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery.once
+    - select2_all/select2
+
+select2:
+  remote: https://github.com/select2/select2
+  version: '4.0.12'
+  license:
+    name: MIT
+    url: https://github.com/select2/select2/blob/4.0.12/LICENSE.md
+    gpl-compatible: true
+  js:
+    //cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js: { external: true, minified: true }
+  css:
+    component:
+      //cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css: { external: true, minified: true }
+  dependencies:
+    - core/jquery

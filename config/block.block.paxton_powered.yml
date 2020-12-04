@@ -1,0 +1,22 @@
+uuid: f579fb4a-6961-47fb-8074-da5fd2fbf350
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - paxton
+_core:
+  default_config_hash: jQQUUWN2Uxr5qZtc9zcJKBCxpKY8orN1u2HPqYYRQDI
+id: paxton_powered
+theme: paxton
+region: footer_first
+weight: -6
+provider: null
+plugin: system_powered_by_block
+settings:
+  id: system_powered_by_block
+  label: 'Powered by Drupal'
+  provider: system
+  label_display: '0'
+visibility: {  }

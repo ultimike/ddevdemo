@@ -1,0 +1,17 @@
+uuid: cd95f07f-01e7-4dcc-a0ed-b94824922f40
+langcode: en
+status: false
+dependencies: {  }
+id: local
+label: Local
+description: 'Config for local development.'
+folder: ../config_split/local
+module:
+  devel: 0
+  devel_generate: 0
+theme: {  }
+blacklist: {  }
+graylist: {  }
+graylist_dependents: true
+graylist_skip_equal: true
+weight: 0

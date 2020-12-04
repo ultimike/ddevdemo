@@ -26,3 +26,6 @@
 
 # Ignore DDEV database snapshots
 .ddev/db_snapshots/
+
+# Ignore Config Splits
+config_split/
