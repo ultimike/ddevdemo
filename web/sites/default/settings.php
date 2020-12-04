@@ -809,7 +809,7 @@ include __DIR__ . "/settings.pantheon.php";
 
 
 
-$settings['config_readonly'] = TRUE;
+//$settings['config_readonly'] = TRUE;
 
 /**
  * Load local development override configuration, if available.
