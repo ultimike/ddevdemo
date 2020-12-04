@@ -808,17 +808,8 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 include __DIR__ . "/settings.pantheon.php";
 
 
-$config['config_split.config_split.local']['status'] = FALSE;
-$config['config_split.config_split.dev']['status'] = TRUE;
-$config['config_split.config_split.live']['status'] = FALSE;
-
-if (PANTHEON_LIVE) {
-  $config['config_split.config_split.local']['status'] = FALSE;
-  $config['config_split.config_split.dev']['status'] = FALSE;
-  $config['config_split.config_split.live']['status'] = TRUE;
-}
-
-$settings['config_readonly'] = FALSE;
+//$config['config_split.config_split.local']['status'] = FALSE;
+//$settings['config_readonly'] = FALSE;
 
 /**
  * Load local development override configuration, if available.
