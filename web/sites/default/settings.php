@@ -807,6 +807,10 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
  */
 include __DIR__ . "/settings.pantheon.php";
 
+
+
+$settings['config_readonly'] = TRUE;
+
 /**
  * Load local development override configuration, if available.
  *
@@ -828,3 +832,5 @@ $settings['install_profile'] = 'standard';
 if (file_exists($app_root . '/' . $site_path . '/settings.ddev.php')) {
   include $app_root . '/' . $site_path . '/settings.ddev.php';
 }
+
+
