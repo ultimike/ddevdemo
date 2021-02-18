@@ -809,7 +809,10 @@ include __DIR__ . "/settings.pantheon.php";
 
 
 //$config['config_split.config_split.local']['status'] = FALSE;
-//$settings['config_readonly'] = FALSE;
+
+if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
+  $settings['config_readonly'] = TRUE;
+} 
 
 /**
  * Load local development override configuration, if available.
