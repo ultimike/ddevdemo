@@ -3,17 +3,18 @@ type: drupal8
 docroot: web
 php_version: "7.3"
 webserver_type: nginx-fpm
-router_http_port: "80"
-router_https_port: "443"
+router_http_port: "8080"
+router_https_port: "8443"
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
 mariadb_version: "10.3"
 mysql_version: ""
 provider: pantheon
-use_dns_when_possible: true
+use_dns_when_possible: false
 composer_version: "2"
 
+# Note that the router_http_port, router_https_port, and use_dns_when_possible were modified for gitpod
 
 # This config.yaml was created with ddev version v1.16.2
 # webimage: drud/ddev-webserver:v1.16.2
