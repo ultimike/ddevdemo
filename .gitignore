@@ -29,3 +29,7 @@
 
 # Ignore Config Splits
 /config_split/
+
+# Gitpod
+.ddev/docker-compose.xdebug-ip.yaml
+.ddev/config.fqdns.yaml
