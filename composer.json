@@ -13,6 +13,10 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/ultimike/ddevdrupalgitpod"
         }
     ],
     "require": {
@@ -31,9 +35,8 @@
         "drupal/redirect": "^1.6",
         "drupal/select2_all": "^1.0@alpha",
         "pantheon-systems/drupal-integrations": "^8.0",
-        "topfloor/composer-cleanup-vcs-dirs": "^1.0"
-    },
-    "require-dev": {
+        "topfloor/composer-cleanup-vcs-dirs": "dev-composer-2",
+        "ultimike/ddevdrupalgitpod": "dev-main"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -49,7 +52,8 @@
                 "web-root": "web/"
             },
             "allowed-packages": [
-                "pantheon-systems/drupal-integrations"
+                "pantheon-systems/drupal-integrations",
+                "ultimike/ddevdrupalgitpod"
             ]
         },
         "installer-paths": {

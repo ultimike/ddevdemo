@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "256685774b490575f70d3582edcad827",
+    "content-hash": "2f78aa7cd502e772eef75f168ccfdb4d",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -5268,20 +5268,20 @@
         },
         {
             "name": "topfloor/composer-cleanup-vcs-dirs",
-            "version": "1.0.1",
+            "version": "dev-composer-2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TopFloorTech/composer-cleanup-vcs-dirs.git",
-                "reference": "0158853dd054321b5048108ed5532c4b5e002d1b"
+                "reference": "3b5af7e47b20f6946d1fc53c36da54c701dcd99d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TopFloorTech/composer-cleanup-vcs-dirs/zipball/0158853dd054321b5048108ed5532c4b5e002d1b",
-                "reference": "0158853dd054321b5048108ed5532c4b5e002d1b",
+                "url": "https://api.github.com/repos/TopFloorTech/composer-cleanup-vcs-dirs/zipball/3b5af7e47b20f6946d1fc53c36da54c701dcd99d",
+                "reference": "3b5af7e47b20f6946d1fc53c36da54c701dcd99d",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.0.0",
+                "composer-plugin-api": "^1 | ^2",
                 "php": ">=5.5",
                 "symfony/finder": "*"
             },
@@ -5302,7 +5302,10 @@
                 "GPL-2.0+"
             ],
             "description": "Automatically deletes .git directories in newly installed or updated dependencies.",
-            "time": "2016-10-06T04:35:51+00:00"
+            "support": {
+                "source": "https://github.com/TopFloorTech/composer-cleanup-vcs-dirs/tree/composer-2"
+            },
+            "time": "2020-11-11T23:25:46+00:00"
         },
         {
             "name": "twig/twig",
@@ -5417,6 +5420,55 @@
                 "stream-wrapper"
             ],
             "time": "2019-12-10T11:53:27+00:00"
+        },
+        {
+            "name": "ultimike/ddevdrupalgitpod",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ultimike/ddevdrupalgitpod.git",
+                "reference": "d134635fe618d6519d0527dbab910d07b28ff53e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ultimike/ddevdrupalgitpod/zipball/d134635fe618d6519d0527dbab910d07b28ff53e",
+                "reference": "d134635fe618d6519d0527dbab910d07b28ff53e",
+                "shasum": ""
+            },
+            "require": {
+                "drupal/core-composer-scaffold": "^8.8 || ^9.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "drupal-scaffold": {
+                    "file-mapping": {
+                        ".gitpod.yml": ".gitpod.yml",
+                        ".gitpod.Dockerfile": ".gitpod.Dockerfile",
+                        ".ddev/generate-fqdns.sh": "generate-fqdns.sh",
+                        ".ddev/generate-xdebug-host-ip.sh": "generate-xdebug-host-ip.sh",
+                        ".ddev/ddevdrupalgitpod.txt": {
+                            "path": "ddevdrupalgitpod.txt",
+                            "overwrite": false
+                        }
+                    }
+                }
+            },
+            "license": [
+                "GNU General Public License, version 2"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Anello",
+                    "email": "manello@gmail.com"
+                }
+            ],
+            "description": "Composer plugin to add Gitpod.io support for DDEV-Local Drupal sites.",
+            "support": {
+                "source": "https://github.com/ultimike/ddevdrupalgitpod/tree/main",
+                "issues": "https://github.com/ultimike/ddevdrupalgitpod/issues"
+            },
+            "time": "2021-02-23T21:25:05+00:00"
         }
     ],
     "packages-dev": [],
@@ -5424,11 +5476,13 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "drupal/config_readonly": 10,
-        "drupal/select2_all": 15
+        "drupal/select2_all": 15,
+        "topfloor/composer-cleanup-vcs-dirs": 20,
+        "ultimike/ddevdrupalgitpod": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
