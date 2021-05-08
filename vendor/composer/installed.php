@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '2af137c641eda92b42948746494462c0e8143638',
+    'reference' => '57c90db8972686c365b9c2937466e85a6ec21f61',
     'name' => 'drupaleasy/ddevdemo',
   ),
   'versions' => 
@@ -1045,7 +1045,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '2af137c641eda92b42948746494462c0e8143638',
+      'reference' => '57c90db8972686c365b9c2937466e85a6ec21f61',
     ),
     'easyrdf/easyrdf' => 
     array (

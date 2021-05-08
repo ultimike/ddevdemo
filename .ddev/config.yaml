@@ -10,14 +10,13 @@ additional_hostnames: []
 additional_fqdns: []
 mariadb_version: "10.3"
 mysql_version: ""
-provider: pantheon
+provider: default
 use_dns_when_possible: false
 composer_version: "2"
 
-# Note that the router_http_port, router_https_port, and use_dns_when_possible were modified for gitpod
 
-# This config.yaml was created with ddev version v1.16.2
-# webimage: drud/ddev-webserver:v1.16.2
+# This config.yaml was created with ddev version v1.16.7
+# webimage: drud/ddev-webserver:v1.16.7
 # dbimage: drud/ddev-dbserver-mariadb-10.2:v1.16.0
 # dbaimage: phpmyadmin:5
 # However we do not recommend explicitly wiring these images into the
