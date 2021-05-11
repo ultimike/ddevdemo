@@ -57,17 +57,17 @@
         },
         {
             "name": "composer/installers",
-            "version": "v1.10.0",
-            "version_normalized": "1.10.0.0",
+            "version": "v1.11.0",
+            "version_normalized": "1.11.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d"
+                "reference": "ae03311f45dfe194412081526be2e003960df74b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
+                "url": "https://api.github.com/repos/composer/installers/zipball/ae03311f45dfe194412081526be2e003960df74b",
+                "reference": "ae03311f45dfe194412081526be2e003960df74b",
                 "shasum": ""
             },
             "require": {
@@ -85,7 +85,7 @@
                 "symfony/phpunit-bridge": "^4.2 || ^5",
                 "symfony/process": "^2.3"
             },
-            "time": "2021-01-14T11:07:16+00:00",
+            "time": "2021-04-28T06:42:17+00:00",
             "type": "composer-plugin",
             "extra": {
                 "class": "Composer\\Installers\\Plugin",
@@ -163,6 +163,7 @@
                 "majima",
                 "mako",
                 "mediawiki",
+                "miaoxing",
                 "modulework",
                 "modx",
                 "moodle",
@@ -180,12 +181,17 @@
                 "sydes",
                 "sylius",
                 "symfony",
+                "tastyigniter",
                 "typo3",
                 "wordpress",
                 "yawik",
                 "zend",
                 "zikula"
             ],
+            "support": {
+                "issues": "https://github.com/composer/installers/issues",
+                "source": "https://github.com/composer/installers/tree/v1.11.0"
+            },
             "funding": [
                 {
                     "url": "https://packagist.com",
@@ -691,27 +697,30 @@
         },
         {
             "name": "drupal/admin_toolbar",
-            "version": "2.4.0",
-            "version_normalized": "2.4.0.0",
+            "version": "3.0.0",
+            "version_normalized": "3.0.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/admin_toolbar.git",
-                "reference": "8.x-2.4"
+                "reference": "3.0.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/admin_toolbar-8.x-2.4.zip",
-                "reference": "8.x-2.4",
-                "shasum": "6240047b8d91ac78f98d861ba8282af971fa0b38"
+                "url": "https://ftp.drupal.org/files/projects/admin_toolbar-3.0.0.zip",
+                "reference": "3.0.0",
+                "shasum": "204f7a0e8b62a8a54256142cf38ca139739fb65c"
             },
             "require": {
                 "drupal/core": "^8.8.0 || ^9.0"
             },
+            "require-dev": {
+                "drupal/admin_toolbar_tools": "*"
+            },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-2.4",
-                    "datestamp": "1601999178",
+                    "version": "3.0.0",
+                    "datestamp": "1611311186",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -1208,17 +1217,17 @@
         },
         {
             "name": "drupal/core",
-            "version": "8.9.13",
-            "version_normalized": "8.9.13.0",
+            "version": "8.9.15",
+            "version_normalized": "8.9.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "a53db77b55a035453d7229e0c3069f8591cb4cb6"
+                "reference": "4804cb039c1e21f841dc4eccb24dc4a90c8280c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/a53db77b55a035453d7229e0c3069f8591cb4cb6",
-                "reference": "a53db77b55a035453d7229e0c3069f8591cb4cb6",
+                "url": "https://api.github.com/repos/drupal/core/zipball/4804cb039c1e21f841dc4eccb24dc4a90c8280c6",
+                "reference": "4804cb039c1e21f841dc4eccb24dc4a90c8280c6",
                 "shasum": ""
             },
             "require": {
@@ -1385,7 +1394,7 @@
                 "drupal/workflows": "self.version",
                 "drupal/workspaces": "self.version"
             },
-            "time": "2021-01-19T23:11:00+00:00",
+            "time": "2021-05-05T11:28:48+00:00",
             "type": "drupal-core",
             "extra": {
                 "drupal-scaffold": {
@@ -1438,12 +1447,15 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
+            "support": {
+                "source": "https://github.com/drupal/core/tree/8.9.15"
+            },
             "install-path": "../../web/core"
         },
         {
             "name": "drupal/core-composer-scaffold",
-            "version": "8.9.13",
-            "version_normalized": "8.9.13.0",
+            "version": "8.9.15",
+            "version_normalized": "8.9.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-composer-scaffold.git",
@@ -1488,6 +1500,9 @@
             "keywords": [
                 "drupal"
             ],
+            "support": {
+                "source": "https://github.com/drupal/core-composer-scaffold/tree/8.9.5"
+            },
             "install-path": "../drupal/core-composer-scaffold"
         },
         {
@@ -1533,17 +1548,17 @@
         },
         {
             "name": "drupal/core-recommended",
-            "version": "8.9.13",
-            "version_normalized": "8.9.13.0",
+            "version": "8.9.15",
+            "version_normalized": "8.9.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-recommended.git",
-                "reference": "7a940fd5b64d2b22366680e2a60d96bf2c10089d"
+                "reference": "eb09bb8097d63ef7fb44d8a464dc84eb9af5141f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/7a940fd5b64d2b22366680e2a60d96bf2c10089d",
-                "reference": "7a940fd5b64d2b22366680e2a60d96bf2c10089d",
+                "url": "https://api.github.com/repos/drupal/core-recommended/zipball/eb09bb8097d63ef7fb44d8a464dc84eb9af5141f",
+                "reference": "eb09bb8097d63ef7fb44d8a464dc84eb9af5141f",
                 "shasum": ""
             },
             "require": {
@@ -1555,7 +1570,7 @@
                 "doctrine/common": "v2.7.3",
                 "doctrine/inflector": "v1.2.0",
                 "doctrine/lexer": "1.0.2",
-                "drupal/core": "8.9.13",
+                "drupal/core": "8.9.15",
                 "easyrdf/easyrdf": "0.9.1",
                 "egulias/email-validator": "2.1.17",
                 "guzzlehttp/guzzle": "6.5.4",
@@ -1568,7 +1583,7 @@
                 "laminas/laminas-zendframework-bridge": "1.0.4",
                 "masterminds/html5": "2.3.0",
                 "paragonie/random_compat": "v9.99.99",
-                "pear/archive_tar": "1.4.12",
+                "pear/archive_tar": "1.4.13",
                 "pear/console_getopt": "v1.4.3",
                 "pear/pear-core-minimal": "v1.10.10",
                 "pear/pear_exception": "v1.0.1",
@@ -1606,51 +1621,54 @@
             "conflict": {
                 "webflo/drupal-core-strict": "*"
             },
-            "time": "2021-01-19T23:11:00+00:00",
+            "time": "2021-05-05T11:28:48+00:00",
             "type": "metapackage",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
             "description": "Locked core dependencies; require this project INSTEAD OF drupal/core.",
+            "support": {
+                "source": "https://github.com/drupal/core-recommended/tree/8.9.15"
+            },
             "install-path": null
         },
         {
             "name": "drupal/ctools",
-            "version": "3.4.0",
-            "version_normalized": "3.4.0.0",
+            "version": "3.5.0",
+            "version_normalized": "3.5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/ctools.git",
-                "reference": "8.x-3.4"
+                "reference": "8.x-3.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/ctools-8.x-3.4.zip",
-                "reference": "8.x-3.4",
-                "shasum": "016ca5abb7ac4ca720352a72e8989f3ef0e20539"
+                "url": "https://ftp.drupal.org/files/projects/ctools-8.x-3.5.zip",
+                "reference": "8.x-3.5",
+                "shasum": "0113cd1e787ff3bde088c836c2d79d14136b0013"
             },
             "require": {
-                "drupal/core": "^8.7.7 || ^9"
+                "drupal/core": "^8.8 || ^9"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-3.x": "3.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-3.4",
-                    "datestamp": "1585763383",
+                    "version": "8.x-3.5",
+                    "datestamp": "1618592931",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
                     }
+                },
+                "branch-alias": {
+                    "dev-8.x-3.x": "3.x-dev"
                 }
             },
             "installation-source": "dist",
             "notification-url": "https://packages.drupal.org/8/downloads",
             "license": [
-                "GPL-2.0+"
+                "GPL-2.0-or-later"
             ],
             "authors": [
                 {
@@ -2945,17 +2963,17 @@
         },
         {
             "name": "pear/archive_tar",
-            "version": "1.4.12",
-            "version_normalized": "1.4.12.0",
+            "version": "1.4.13",
+            "version_normalized": "1.4.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Archive_Tar.git",
-                "reference": "19bb8e95490d3e3ad92fcac95500ca80bdcc7495"
+                "reference": "2b87b41178cc6d4ad3cba678a46a1cae49786011"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/19bb8e95490d3e3ad92fcac95500ca80bdcc7495",
-                "reference": "19bb8e95490d3e3ad92fcac95500ca80bdcc7495",
+                "url": "https://api.github.com/repos/pear/Archive_Tar/zipball/2b87b41178cc6d4ad3cba678a46a1cae49786011",
+                "reference": "2b87b41178cc6d4ad3cba678a46a1cae49786011",
                 "shasum": ""
             },
             "require": {
@@ -2970,7 +2988,7 @@
                 "ext-xz": "Lzma2 compression support.",
                 "ext-zlib": "Gzip compression support."
             },
-            "time": "2021-01-18T19:32:54+00:00",
+            "time": "2021-02-16T10:50:50+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -3010,6 +3028,10 @@
                 "archive",
                 "tar"
             ],
+            "support": {
+                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Archive_Tar",
+                "source": "https://github.com/pear/Archive_Tar"
+            },
             "funding": [
                 {
                     "url": "https://github.com/mrook",
@@ -3894,23 +3916,23 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v5.2.3",
-            "version_normalized": "5.2.3.0",
+            "version": "v5.2.4",
+            "version_normalized": "5.2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "4adc8d172d602008c204c2e16956f99257248e03"
+                "reference": "0d639a0943822626290d169965804f79400e6a04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/4adc8d172d602008c204c2e16956f99257248e03",
-                "reference": "4adc8d172d602008c204c2e16956f99257248e03",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/0d639a0943822626290d169965804f79400e6a04",
+                "reference": "0d639a0943822626290d169965804f79400e6a04",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5"
             },
-            "time": "2021-01-28T22:06:19+00:00",
+            "time": "2021-02-15T18:55:04+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -3937,6 +3959,9 @@
             ],
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/finder/tree/v5.2.4"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -4660,8 +4685,8 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.22.0",
-            "version_normalized": "1.22.0.0",
+            "version": "v1.22.1",
+            "version_normalized": "1.22.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
@@ -4725,6 +4750,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.22.1"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -5323,17 +5351,17 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v4.4.19",
-            "version_normalized": "4.4.19.0",
+            "version": "v4.4.22",
+            "version_normalized": "4.4.22.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "a1eab2f69906dc83c5ddba4632180260d0ab4f7f"
+                "reference": "c194bcedde6295f3ec3e9eba1f5d484ea97c41a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/a1eab2f69906dc83c5ddba4632180260d0ab4f7f",
-                "reference": "a1eab2f69906dc83c5ddba4632180260d0ab4f7f",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/c194bcedde6295f3ec3e9eba1f5d484ea97c41a7",
+                "reference": "c194bcedde6295f3ec3e9eba1f5d484ea97c41a7",
                 "shasum": ""
             },
             "require": {
@@ -5357,7 +5385,7 @@
                 "ext-intl": "To show region name in time zone dump",
                 "symfony/console": "To use the ServerDumpCommand and/or the bin/var-dump-server script"
             },
-            "time": "2021-01-27T09:09:26+00:00",
+            "time": "2021-04-19T13:36:17+00:00",
             "bin": [
                 "Resources/bin/var-dump-server"
             ],
@@ -5394,6 +5422,9 @@
                 "debug",
                 "dump"
             ],
+            "support": {
+                "source": "https://github.com/symfony/var-dumper/tree/v4.4.22"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
