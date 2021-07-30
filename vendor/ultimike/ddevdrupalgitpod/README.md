@@ -30,8 +30,10 @@ This work is 100% based on the amazing work that Ofer Shaal did in figuring out 
 
 5.  Commit and push all changes to GitHub.
 
-6.  In your browser, go to https://gitpod.io/#github.com/vendor/name replacing "vendor/name" with your project vendor/name on Github.com.
+6.  Be sure your gitpod.io/settings have "Enable feature preview" selected.
 
-7. Wait for the "" message to appear in Gitpod.io interface.
+7.  In your browser, go to https://gitpod.io/#github.com/vendor/name replacing "vendor/name" with your project vendor/name on Github.com.
+
+8. Wait for the "A service is available on port 8080" message to appear in Gitpod.io Terminal interface.
 
 9. Use `gp url 8080` in the Gitpod.io Terminal to view the Drupal site's URL.

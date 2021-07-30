@@ -7,6 +7,7 @@
 #   It exists only for core development purposes.
 #
 # The script makes the following checks:
+# - Spell checking.
 # - File modes.
 # - No changes to core/node_modules directory.
 # - PHPCS checks PHP and YAML files.
@@ -14,6 +15,8 @@
 # - Checks .es6.js and .js files are equivalent.
 # - Stylelint checks CSS files.
 # - Checks .pcss.css and .css files are equivalent.
+
+# cSpell:disable
 
 # Searches an array.
 contains_element() {
@@ -120,6 +123,39 @@ fi;
 # run and all dependencies are updated.
 FINAL_STATUS=0
 
+DEPENDENCIES_NEED_INSTALLING=0
+# Ensure PHP development dependencies are installed.
+# @todo https://github.com/composer/composer/issues/4497 Improve this to
+#  determine if dependencies in the lock file match the installed versions.
+#  Using composer install --dry-run is not valid because it would depend on
+#  user-facing strings in Composer.
+if ! [[ -f 'vendor/bin/phpcs' ]]; then
+  printf "Drupal's PHP development dependencies are not installed. Run 'composer install' from the root directory.\n"
+  DEPENDENCIES_NEED_INSTALLING=1;
+fi
+
+cd "$TOP_LEVEL/core"
+
+# Ensure JavaScript development dependencies are installed.
+yarn check -s 2>/dev/null
+if [ "$?" -ne "0" ]; then
+  printf "Drupal's JavaScript development dependencies are not installed. Run 'yarn install' inside the core directory.\n"
+  DEPENDENCIES_NEED_INSTALLING=1;
+fi
+
+if [ $DEPENDENCIES_NEED_INSTALLING -ne 0 ]; then
+  exit 1;
+fi
+
+# Check all files for spelling in one go for better performance.
+yarn run -s spellcheck -c $TOP_LEVEL/core/.cspell.json $ABS_FILES
+if [ "$?" -ne "0" ]; then
+  # If there are failures set the status to a number other than 0.
+  FINAL_STATUS=1
+  printf "\nCSpell: ${red}failed${reset}\n"
+else
+  printf "\nCSpell: ${green}passed${reset}\n"
+fi
 cd "$TOP_LEVEL"
 
 # Add a separator line to make the output easier to read.
@@ -129,7 +165,7 @@ printf "\n"
 
 for FILE in $FILES; do
   STATUS=0;
-  # Print a line to separate output.
+  # Print a line to separate spellcheck output from per file output.
   printf "Checking %s\n" "$FILE"
   printf "\n"
 

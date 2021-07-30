@@ -78,7 +78,7 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
       ->disableOriginalConstructor()
       ->getMock();
@@ -390,7 +390,7 @@ class UrlGeneratorTest extends UnitTestCase {
       ->method('processOutbound');
 
     $path = $this->generator->getPathFromRoute('test_3');
-    $this->assertEquals($path, 'test/two');
+    $this->assertEquals('test/two', $path);
   }
 
   /**
@@ -430,7 +430,7 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * Confirms that explicitly setting the base_url works with generated routes
+   * Confirms that explicitly setting the base_url works with generated routes.
    */
   public function testBaseURLGeneration() {
     $options = ['base_url' => 'http://www.example.com:8888'];
@@ -452,7 +452,8 @@ class UrlGeneratorTest extends UnitTestCase {
   }
 
   /**
-   * Test that the 'scheme' route requirement is respected during url generation.
+   * Tests that the 'scheme' route requirement is respected during url
+   * generation.
    */
   public function testUrlGenerationWithHttpsRequirement() {
     $url = $this->generator->generate('test_4', [], TRUE);

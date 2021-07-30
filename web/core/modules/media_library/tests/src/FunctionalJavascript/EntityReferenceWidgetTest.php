@@ -24,7 +24,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a few example media items for use in selection.
@@ -113,7 +113,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->assertTrue($menu->hasLink('Show Type Three media (selected)'));
     // Assert the focus is set to the first tabbable element when a vertical tab
     // is clicked.
-    $this->assertJsCondition('jQuery("#media-library-content :tabbable:first").is(":focus")');
+    $this->assertJsCondition('jQuery(tabbable.tabbable(document.getElementById("media-library-content"))[0]).is(":focus")');
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
 
     // Assert that there are no links in the media library view.
@@ -163,6 +163,12 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $expected_link_titles = ['Show Type Three media (selected)', 'Show Type One media', 'Show Type Two media', 'Show Type Four media'];
     $this->assertSame($link_titles, $expected_link_titles);
     $this->drupalGet('admin/structure/types/manage/basic_page/form-display');
+
+    // Ensure that the widget settings form is not displayed when only
+    // one media type is allowed.
+    $assert_session->pageTextContains('Single media type');
+    $assert_session->buttonNotExists('field_single_media_type_settings_edit');
+
     $assert_session->buttonExists('field_twin_media_settings_edit')->press();
     $this->assertElementExistsAfterWait('css', '#field-twin-media .tabledrag-toggle-weight')->press();
     $assert_session->fieldExists('fields[field_twin_media][settings_edit_form][settings][media_types][type_one][weight]')->selectOption(0);
@@ -223,11 +229,10 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     // Assert the focus is set back on the open button of the media field.
     $this->assertJsCondition('jQuery("#field_twin_media-media-library-wrapper .js-media-library-open-button").is(":focus")');
 
-    // Assert that we can toggle the visibility of the weight inputs.
+    // The toggle for weight inputs' visibility should not be available when the
+    // field contains a single item.
     $wrapper = $assert_session->elementExists('css', '.field--name-field-twin-media');
-    $wrapper->pressButton('Show media item weights');
-    $assert_session->fieldExists('Weight', $wrapper)->click();
-    $wrapper->pressButton('Hide media item weights');
+    $assert_session->elementNotExists('named', ['button', 'Show media item weights'], $wrapper);
 
     // Remove the selected item.
     $button = $assert_session->buttonExists('Remove', $wrapper);
@@ -244,6 +249,14 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $this->openMediaLibraryForField('field_twin_media');
     $page->checkField('Select Dog');
     $this->pressInsertSelected('Added one media item.');
+    // Assert that we can toggle the visibility of the weight inputs when the
+    // field contains more than one item.
+    $wrapper = $assert_session->elementExists('css', '.field--name-field-twin-media');
+    $wrapper->pressButton('Show media item weights');
+    // Ensure that the styling doesn't accidentally render the weight field
+    // unusable.
+    $assert_session->fieldExists('Weight', $wrapper)->click();
+    $wrapper->pressButton('Hide media item weights');
 
     // Assert the same has been added twice and remove the items again.
     $this->waitForElementsCount('css', '.field--name-field-twin-media [data-media-library-item-delta]', 2);
