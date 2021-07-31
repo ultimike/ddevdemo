@@ -1,0 +1,41 @@
+name: Paxton
+type: theme
+base theme: classy
+description: Bootstrap Responsive Theme For Paxton
+package: core
+# core: 8.x
+libraries:
+  - paxton/global-css
+  - paxton/global-js
+  - paxton/base
+  - paxton/paxton-components
+  - paxton/paxton-bootstrap
+regions:
+  header: 'Header'
+  primary_menu: 'Primary Menu'
+  page_title: 'Page Title'
+  banner: 'Banner'
+  highlighted: 'Highlighted'
+  content_top: 'Content Top'
+  help: 'Help'
+  breadcrumb: 'Breadcrumb'
+  content: 'content'
+  sidebar_first: 'Left Sidebar'
+  sidebar_second: 'Right Sidebar'
+  content_bottom: 'Content Bottom'
+  footer_menu: 'Footer Menu'
+  footer_first: 'Footer First'
+  footer_second: 'Footer Second'
+  footer_third: 'Fooder Third'
+  footer_bottom: 'Fooder Bottom'
+# Information added by Drupal.org packaging script on 2015-03-18
+# version: '8.0.0-rc4'
+# core: '8.x'
+# project: 'Paxton'
+# datestamp: 1426639082
+
+# Information added by Drupal.org packaging script on 2015-12-29
+version: '8.x-1.3'
+core: '8.x'
+project: 'paxton'
+datestamp: 1451384059
