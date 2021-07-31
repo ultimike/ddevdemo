@@ -4,6 +4,7 @@ base theme: classy
 description: Bootstrap Responsive Theme For Paxton
 package: core
 # core: 8.x
+core_version_requirement: ^8 || ^9
 libraries:
   - paxton/global-css
   - paxton/global-js
