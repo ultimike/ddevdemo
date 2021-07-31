@@ -3,7 +3,7 @@
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ultimike/ddevdemo)
 
-This project contains a Drupal 8 demonstration project (based on the [Drupal Composer/Drupal Project
+This project contains a Drupal 9 demonstration project (based on the [Drupal Composer/Drupal Project
 template](https://github.com/drupal-composer/drupal-project/)) that is part of the "Intro to DDEV"
 workshop presented by DrupalEasy.
 
