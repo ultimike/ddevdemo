@@ -1,45 +1,66 @@
 image:
   file: .gitpod.Dockerfile
 
-# Use 'lock file' to delay running ddev until it is installed
-# https://www.gitpod.io/blog/gitpodify/#running-init-scripts
+# ddev and composer are running as part of the prebuild
+# when starting a workspace all docker images are ready
 tasks:
-  # - name: ddev_install
-  #   init: |
-  #     touch /tmp/.ddev-lock
-  #     brew tap drud/ddev && brew install ddev
-  #     rm /tmp/.ddev-lock
-  - init: composer install
-  - name: docker_up
-    command: sudo docker-up
-  - name: ddev_run
-    # init: sleep 1 && while [ -f /tmp/.ddev-lock ]; do sleep 1; done
+  - name: Terminal
+    init: |
+      export DDEV_NONINTERACTIVE=true
+      .ddev/gitpod-setup-ddev.sh
+      ddev composer install
+      ddev drush si -y --account-pass=admin --site-name='ddev_gitpod' demo_umami
     command: |
-      sleep 5
-      docker rm -f $(docker ps -aq) || true
-      docker rmi -f $(docker images -q) || true
-      mkcert -install
-      ddev config global --instrumentation-opt-in=true --router-bind-all-interfaces=true
-      chmod +x .ddev/generate-fqdns.sh
-      chmod +x .ddev/generate-xdebug-host-ip.sh
-      .ddev/generate-fqdns.sh
-      .ddev/generate-xdebug-host-ip.sh
-      cp .ddev/ddevdrupalgitpod.txt .ddev/config.ddevdrupalgitpod.yaml
-      ddev start
+      .ddev/gitpod-setup-ddev.sh
+      ddev composer install
+      gp await-port 8080 && gp preview $(gp url 8080)
 
-# Make the following ports public
+# VScode xdebug extension
+vscode:
+  extensions:
+    - felixfbecker.php-debug
+    - bmewburn.vscode-intelephense-client
+    - ziyasal.vscode-open-in-github
+
 ports:
+  # Used by projector
+  - port: 6942
+    onOpen: ignore
+    visibility: private
+  # Direct-connect ddev-webserver port that is the main port
   - port: 8080
+    visibility: private
+  # Currently un-notified and unsupported mailhog http port
   - port: 8025
     onOpen: ignore
+    visibility: private
+  # Currently un-notified and unsupported mailhog https port
   - port: 8026
     onOpen: ignore
+    visibility: private
+  # Currently un-notified and unsupported phpmyadmin http port
   - port: 8036
     onOpen: ignore
+    visibility: private
+  # Currently un-notified and unsupported phpmyadmin https port
   - port: 8037
     onOpen: ignore
-  - port: 8443
+    visibility: private
+  # router http port that we're ignoring.
+  - port: 8888
     onOpen: ignore
+    visibility: private
+  # router https port that we're ignoring.
+  - port: 8889
+    onOpen: ignore
+    visibility: private
+  # xdebug port
+  - port: 9000
+    onOpen: ignore
+    visibility: private
+  # projector port
+  - port: 9999
+    visibility: private
 
 github:
   prebuilds:
