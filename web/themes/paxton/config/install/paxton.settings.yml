@@ -1,0 +1,31 @@
+features:
+   comment_user_picture: true
+   comment_user_verification: true
+   favicon: true
+   logo: true
+   name: true
+   node_user_picture: true
+   slogan: true
+slideshow_display: 1
+show_social_icons: 1
+slide_title_1: 'Welcome Message'
+slide_description_1: 'Nulla quis lorem ut libero malesuada feugiat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.' 
+slide_url_1: 'node/3'
+slide_image_path_1: '/images/parallax-slider/slide_one.png'
+slide_title_2: 'About Websites'
+slide_head_2: 'Fully Responsive'
+slide_description_2: 'Nulla quis lorem ut libero malesuada feugiat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.' 
+slide_url_2: 'node/3'
+slide_image_path_2: '/images/parallax-slider/slide_two.png'
+slide_title_3: 'success of Site'
+slide_description_3: 'Nulla quis lorem ut libero malesuada feugiat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.' 
+slide_url_3: 'node/3'
+slide_image_path_3: '/images/parallax-slider/slide_three.png'
+slide_title_4: 'Smaple Contents'
+slide_description_4: 'Nulla quis lorem ut libero malesuada feugiat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.' 
+slide_url_4: 'node/3'
+slide_image_path_4: '/images/parallax-slider/slide-four.png'
+slide_title_5: 'WEBSITE FEEDBACK'
+slide_description_5: 'Nulla quis lorem ut libero malesuada feugiat. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a.' 
+slide_url_5: 'node/3'
+slide_image_path_5: '/images/parallax-slider/slide_five.png'
