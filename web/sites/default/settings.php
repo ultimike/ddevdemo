@@ -808,7 +808,7 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 include __DIR__ . "/settings.pantheon.php";
 
 if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
-  $settings['config_readonly'] = TRUE;
+//  $settings['config_readonly'] = TRUE;
 } 
 else {
   $config['config_split.config_split.local_development']['status'] = TRUE;
