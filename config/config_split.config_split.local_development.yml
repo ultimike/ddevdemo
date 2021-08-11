@@ -11,7 +11,8 @@ module:
   devel_generate: 0
 theme: {  }
 blacklist: {  }
-graylist: {  }
+graylist:
+  - system.site
 graylist_dependents: true
 graylist_skip_equal: true
 weight: 0

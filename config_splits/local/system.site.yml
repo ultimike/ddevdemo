@@ -1,0 +1,14 @@
+uuid: 5f84b51e-cf13-4ccb-8299-191ce7e95bb7
+name: 'Cupcakes! THIS IS YOUR LOCAL SITE SO GO NUTS!!! (PUN INTENDEND)'
+mail: test@example.com
+slogan: Yummmmm.
+page:
+  403: ''
+  404: ''
+  front: /node
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI
