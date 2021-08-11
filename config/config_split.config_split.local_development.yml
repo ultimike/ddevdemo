@@ -1,0 +1,17 @@
+uuid: bcd082dc-367f-45a0-bfca-5bda39c43e8a
+langcode: en
+status: false
+dependencies: {  }
+id: local_development
+label: 'Local development'
+description: 'Mike''s local development configuration.'
+folder: ../config_splits/local
+module:
+  devel: 0
+  devel_generate: 0
+theme: {  }
+blacklist: {  }
+graylist: {  }
+graylist_dependents: true
+graylist_skip_equal: true
+weight: 0
