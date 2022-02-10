@@ -171,11 +171,11 @@ EOF
       ]);
     $this->moduleHandler->expects($this->exactly(3))
       ->method('getName')
-      ->will($this->returnValueMap([
+      ->willReturnMap([
         ['module_a', 'Module a'],
         ['module_b', 'Module b'],
         ['module_c', 'A Module'],
-      ]));
+      ]);
 
     $url = vfsStream::url('modules');
     mkdir($url . '/module_a');
@@ -332,8 +332,10 @@ EOF
    *
    * @param array $actual_permissions
    *   The actual permissions
+   *
+   * @internal
    */
-  protected function assertPermissions(array $actual_permissions) {
+  protected function assertPermissions(array $actual_permissions): void {
     $this->assertCount(4, $actual_permissions);
     $this->assertEquals('single_description', $actual_permissions['access_module_a']['title']);
     $this->assertEquals('module_a', $actual_permissions['access_module_a']['provider']);

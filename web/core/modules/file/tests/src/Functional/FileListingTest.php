@@ -116,7 +116,7 @@ class FileListingTest extends FileFieldTestBase {
     foreach ($nodes as $node) {
       $file = File::load($node->file->target_id);
       $this->assertSession()->pageTextContains($file->getFilename());
-      $this->assertSession()->linkByHrefExists(file_create_url($file->getFileUri()));
+      $this->assertSession()->linkByHrefExists($file->createFileUrl());
       $this->assertSession()->linkByHrefExists('admin/content/files/usage/' . $file->id());
     }
     $this->assertSession()->elementTextNotContains('css', 'table.views-table', 'Temporary');
@@ -131,11 +131,11 @@ class FileListingTest extends FileFieldTestBase {
     $this->drupalGet('admin/content/files');
     $file = File::load($orphaned_file);
     $usage = $this->sumUsages($file_usage->listUsage($file));
-    $this->assertRaw('admin/content/files/usage/' . $file->id() . '">' . $usage);
+    $this->assertSession()->responseContains('admin/content/files/usage/' . $file->id() . '">' . $usage);
 
     $file = File::load($used_file);
     $usage = $this->sumUsages($file_usage->listUsage($file));
-    $this->assertRaw('admin/content/files/usage/' . $file->id() . '">' . $usage);
+    $this->assertSession()->responseContains('admin/content/files/usage/' . $file->id() . '">' . $usage);
 
     $result = $this->xpath("//td[contains(@class, 'views-field-status') and contains(text(), :value)]", [':value' => 'Temporary']);
     $this->assertCount(1, $result, 'Unused file marked as temporary.');
@@ -227,8 +227,8 @@ class FileListingTest extends FileFieldTestBase {
       'filemime' => 'text/plain',
       'created' => 1,
       'changed' => 1,
-      'status' => FILE_STATUS_PERMANENT,
     ]);
+    $file->setPermanent();
     file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.

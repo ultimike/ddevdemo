@@ -37,7 +37,7 @@ class ShortcutSetsTest extends ShortcutTestBase {
    */
   public function testShortcutSetAdd() {
     $this->drupalGet('admin/config/user-interface/shortcut');
-    $this->clickLink(t('Add shortcut set'));
+    $this->clickLink('Add shortcut set');
     $edit = [
       'label' => $this->randomMachineName(),
       'id' => strtolower($this->randomMachineName()),
@@ -93,7 +93,7 @@ class ShortcutSetsTest extends ShortcutTestBase {
     }
 
     $this->submitForm($edit, 'Save');
-    $this->assertRaw(t('The shortcut set has been updated.'));
+    $this->assertSession()->pageTextContains("The shortcut set has been updated.");
 
     \Drupal::entityTypeManager()->getStorage('shortcut')->resetCache();
     // Check to ensure that the shortcut weights have changed and that
@@ -165,7 +165,7 @@ class ShortcutSetsTest extends ShortcutTestBase {
 
     $new_label = $this->randomMachineName();
     $this->drupalGet('admin/config/user-interface/shortcut');
-    $this->clickLink(t('Edit shortcut set'));
+    $this->clickLink('Edit shortcut set');
     $this->submitForm(['label' => $new_label], 'Save');
     $set = ShortcutSet::load($set->id());
     $this->assertSame($new_label, $set->label(), 'Shortcut set has been successfully renamed.');

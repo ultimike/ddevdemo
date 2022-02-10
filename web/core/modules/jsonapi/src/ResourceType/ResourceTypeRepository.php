@@ -118,24 +118,27 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    */
   public function all() {
     $cached = $this->cache->get('jsonapi.resource_types', FALSE);
-    if ($cached === FALSE) {
-      $resource_types = [];
-      foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
-        $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()));
-        $resource_types = array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
-          $resource_type = $this->createResourceType($entity_type, (string) $bundle);
-          return array_merge($resource_types, [
-            $resource_type->getTypeName() => $resource_type,
-          ]);
-        }, $resource_types);
-      }
-      foreach ($resource_types as $resource_type) {
-        $relatable_resource_types = $this->calculateRelatableResourceTypes($resource_type, $resource_types);
-        $resource_type->setRelatableResourceTypes($relatable_resource_types);
-      }
-      $this->cache->set('jsonapi.resource_types', $resource_types, Cache::PERMANENT, $this->cacheTags);
+    if ($cached) {
+      return $cached->data;
     }
-    return $cached ? $cached->data : $resource_types;
+
+    $resource_types = [];
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
+      $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()));
+      $resource_types = array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
+        $resource_type = $this->createResourceType($entity_type, (string) $bundle);
+        return array_merge($resource_types, [
+          $resource_type->getTypeName() => $resource_type,
+        ]);
+      }, $resource_types);
+    }
+    foreach ($resource_types as $resource_type) {
+      $relatable_resource_types = $this->calculateRelatableResourceTypes($resource_type, $resource_types);
+      $resource_type->setRelatableResourceTypes($relatable_resource_types);
+    }
+    $this->cache->set('jsonapi.resource_types', $resource_types, Cache::PERMANENT, $this->cacheTags);
+
+    return $resource_types;
   }
 
   /**
@@ -150,6 +153,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   A JSON:API resource type.
    */
   protected function createResourceType(EntityTypeInterface $entity_type, $bundle) {
+    $type_name = NULL;
     $raw_fields = $this->getAllFieldNames($entity_type, $bundle);
     $internalize_resource_type = $entity_type->isInternal();
     $fields = static::getFields($raw_fields, $entity_type, $bundle);
@@ -158,6 +162,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       $this->eventDispatcher->dispatch($event, ResourceTypeBuildEvents::BUILD);
       $internalize_resource_type = $event->resourceTypeShouldBeDisabled();
       $fields = $event->getFields();
+      $type_name = $event->getResourceTypeName();
     }
     return new ResourceType(
       $entity_type->id(),
@@ -167,7 +172,8 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       static::isLocatableResourceType($entity_type, $bundle),
       static::isMutableResourceType($entity_type, $bundle),
       static::isVersionableResourceType($entity_type),
-      $fields
+      $fields,
+      $type_name
     );
   }
 
@@ -180,7 +186,17 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
       throw new PreconditionFailedHttpException('Server error. The current route is malformed.');
     }
 
-    return static::lookupResourceType($this->all(), $entity_type_id, $bundle);
+    $map_id = sprintf('jsonapi.resource_type.%s.%s', $entity_type_id, $bundle);
+    $cached = $this->cache->get($map_id);
+
+    if ($cached) {
+      return $cached->data;
+    }
+
+    $resource_type = static::lookupResourceType($this->all(), $entity_type_id, $bundle);
+    $this->cache->set($map_id, $resource_type, Cache::PERMANENT, $this->cacheTags);
+
+    return $resource_type;
   }
 
   /**
@@ -188,7 +204,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    */
   public function getByTypeName($type_name) {
     $resource_types = $this->all();
-    return isset($resource_types[$type_name]) ? $resource_types[$type_name] : NULL;
+    return $resource_types[$type_name] ?? NULL;
   }
 
   /**
@@ -508,8 +524,8 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   The resource type or NULL if one cannot be found.
    */
   protected static function lookupResourceType(array $resource_types, $entity_type_id, $bundle) {
-    if (isset($resource_types["$entity_type_id--$bundle"])) {
-      return $resource_types["$entity_type_id--$bundle"];
+    if (isset($resource_types[$entity_type_id . ResourceType::TYPE_NAME_URI_PATH_SEPARATOR . $bundle])) {
+      return $resource_types[$entity_type_id . ResourceType::TYPE_NAME_URI_PATH_SEPARATOR . $bundle];
     }
 
     foreach ($resource_types as $resource_type) {

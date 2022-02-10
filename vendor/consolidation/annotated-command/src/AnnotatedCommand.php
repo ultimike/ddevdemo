@@ -39,6 +39,7 @@ class AnnotatedCommand extends Command implements HelpDocumentAlter
     protected $topics = [];
     protected $returnType;
     protected $injectedClasses = [];
+    protected $parameterMap = [];
 
     public function __construct($name = null)
     {
@@ -139,6 +140,7 @@ class AnnotatedCommand extends Command implements HelpDocumentAlter
         if (method_exists($this, 'setHidden')) {
             $this->setHidden($commandInfo->getHidden());
         }
+        $this->parameterMap = $commandInfo->getParameterMap();
         return $this;
     }
 
@@ -147,7 +149,7 @@ class AnnotatedCommand extends Command implements HelpDocumentAlter
         return $this->examples;
     }
 
-    protected function addUsageOrExample($usage, $description)
+    public function addUsageOrExample($usage, $description)
     {
         $this->addUsage($usage);
         if (!empty($description)) {
@@ -205,14 +207,51 @@ class AnnotatedCommand extends Command implements HelpDocumentAlter
 
             if (empty($description) && isset($automaticOptions[$name])) {
                 $description = $automaticOptions[$name]->getDescription();
-                $inputOption = static::inputOptionSetDescription($inputOption, $description);
+                $this->addInputOption($inputOption, $description);
+            } else {
+                $this->addInputOption($inputOption);
             }
-            $this->getDefinition()->addOption($inputOption);
         }
     }
 
+    private function addInputOption($inputOption, $description = null)
+    {
+        $default = $inputOption->getDefault();
+        // Recover the 'mode' value, because Symfony is stubborn
+        $mode = 0;
+        if ($inputOption->isValueRequired()) {
+            $mode |= InputOption::VALUE_REQUIRED;
+        }
+        if ($inputOption->isValueOptional()) {
+            $mode |= InputOption::VALUE_OPTIONAL;
+        }
+        if ($inputOption->isArray()) {
+            $mode |= InputOption::VALUE_IS_ARRAY;
+        }
+        if (!$mode) {
+            $mode = InputOption::VALUE_NONE;
+            $default = null;
+        }
+
+        $this->addOption(
+            $inputOption->getName(),
+            $inputOption->getShortcut(),
+            $mode,
+            $description ?? $inputOption->getDescription(),
+            $default
+        );
+    }
+
+    /**
+     * @deprecated since 4.5.0
+     */
     protected static function inputOptionSetDescription($inputOption, $description)
     {
+        @\trigger_error(
+            'Since consolidation/annotated-command 4.5: ' .
+            'AnnotatedCommand::inputOptionSetDescription method is deprecated and will be removed in 5.0',
+            \E_USER_DEPRECATED
+        );
         // Recover the 'mode' value, because Symfony is stubborn
         $mode = 0;
         if ($inputOption->isValueRequired()) {
@@ -346,7 +385,8 @@ class AnnotatedCommand extends Command implements HelpDocumentAlter
         $commandData = new CommandData(
             $this->annotationData,
             $input,
-            $output
+            $output,
+            $this->parameterMap
         );
 
         // Fetch any classes (e.g. InputInterface / OutputInterface) that

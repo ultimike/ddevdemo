@@ -137,10 +137,10 @@ class UrlGeneratorTest extends UnitTestCase {
     $this->provider = $provider;
     $this->provider->expects($this->any())
       ->method('getRouteByName')
-      ->will($this->returnValueMap($route_name_return_map));
+      ->willReturnMap($route_name_return_map);
     $provider->expects($this->any())
       ->method('getRoutesByNames')
-      ->will($this->returnValueMap($routes_names_return_map));
+      ->willReturnMap($routes_names_return_map);
 
     // Create an alias manager stub.
     $alias_manager = $this->getMockBuilder('Drupal\path_alias\AliasManager')
@@ -149,7 +149,7 @@ class UrlGeneratorTest extends UnitTestCase {
 
     $alias_manager->expects($this->any())
       ->method('getAliasByPath')
-      ->will($this->returnCallback([$this, 'aliasManagerCallback']));
+      ->willReturnCallback([$this, 'aliasManagerCallback']);
 
     $this->aliasManager = $alias_manager;
 
@@ -529,18 +529,20 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * Asserts \Drupal\Core\Routing\UrlGenerator::generateFromRoute()'s output.
    *
-   * @param $route_name
+   * @param string $route_name
    *   The route name to test.
    * @param array $route_parameters
    *   The route parameters to test.
    * @param array $options
    *   The options to test.
-   * @param $expected_url
+   * @param string $expected_url
    *   The expected generated URL string.
    * @param \Drupal\Core\Render\BubbleableMetadata $expected_bubbleable_metadata
    *   The expected generated bubbleable metadata.
+   *
+   * @internal
    */
-  protected function assertGenerateFromRoute($route_name, array $route_parameters, array $options, $expected_url, BubbleableMetadata $expected_bubbleable_metadata) {
+  protected function assertGenerateFromRoute(string $route_name, array $route_parameters, array $options, string $expected_url, BubbleableMetadata $expected_bubbleable_metadata): void {
     // First, test with $collect_cacheability_metadata set to the default value.
     $url = $this->generator->generateFromRoute($route_name, $route_parameters, $options);
     $this->assertSame($expected_url, $url);

@@ -135,7 +135,7 @@ class ThemeTest extends KernelTestBase {
         '#markup' => 'Foo',
       ],
     ];
-    $this->assertThemeOutput('theme_test_render_element_children', $element, 'Foo', 'drupal_render() avoids #theme recursion loop when rendering a render element.');
+    $this->assertThemeOutput('theme_test_render_element_children', $element, 'Foo', "\Drupal::service('renderer')->render() avoids #theme recursion loop when rendering a render element.");
 
     $element = [
       '#theme_wrappers' => ['theme_test_render_element_children'],
@@ -143,7 +143,7 @@ class ThemeTest extends KernelTestBase {
         '#markup' => 'Foo',
       ],
     ];
-    $this->assertThemeOutput('theme_test_render_element_children', $element, 'Foo', 'drupal_render() avoids #theme_wrappers recursion loop when rendering a render element.');
+    $this->assertThemeOutput('theme_test_render_element_children', $element, 'Foo', "\Drupal::service('renderer')->render() avoids #theme_wrappers recursion loop when rendering a render element.");
   }
 
   /**
@@ -151,7 +151,7 @@ class ThemeTest extends KernelTestBase {
    */
   public function testFindThemeTemplates() {
     $registry = $this->container->get('theme.registry')->get();
-    $templates = drupal_find_theme_templates($registry, '.html.twig', drupal_get_path('theme', 'test_theme'));
+    $templates = drupal_find_theme_templates($registry, '.html.twig', $this->getThemePath('test_theme'));
     $this->assertEquals('node--1', $templates['node__1']['template'], 'Template node--1.html.twig was found in test_theme.');
   }
 

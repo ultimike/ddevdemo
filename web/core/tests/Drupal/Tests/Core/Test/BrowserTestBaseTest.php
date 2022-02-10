@@ -2,13 +2,11 @@
 
 namespace Drupal\Tests\Core\Test;
 
-use Behat\Mink\Driver\GoutteDriver;
 use Drupal\Tests\DrupalTestBrowser;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\BrowserTestBase;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Behat\Mink\Session;
-use Goutte\Client;
 
 /**
  * @coversDefaultClass \Drupal\Tests\BrowserTestBase
@@ -19,7 +17,7 @@ class BrowserTestBaseTest extends UnitTestCase {
   protected function mockBrowserTestBaseWithDriver($driver) {
     $session = $this->getMockBuilder(Session::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getDriver'])
+      ->onlyMethods(['getDriver'])
       ->getMock();
     $session->expects($this->any())
       ->method('getDriver')
@@ -27,7 +25,7 @@ class BrowserTestBaseTest extends UnitTestCase {
 
     $btb = $this->getMockBuilder(BrowserTestBase::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getSession'])
+      ->onlyMethods(['getSession'])
       ->getMockForAbstractClass();
     $btb->expects($this->any())
       ->method('getSession')
@@ -44,7 +42,7 @@ class BrowserTestBaseTest extends UnitTestCase {
     $expected = new \stdClass();
 
     $browserkit_client = $this->getMockBuilder(DrupalTestBrowser::class)
-      ->setMethods(['getClient'])
+      ->onlyMethods(['getClient'])
       ->getMockForAbstractClass();
     $browserkit_client->expects($this->once())
       ->method('getClient')
@@ -52,32 +50,6 @@ class BrowserTestBaseTest extends UnitTestCase {
 
     // Because the driver is a BrowserKitDriver, we'll get back a client.
     $driver = new BrowserKitDriver($browserkit_client);
-    $btb = $this->mockBrowserTestBaseWithDriver($driver);
-
-    $ref_gethttpclient = new \ReflectionMethod($btb, 'getHttpClient');
-    $ref_gethttpclient->setAccessible(TRUE);
-
-    $this->assertSame(get_class($expected), get_class($ref_gethttpclient->invoke($btb)));
-  }
-
-  /**
-   * @covers ::getHttpClient
-   *
-   * @group legacy
-   */
-  public function testGetHttpClientGoutte() {
-    // Our stand-in for the Guzzle client object.
-    $expected = new \stdClass();
-
-    $browserkit_client = $this->getMockBuilder(Client::class)
-      ->setMethods(['getClient'])
-      ->getMockForAbstractClass();
-    $browserkit_client->expects($this->once())
-      ->method('getClient')
-      ->willReturn($expected);
-
-    // Because the driver is a GoutteDriver, we'll get back a client.
-    $driver = new GoutteDriver($browserkit_client);
     $btb = $this->mockBrowserTestBaseWithDriver($driver);
 
     $ref_gethttpclient = new \ReflectionMethod($btb, 'getHttpClient');
@@ -112,7 +84,7 @@ class BrowserTestBaseTest extends UnitTestCase {
     $this->assertTrue(method_exists(BrowserTestBase::class, $method));
     $btb = $this->getMockBuilder(BrowserTestBase::class)
       ->disableOriginalConstructor()
-      ->setMethods([$method])
+      ->onlyMethods([$method])
       ->getMockForAbstractClass();
     $btb->expects($this->never())->method($method);
     $ref_tearDown = new \ReflectionMethod($btb, 'tearDown');

@@ -135,7 +135,8 @@ class ForumTest extends BrowserTestBase {
     // Check that the basic forum install creates a default forum topic
     $this->drupalGet('/forum');
     // Look for the "General discussion" default forum
-    $this->assertRaw(Link::createFromRoute(t('General discussion'), 'forum.page', ['taxonomy_term' => 1])->toString());
+    $this->assertSession()->linkExists('General discussion');
+    $this->assertSession()->linkByHrefExists('/forum/1');
     // Check the presence of expected cache tags.
     $this->assertSession()->responseHeaderContains('X-Drupal-Cache-Tags', 'config:forum.settings');
 
@@ -332,13 +333,13 @@ class ForumTest extends BrowserTestBase {
     $this->assertSession()->linkExists('Add forum');
     $this->assertSession()->linkExists('Add container');
     $this->clickLink('edit container');
-    $this->assertRaw('Edit container');
+    $this->assertSession()->pageTextContains('Edit container');
     // Create forum inside the forum container.
     $this->forum = $this->createForum('forum', $this->forumContainer['tid']);
     // Verify the "edit forum" link exists and functions correctly.
     $this->drupalGet('admin/structure/forum');
     $this->clickLink('edit forum');
-    $this->assertRaw('Edit forum');
+    $this->assertSession()->pageTextContains('Edit forum');
     // Navigate back to forum structure page.
     $this->drupalGet('admin/structure/forum');
     // Create second forum in container, destined to be deleted below.
@@ -346,7 +347,7 @@ class ForumTest extends BrowserTestBase {
     // Save forum overview.
     $this->drupalGet('admin/structure/forum/');
     $this->submitForm([], 'Save');
-    $this->assertRaw(t('The configuration options have been saved.'));
+    $this->assertSession()->pageTextContains('The configuration options have been saved.');
     // Delete this second forum.
     $this->deleteForum($delete_forum['tid']);
     // Create forum at the top (root) level.
@@ -403,7 +404,7 @@ class ForumTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/taxonomy/manage/' . $original_vocabulary->id());
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertRaw(t('Updated vocabulary %name.', ['%name' => $edit['name']]));
+    $this->assertSession()->pageTextContains("Updated vocabulary {$edit['name']}.");
 
     // Grab the newly edited vocabulary.
     $current_vocabulary = Vocabulary::load($vid);
@@ -463,7 +464,7 @@ class ForumTest extends BrowserTestBase {
       'description__value' => $description,
     ]);
     $term = array_shift($term);
-    $this->assertTrue(!empty($term), 'The ' . $type . ' exists in the database');
+    $this->assertNotEmpty($term, "The forum type '$type' should exist in the database.");
 
     // Verify forum hierarchy.
     $tid = $term->id();
@@ -489,10 +490,10 @@ class ForumTest extends BrowserTestBase {
   public function deleteForum($tid) {
     // Delete the forum.
     $this->drupalGet('admin/structure/forum/edit/forum/' . $tid);
-    $this->clickLink(t('Delete'));
+    $this->clickLink('Delete');
     $this->assertSession()->pageTextContains('Are you sure you want to delete the forum');
-    $this->assertNoText('Add forum');
-    $this->assertNoText('Add forum container');
+    $this->assertSession()->pageTextNotContains('Add forum');
+    $this->assertSession()->pageTextNotContains('Add forum container');
     $this->submitForm([], 'Delete');
 
     // Assert that the forum no longer exists.
@@ -583,15 +584,14 @@ class ForumTest extends BrowserTestBase {
     $this->drupalGet('node/add/forum', ['query' => ['forum_id' => $tid]]);
     $this->submitForm($edit, 'Save');
 
-    $type = t('Forum topic');
     if ($container) {
-      $this->assertNoText("$type $title has been created.");
-      $this->assertRaw(t('The item %title is a forum container, not a forum.', ['%title' => $forum['name']]));
+      $this->assertSession()->pageTextNotContains("Forum topic $title has been created.");
+      $this->assertSession()->pageTextContains("The item {$forum['name']} is a forum container, not a forum.");
       return;
     }
     else {
-      $this->assertSession()->pageTextContains($type . ' ' . $title . ' has been created.');
-      $this->assertNoRaw(t('The item %title is a forum container, not a forum.', ['%title' => $forum['name']]));
+      $this->assertSession()->pageTextContains("Forum topic $title has been created.");
+      $this->assertSession()->pageTextNotContains("The item {$forum['name']} is a forum container, not a forum.");
 
       // Verify that the creation message contains a link to a node.
       $this->assertSession()->elementExists('xpath', '//div[@data-drupal-messages]//a[contains(@href, "node/")]');
@@ -604,8 +604,8 @@ class ForumTest extends BrowserTestBase {
 
     // View forum topic.
     $this->drupalGet('node/' . $node->id());
-    $this->assertRaw($title);
-    $this->assertRaw($body);
+    $this->assertSession()->pageTextContains($title);
+    $this->assertSession()->pageTextContains($body);
 
     return $node;
   }
@@ -643,8 +643,8 @@ class ForumTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->titleEquals($node->label() . ' | Drupal');
     $breadcrumb_build = [
-      Link::createFromRoute(t('Home'), '<front>'),
-      Link::createFromRoute(t('Forums'), 'forum.index'),
+      Link::createFromRoute('Home', '<front>'),
+      Link::createFromRoute('Forums', 'forum.index'),
       Link::createFromRoute($this->forumContainer['name'], 'forum.page', ['taxonomy_term' => $this->forumContainer['tid']]),
       Link::createFromRoute($this->forum['name'], 'forum.page', ['taxonomy_term' => $this->forum['tid']]),
     ];
@@ -652,7 +652,7 @@ class ForumTest extends BrowserTestBase {
       '#theme' => 'breadcrumb',
       '#links' => $breadcrumb_build,
     ];
-    $this->assertRaw(\Drupal::service('renderer')->renderRoot($breadcrumb));
+    $this->assertSession()->responseContains(\Drupal::service('renderer')->renderRoot($breadcrumb));
 
     // View forum edit node.
     $this->drupalGet('node/' . $node->id() . '/edit');
@@ -688,7 +688,7 @@ class ForumTest extends BrowserTestBase {
       $this->drupalGet('node/' . $node->id() . '/delete');
       $this->submitForm([], 'Delete');
       $this->assertSession()->statusCodeEquals($response);
-      $this->assertRaw(t('Forum topic %title has been deleted.', ['%title' => $edit['title[0][value]']]));
+      $this->assertSession()->pageTextContains("Forum topic {$edit['title[0][value]']} has been deleted.");
     }
   }
 
@@ -707,8 +707,8 @@ class ForumTest extends BrowserTestBase {
     $this->assertSession()->titleEquals($forum['name'] . ' | Drupal');
 
     $breadcrumb_build = [
-      Link::createFromRoute(t('Home'), '<front>'),
-      Link::createFromRoute(t('Forums'), 'forum.index'),
+      Link::createFromRoute('Home', '<front>'),
+      Link::createFromRoute('Forums', 'forum.index'),
     ];
     if (isset($parent)) {
       $breadcrumb_build[] = Link::createFromRoute($parent['name'], 'forum.page', ['taxonomy_term' => $parent['tid']]);
@@ -718,7 +718,7 @@ class ForumTest extends BrowserTestBase {
       '#theme' => 'breadcrumb',
       '#links' => $breadcrumb_build,
     ];
-    $this->assertRaw(\Drupal::service('renderer')->renderRoot($breadcrumb));
+    $this->assertSession()->responseContains(\Drupal::service('renderer')->renderRoot($breadcrumb));
   }
 
   /**

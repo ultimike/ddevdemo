@@ -18,7 +18,7 @@ html {
 }
 
 body {
-  color: #222330;
+  color: #232429;
   background: #fff;
 }
 
@@ -139,7 +139,7 @@ address {
 
 u,
 ins {
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 s,

@@ -64,7 +64,7 @@ class SearchBlockTest extends BrowserTestBase {
     // Check that name attribute is not empty.
     $pattern = "//input[@type='submit' and @name='']";
     $elements = $this->xpath($pattern);
-    $this->assertTrue(empty($elements), 'The search input field does not have empty name attribute.');
+    $this->assertEmpty($elements, 'The search input field does not have empty name attribute.');
 
     // Test a normal search via the block form, from the front page.
     $terms = ['keys' => 'test'];
@@ -119,16 +119,16 @@ class SearchBlockTest extends BrowserTestBase {
     $this->drupalGet('node');
     $this->submitForm(['keys' => $this->randomMachineName(1)], 'Search');
     $this->assertSession()->pageTextContains('You must include at least one keyword to match in the content');
-    $this->assertNoText('Please enter some keywords');
+    $this->assertSession()->pageTextNotContains('Please enter some keywords');
     $this->submitForm(['keys' => $this->randomMachineName()], 'Search', 'search-block-form');
-    $this->assertNoText('You must include at least one keyword to match in the content');
+    $this->assertSession()->pageTextNotContains('You must include at least one keyword to match in the content');
 
     // Same test again, using the search page form for the second search this
     // time.
     $this->drupalGet('node');
     $this->submitForm(['keys' => $this->randomMachineName(1)], 'Search');
     $this->submitForm(['keys' => $this->randomMachineName()], 'Search', 'search-form');
-    $this->assertNoText('You must include at least one keyword to match in the content');
+    $this->assertSession()->pageTextNotContains('You must include at least one keyword to match in the content');
 
     // Edit the block configuration so that it searches users instead of nodes,
     // and test.

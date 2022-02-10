@@ -67,43 +67,44 @@
 
     attach(context, settings) {
       const that = this;
-      $(context)
-        .find('[name="filters[filter_html][settings][allowed_html]"]')
-        .once('filter-filter_html-updating')
-        .each(function () {
-          that.$allowedHTMLFormItem = $(this);
-          that.$allowedHTMLDescription = that.$allowedHTMLFormItem
-            .closest('.js-form-item')
-            .find('.description');
-          that.userTags = that._parseSetting(this.value);
+      once(
+        'filter-filter_html-updating',
+        '[name="filters[filter_html][settings][allowed_html]"]',
+        context,
+      ).forEach((formItem) => {
+        that.$allowedHTMLFormItem = $(formItem);
+        that.$allowedHTMLDescription = that.$allowedHTMLFormItem
+          .closest('.js-form-item')
+          .find('.description');
+        that.userTags = that._parseSetting(formItem.value);
 
-          // Update the new allowed tags based on added text editor features.
-          $(document)
-            .on('drupalEditorFeatureAdded', (e, feature) => {
+        // Update the new allowed tags based on added text editor features.
+        $(document)
+          .on('drupalEditorFeatureAdded', (e, feature) => {
+            that.newFeatures[feature.name] = feature.rules;
+            that._updateAllowedTags();
+          })
+          .on('drupalEditorFeatureModified', (e, feature) => {
+            if (that.newFeatures.hasOwnProperty(feature.name)) {
               that.newFeatures[feature.name] = feature.rules;
               that._updateAllowedTags();
-            })
-            .on('drupalEditorFeatureModified', (e, feature) => {
-              if (that.newFeatures.hasOwnProperty(feature.name)) {
-                that.newFeatures[feature.name] = feature.rules;
-                that._updateAllowedTags();
-              }
-            })
-            .on('drupalEditorFeatureRemoved', (e, feature) => {
-              if (that.newFeatures.hasOwnProperty(feature.name)) {
-                delete that.newFeatures[feature.name];
-                that._updateAllowedTags();
-              }
-            });
-
-          // When the allowed tags list is manually changed, update userTags.
-          that.$allowedHTMLFormItem.on('change.updateUserTags', function () {
-            that.userTags = _.difference(
-              that._parseSetting(this.value),
-              that.autoTags,
-            );
+            }
+          })
+          .on('drupalEditorFeatureRemoved', (e, feature) => {
+            if (that.newFeatures.hasOwnProperty(feature.name)) {
+              delete that.newFeatures[feature.name];
+              that._updateAllowedTags();
+            }
           });
+
+        // When the allowed tags list is manually changed, update userTags.
+        that.$allowedHTMLFormItem.on('change.updateUserTags', function () {
+          that.userTags = _.difference(
+            that._parseSetting(this.value),
+            that.autoTags,
+          );
         });
+      });
     },
 
     /**
@@ -267,26 +268,29 @@
      *   tag name.
      */
     _parseSetting(setting) {
-      let node;
       let tag;
       let rule;
       let attributes;
       let attribute;
+
       const allowedTags = setting.match(/(<[^>]+>)/g);
-      const sandbox = document.createElement('div');
       const rules = {};
       for (let t = 0; t < allowedTags.length; t++) {
-        // Let the browser do the parsing work for us.
-        sandbox.innerHTML = allowedTags[t];
-        node = sandbox.firstChild;
-        tag = node.tagName.toLowerCase();
+        // Create a jQuery object, making it possible to easily retrieve the
+        // tag name of the allowed tag, regardless of what attributes are set or
+        // what its required parent elements are.
+        const $tagObject = $(allowedTags[t]);
+
+        // Parse the tag name from the jQuery object.
+        tag = $tagObject.prop('tagName').toLowerCase();
 
         // Build the Drupal.FilterHtmlRule object.
         rule = new Drupal.FilterHTMLRule();
         // We create one rule per allowed tag, so always one tag.
         rule.restrictedTags.tags = [tag];
+
         // Add the attribute restrictions.
-        attributes = node.attributes;
+        attributes = $tagObject.prop('attributes');
         for (let i = 0; i < attributes.length; i++) {
           attribute = attributes.item(i);
           const attributeName = attribute.nodeName;

@@ -49,8 +49,8 @@ class InstallerTranslationQueryTest extends InstallerTestBase {
    * {@inheritdoc}
    */
   protected function setUpLanguage() {
-    // The language was was preset by passing a query parameter in the URL, so
-    // no explicit language selection is necessary.
+    // The language was preset by passing a query parameter in the URL, so no
+    // explicit language selection is necessary.
   }
 
   /**
@@ -63,7 +63,7 @@ class InstallerTranslationQueryTest extends InstallerTestBase {
     // Verify German was configured but not English.
     $this->drupalGet('admin/config/regional/language');
     $this->assertSession()->pageTextContains('German');
-    $this->assertNoText('English');
+    $this->assertSession()->pageTextNotContains('English');
   }
 
   /**

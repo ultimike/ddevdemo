@@ -28,15 +28,7 @@ class UpdatePostUpdateTest extends BrowserTestBase {
     $connection = Database::getConnection();
 
     // Set the schema version.
-    $connection->merge('key_value')
-      ->condition('collection', 'system.schema')
-      ->condition('name', 'update_test_postupdate')
-      ->fields([
-        'collection' => 'system.schema',
-        'name' => 'update_test_postupdate',
-        'value' => 'i:8000;',
-      ])
-      ->execute();
+    \Drupal::service('update.update_hook_registry')->setInstalledVersion('update_test_postupdate', 8000);
 
     // Update core.extension.
     $extensions = $connection->select('config')
@@ -84,16 +76,16 @@ class UpdatePostUpdateTest extends BrowserTestBase {
   public function testPostUpdate() {
     $this->runUpdates();
 
-    $this->assertRaw('<h3>Update first</h3>');
-    $this->assertRaw('First update');
-    $this->assertRaw('<h3>Update second</h3>');
-    $this->assertRaw('Second update');
-    $this->assertRaw('<h3>Update test1</h3>');
-    $this->assertRaw('Test1 update');
-    $this->assertRaw('<h3>Update test0</h3>');
-    $this->assertRaw('Test0 update');
-    $this->assertRaw('<h3>Update test_batch</h3>');
-    $this->assertRaw('Test post update batches');
+    $this->assertSession()->responseContains('<h3>Update first</h3>');
+    $this->assertSession()->pageTextContains('First update');
+    $this->assertSession()->responseContains('<h3>Update second</h3>');
+    $this->assertSession()->pageTextContains('Second update');
+    $this->assertSession()->responseContains('<h3>Update test1</h3>');
+    $this->assertSession()->pageTextContains('Test1 update');
+    $this->assertSession()->responseContains('<h3>Update test0</h3>');
+    $this->assertSession()->pageTextContains('Test0 update');
+    $this->assertSession()->responseContains('<h3>Update test_batch</h3>');
+    $this->assertSession()->pageTextContains('Test post update batches');
 
     // Test state value set by each post update.
     $updates = [

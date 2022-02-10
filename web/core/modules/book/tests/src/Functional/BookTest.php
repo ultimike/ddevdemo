@@ -130,23 +130,23 @@ class BookTest extends BrowserTestBase {
 
     // On non-node route.
     $this->drupalGet($this->adminUser->toUrl());
-    $this->assertRaw('[route.book_navigation]=book.none');
+    $this->assertSession()->responseContains('[route.book_navigation]=book.none');
 
     // On non-book node route.
     $this->drupalGet($page->toUrl());
-    $this->assertRaw('[route.book_navigation]=book.none');
+    $this->assertSession()->responseContains('[route.book_navigation]=book.none');
 
     // On book node route.
     $this->drupalGet($book_nodes[0]->toUrl());
-    $this->assertRaw('[route.book_navigation]=0|2|3');
+    $this->assertSession()->responseContains('[route.book_navigation]=0|2|3');
     $this->drupalGet($book_nodes[1]->toUrl());
-    $this->assertRaw('[route.book_navigation]=0|2|3|4');
+    $this->assertSession()->responseContains('[route.book_navigation]=0|2|3|4');
     $this->drupalGet($book_nodes[2]->toUrl());
-    $this->assertRaw('[route.book_navigation]=0|2|3|5');
+    $this->assertSession()->responseContains('[route.book_navigation]=0|2|3|5');
     $this->drupalGet($book_nodes[3]->toUrl());
-    $this->assertRaw('[route.book_navigation]=0|2|6');
+    $this->assertSession()->responseContains('[route.book_navigation]=0|2|6');
     $this->drupalGet($book_nodes[4]->toUrl());
-    $this->assertRaw('[route.book_navigation]=0|2|7');
+    $this->assertSession()->responseContains('[route.book_navigation]=0|2|7');
   }
 
   /**
@@ -251,12 +251,12 @@ class BookTest extends BrowserTestBase {
     // Log in as web user and view printer-friendly version.
     $this->drupalLogin($this->webUser);
     $this->drupalGet('node/' . $this->book->id());
-    $this->clickLink(t('Printer-friendly version'));
+    $this->clickLink('Printer-friendly version');
 
     // Make sure each part of the book is there.
     foreach ($nodes as $node) {
       $this->assertSession()->pageTextContains($node->label());
-      $this->assertRaw($node->body->processed);
+      $this->assertSession()->responseContains($node->body->processed);
     }
 
     // Make sure we can't export an unsupported format.
@@ -310,7 +310,7 @@ class BookTest extends BrowserTestBase {
     // Link to book root.
     $this->assertSession()->pageTextContains($this->book->label());
     // No links to individual book pages.
-    $this->assertNoText($nodes[0]->label());
+    $this->assertSession()->pageTextNotContains($nodes[0]->label());
 
     // Ensure that an unpublished node does not appear in the navigation for a
     // user without access. By unpublishing a parent page, child pages should
@@ -419,7 +419,7 @@ class BookTest extends BrowserTestBase {
 
     // Test the 'book pages' block_mode setting.
     $this->drupalGet('<front>');
-    $this->assertNoText($block->label());
+    $this->assertSession()->pageTextNotContains($block->label());
   }
 
   /**
@@ -440,7 +440,7 @@ class BookTest extends BrowserTestBase {
     $this->submitForm($edit, 'Remove');
     $node_storage->resetCache([$nodes[4]->id()]);
     $node4 = $node_storage->load($nodes[4]->id());
-    $this->assertTrue(empty($node4->book), 'Deleting child book node properly allowed.');
+    $this->assertEmpty($node4->book, 'Deleting child book node properly allowed.');
 
     // $nodes[4] is stale, trying to delete it directly will cause an error.
     $node4->delete();
@@ -453,13 +453,13 @@ class BookTest extends BrowserTestBase {
     $this->submitForm($edit, 'Remove');
     $node_storage->resetCache([$this->book->id()]);
     $node = $node_storage->load($this->book->id());
-    $this->assertTrue(empty($node->book), 'Deleting childless top-level book node properly allowed.');
+    $this->assertEmpty($node->book, 'Deleting childless top-level book node properly allowed.');
 
     // Tests directly deleting a book parent.
     $nodes = $this->createBook();
     $this->drupalLogin($this->adminUser);
     $this->drupalGet($this->book->toUrl('delete-form'));
-    $this->assertRaw(t('%title is part of a book outline, and has associated child pages. If you proceed with deletion, the child pages will be relocated automatically.', ['%title' => $this->book->label()]));
+    $this->assertSession()->pageTextContains($this->book->label() . ' is part of a book outline, and has associated child pages. If you proceed with deletion, the child pages will be relocated automatically.');
     // Delete parent, and visit a child page.
     $this->drupalGet($this->book->toUrl('delete-form'));
     $this->submitForm([], 'Delete');
@@ -489,7 +489,7 @@ class BookTest extends BrowserTestBase {
 
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('node/' . $empty_book->id() . '/outline');
-    $this->assertRaw(t('Book outline'));
+    $this->assertSession()->pageTextContains('Book outline');
     // Verify that the node does not belong to a book.
     $this->assertTrue($this->assertSession()->optionExists('edit-book-bid', 0)->isSelected());
     $this->assertSession()->linkNotExists('Remove from book outline');
@@ -512,9 +512,9 @@ class BookTest extends BrowserTestBase {
 
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('node/' . $book->id() . '/outline');
-    $this->assertRaw(t('Book outline'));
-    $this->clickLink(t('Remove from book outline'));
-    $this->assertRaw(t('Are you sure you want to remove %title from the book hierarchy?', ['%title' => $book->label()]));
+    $this->assertSession()->pageTextContains('Book outline');
+    $this->clickLink('Remove from book outline');
+    $this->assertSession()->pageTextContains('Are you sure you want to remove ' . $book->label() . ' from the book hierarchy?');
 
     // Create a new node and set the book after the node was created.
     $node = $this->drupalCreateNode(['type' => 'book']);
@@ -635,9 +635,11 @@ class BookTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/book/' . $this->book->id());
     $this->assertSession()->pageTextContains($this->book->label());
 
-    $elements = $this->xpath('//table//ul[@class="dropbutton"]/li/a');
-    $this->assertEquals('View', $elements[0]->getText(), 'View link is found from the list.');
-    $this->assertSameSize($nodes, $elements, 'All the book pages are displayed on the book outline page.');
+    // Test that the view link is found from the list.
+    $this->assertSession()->elementTextEquals('xpath', '//table//ul[@class="dropbutton"]/li/a', 'View');
+
+    // Test that all the book pages are displayed on the book outline page.
+    $this->assertSession()->elementsCount('xpath', '//table//ul[@class="dropbutton"]/li/a', count($nodes));
 
     // Unpublish a book in the hierarchy.
     $nodes[0]->setUnPublished();
@@ -645,8 +647,7 @@ class BookTest extends BrowserTestBase {
 
     // Node should still appear on the outline for admins.
     $this->drupalGet('admin/structure/book/' . $this->book->id());
-    $elements = $this->xpath('//table//ul[@class="dropbutton"]/li/a');
-    $this->assertSameSize($nodes, $elements, 'All the book pages are displayed on the book outline page.');
+    $this->assertSession()->elementsCount('xpath', '//table//ul[@class="dropbutton"]/li/a', count($nodes));
 
     // Saving a book page not as the current version shouldn't effect the book.
     $old_title = $nodes[1]->getTitle();
@@ -656,8 +657,7 @@ class BookTest extends BrowserTestBase {
     $nodes[1]->setTitle($new_title);
     $nodes[1]->save();
     $this->drupalGet('admin/structure/book/' . $this->book->id());
-    $elements = $this->xpath('//table//ul[@class="dropbutton"]/li/a');
-    $this->assertSameSize($nodes, $elements, 'All the book pages are displayed on the book outline page.');
+    $this->assertSession()->elementsCount('xpath', '//table//ul[@class="dropbutton"]/li/a', count($nodes));
     $this->assertSession()->responseNotContains($new_title);
     $this->assertSession()->responseContains($old_title);
   }
@@ -681,7 +681,7 @@ class BookTest extends BrowserTestBase {
     // @see node_access_test_node_grants().
     $this->drupalLogin($this->webUserWithoutNodeAccess);
     $book_node = $node_storage->load($this->book->id());
-    $this->assertTrue(!empty($book_node->book));
+    $this->assertNotEmpty($book_node->book);
     $this->assertEquals($this->book->id(), $book_node->book['bid']);
 
     // Reset the internal cache to retrigger the hook_node_load() call.
@@ -689,7 +689,7 @@ class BookTest extends BrowserTestBase {
 
     $this->drupalLogin($this->webUser);
     $book_node = $node_storage->load($this->book->id());
-    $this->assertTrue(!empty($book_node->book));
+    $this->assertNotEmpty($book_node->book);
     $this->assertEquals($this->book->id(), $book_node->book['bid']);
   }
 

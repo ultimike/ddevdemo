@@ -93,10 +93,10 @@ class DateRangeFieldTest extends DateTestBase {
       preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-      $this->assertRaw($start_date->format($date_format));
-      $this->assertNoRaw($start_date->format($time_format));
-      $this->assertRaw($end_date->format($date_format));
-      $this->assertNoRaw($end_date->format($time_format));
+      $this->assertSession()->responseContains($start_date->format($date_format));
+      $this->assertSession()->responseNotContains($start_date->format($time_format));
+      $this->assertSession()->responseContains($end_date->format($date_format));
+      $this->assertSession()->responseNotContains($end_date->format($time_format));
 
       // Verify the date doesn't change when entity is edited through the form.
       $entity = EntityTest::load($id);
@@ -326,10 +326,10 @@ class DateRangeFieldTest extends DateTestBase {
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-    $this->assertRaw($start_date->format($date_format));
-    $this->assertRaw($start_date->format($time_format));
-    $this->assertRaw($end_date->format($date_format));
-    $this->assertRaw($end_date->format($time_format));
+    $this->assertSession()->responseContains($start_date->format($date_format));
+    $this->assertSession()->responseContains($start_date->format($time_format));
+    $this->assertSession()->responseContains($end_date->format($date_format));
+    $this->assertSession()->responseContains($end_date->format($time_format));
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -499,10 +499,10 @@ class DateRangeFieldTest extends DateTestBase {
     preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-    $this->assertRaw($start_date->format($date_format));
-    $this->assertNoRaw($start_date->format($time_format));
-    $this->assertRaw($end_date->format($date_format));
-    $this->assertNoRaw($end_date->format($time_format));
+    $this->assertSession()->responseContains($start_date->format($date_format));
+    $this->assertSession()->responseNotContains($start_date->format($time_format));
+    $this->assertSession()->responseContains($end_date->format($date_format));
+    $this->assertSession()->responseNotContains($end_date->format($time_format));
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -854,7 +854,7 @@ class DateRangeFieldTest extends DateTestBase {
 
     // Test the widget for validation notifications.
     foreach ($this->datelistDataProvider() as $data) {
-      list($start_date_value, $end_date_value, $expected) = $data;
+      [$start_date_value, $end_date_value, $expected] = $data;
 
       // Display creation form.
       $this->drupalGet('entity_test/add');
@@ -1118,7 +1118,7 @@ class DateRangeFieldTest extends DateTestBase {
 
     // Check if default_date has been stored successfully.
     $config_entity = $this->config('field.field.node.date_content.' . $field_name)->get();
-    $this->assertTrue(empty($config_entity['default_value']), 'Empty default value has been stored successfully');
+    $this->assertEmpty($config_entity['default_value'], 'Empty default value has been stored successfully');
 
     // Clear field cache in order to avoid stale cache values.
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();

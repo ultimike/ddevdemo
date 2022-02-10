@@ -58,7 +58,7 @@ class CommentPreviewTest extends CommentTestBase {
     $this->submitForm($edit, 'Preview');
     $this->assertInstanceOf(MarkupInterface::class, $this->webUser->getDisplayName());
     $this->assertSession()->assertNoEscaped('<em>' . $this->webUser->id() . '</em>');
-    $this->assertRaw('<em>' . $this->webUser->id() . '</em>');
+    $this->assertSession()->responseContains('<em>' . $this->webUser->id() . '</em>');
 
     // Add a user picture.
     $image = current($this->drupalGetTestFiles('image'));
@@ -81,6 +81,10 @@ class CommentPreviewTest extends CommentTestBase {
 
     // Check that the user picture is displayed.
     $this->assertSession()->elementExists('xpath', "//article[contains(@class, 'preview')]//div[contains(@class, 'user-picture')]//img");
+
+    // Ensure that preview node is displayed after the submit buttons of the form.
+    $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/following-sibling::article', [':id' => 'edit-actions']);
+    $this->assertSession()->elementExists('xpath', $xpath);
   }
 
   /**
@@ -125,8 +129,7 @@ class CommentPreviewTest extends CommentTestBase {
     $submit_button = $this->assertSession()->buttonExists('Save');
     $submit_button->click();
     $this->assertSession()->pageTextContains('Your comment has been posted.');
-    $elements = $this->xpath('//section[contains(@class, "comment-wrapper")]/article');
-    $this->assertCount(2, $elements);
+    $this->assertSession()->elementsCount('xpath', '//section[contains(@class, "comment-wrapper")]/article', 2);
   }
 
   /**

@@ -2,13 +2,13 @@
 
 namespace Drupal\Tests\image\Functional;
 
-use Drupal\Core\Url;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Url;
+use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
-use Drupal\file\Entity\File;
 use Drupal\Tests\TestFileCreationTrait;
 
 /**
@@ -68,7 +68,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     ];
     $this->drupalGet('admin/config/media/image-styles/add');
     $this->submitForm($edit, 'Create new style');
-    $this->assertRaw(t('Style %name was created.', ['%name' => $style_label]));
+    $this->assertSession()->pageTextContains("Style {$style_label} was created.");
     $options = image_style_options();
     $this->assertArrayHasKey($style_name, $options);
   }
@@ -120,7 +120,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     ];
     $this->drupalGet($admin_path . '/add');
     $this->submitForm($edit, 'Create new style');
-    $this->assertRaw(t('Style %name was created.', ['%name' => $style_label]));
+    $this->assertSession()->pageTextContains("Style {$style_label} was created.");
 
     // Ensure that the expected entity operations are there.
     $this->drupalGet($admin_path);
@@ -257,7 +257,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     // Confirm that the form submission was successful.
     $this->assertSession()->statusCodeEquals(200);
     $image_crop_effect = $style->getEffect($uuids['image_crop']);
-    $this->assertRaw(t('The image effect %name has been deleted.', ['%name' => $image_crop_effect->label()]));
+    $this->assertSession()->pageTextContains("The image effect {$image_crop_effect->label()} has been deleted.");
     // Confirm that there is no longer a link to the effect.
     $this->assertSession()->linkByHrefNotExists($style_path . '/effects/' . $uuids['image_crop'] . '/delete');
     // Refresh the image style information and verify that the effect was
@@ -305,9 +305,8 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Confirm that the empty text is correct on the image styles page.
     $this->drupalGet($admin_path);
-    $this->assertRaw(t('There are currently no styles. <a href=":url">Add a new one</a>.', [
-      ':url' => Url::fromRoute('image.style_add')->toString(),
-    ]));
+    $this->assertSession()->pageTextContains("There are currently no styles. Add a new one.");
+    $this->assertSession()->linkByHrefExists(Url::fromRoute('image.style_add')->toString());
 
   }
 
@@ -343,8 +342,11 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $original_uri = File::load($fid)->getFileUri();
 
     // Test that image is displayed using newly created style.
+    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+    $file_url_generator = \Drupal::service('file_url_generator');
+
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(file_url_transform_relative($style->buildUrl($original_uri)));
+    $this->assertSession()->responseContains($file_url_generator->transformRelative($style->buildUrl($original_uri)));
 
     // Rename the style and make sure the image field is updated.
     $new_style_name = strtolower($this->randomMachineName(10));
@@ -360,7 +362,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Reload the image style using the new name.
     $style = ImageStyle::load($new_style_name);
-    $this->assertRaw(file_url_transform_relative($style->buildUrl($original_uri)));
+    $this->assertSession()->responseContains($file_url_generator->transformRelative($style->buildUrl($original_uri)));
 
     // Delete the style and choose a replacement style.
     $edit = [
@@ -368,12 +370,11 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     ];
     $this->drupalGet($style_path . $new_style_name . '/delete');
     $this->submitForm($edit, 'Delete');
-    $message = t('The image style %name has been deleted.', ['%name' => $new_style_label]);
-    $this->assertRaw($message);
+    $this->assertSession()->pageTextContains("The image style {$new_style_label} has been deleted.");
 
     $replacement_style = ImageStyle::load('thumbnail');
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(file_url_transform_relative($replacement_style->buildUrl($original_uri)));
+    $this->assertSession()->responseContains($file_url_generator->transformRelative($replacement_style->buildUrl($original_uri)));
   }
 
   /**
@@ -389,12 +390,12 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->assertSession()->pageTextContains('Scale and crop 300×200');
 
     // There should normally be only one edit link on this page initially.
-    $this->clickLink(t('Edit'));
+    $this->clickLink('Edit');
     $this->submitForm(['data[width]' => '360', 'data[height]' => '240'], 'Update effect');
     $this->assertSession()->pageTextContains('Scale and crop 360×240');
 
     // Check that the previous effect is replaced.
-    $this->assertNoText('Scale and crop 300×200');
+    $this->assertSession()->pageTextNotContains('Scale and crop 300×200');
 
     // Add another scale effect.
     $this->drupalGet('admin/config/media/image-styles/add');
@@ -403,7 +404,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->submitForm(['data[width]' => '12', 'data[height]' => '19'], 'Add effect');
 
     // Edit the scale effect that was just added.
-    $this->clickLink(t('Edit'));
+    $this->clickLink('Edit');
     $this->submitForm(['data[width]' => '24', 'data[height]' => '19'], 'Update effect');
 
     // Add another scale effect and make sure both exist. Click through from
@@ -493,7 +494,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Test that image is displayed using newly created style.
     $this->drupalGet('node/' . $nid);
-    $this->assertRaw(file_url_transform_relative($style->buildUrl($original_uri)));
+    $this->assertSession()->responseContains(\Drupal::service('file_url_generator')->transformRelative($style->buildUrl($original_uri)));
 
     // Copy config to sync, and delete the image style.
     $sync = $this->container->get('config.storage.sync');
@@ -519,8 +520,8 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style->save();
 
     $this->drupalGet('admin/config/media/image-styles');
-    $this->clickLink(t('Edit'));
-    $this->assertRaw(t('Select a new effect'));
+    $this->clickLink('Edit');
+    $this->assertSession()->pageTextContains("Select a new effect");
   }
 
 }

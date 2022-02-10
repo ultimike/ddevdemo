@@ -105,7 +105,7 @@ class LinkFieldTest extends BrowserTestBase {
     // Display creation form.
     $this->drupalGet('entity_test/add');
     $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", '');
-    $this->assertRaw('placeholder="http://example.com"');
+    $this->assertSession()->responseContains('placeholder="http://example.com"');
 
     // Create a path alias.
     $this->createPathAlias('/admin', '/a/path/alias');
@@ -211,8 +211,10 @@ class LinkFieldTest extends BrowserTestBase {
    *   The field name.
    * @param array $valid_entries
    *   An array of valid URL entries.
+   *
+   * @internal
    */
-  protected function assertValidEntries($field_name, array $valid_entries) {
+  protected function assertValidEntries(string $field_name, array $valid_entries): void {
     foreach ($valid_entries as $uri => $string) {
       $edit = [
         "{$field_name}[0][uri]" => $uri,
@@ -222,7 +224,7 @@ class LinkFieldTest extends BrowserTestBase {
       preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
-      $this->assertRaw('"' . $string . '"');
+      $this->assertSession()->responseContains('"' . $string . '"');
     }
   }
 
@@ -233,8 +235,10 @@ class LinkFieldTest extends BrowserTestBase {
    *   The field name.
    * @param array $invalid_entries
    *   An array of invalid URL entries.
+   *
+   * @internal
    */
-  protected function assertInvalidEntries($field_name, array $invalid_entries) {
+  protected function assertInvalidEntries(string $field_name, array $invalid_entries): void {
     foreach ($invalid_entries as $invalid_value => $error_message) {
       $edit = [
         "{$field_name}[0][uri]" => $invalid_value,
@@ -296,14 +300,14 @@ class LinkFieldTest extends BrowserTestBase {
       // Assert label is shown.
       $this->assertSession()->pageTextContains('Read more about this entity');
       $this->assertSession()->fieldValueEquals("{$field_name}[0][uri]", '');
-      $this->assertRaw('placeholder="http://example.com"');
+      $this->assertSession()->responseContains('placeholder="http://example.com"');
 
       if ($title_setting === DRUPAL_DISABLED) {
         $this->assertSession()->fieldNotExists("{$field_name}[0][title]");
-        $this->assertNoRaw('placeholder="Enter the text for this link"');
+        $this->assertSession()->responseNotContains('placeholder="Enter the text for this link"');
       }
       else {
-        $this->assertRaw('placeholder="Enter the text for this link"');
+        $this->assertSession()->responseContains('placeholder="Enter the text for this link"');
 
         $this->assertSession()->fieldValueEquals("{$field_name}[0][title]", '');
         if ($title_setting === DRUPAL_OPTIONAL) {
@@ -327,7 +331,7 @@ class LinkFieldTest extends BrowserTestBase {
             "{$field_name}[0][uri]" => '',
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertNoText('Link text field is required.');
+          $this->assertSession()->pageTextNotContains('Link text field is required.');
 
           // Verify that a URL and link text meets requirements.
           $this->drupalGet('entity_test/add');
@@ -336,7 +340,7 @@ class LinkFieldTest extends BrowserTestBase {
             "{$field_name}[0][title]" => 'Example',
           ];
           $this->submitForm($edit, 'Save');
-          $this->assertNoText('Link text field is required.');
+          $this->assertSession()->pageTextNotContains('Link text field is required.');
         }
       }
     }

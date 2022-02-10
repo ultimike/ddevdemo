@@ -38,7 +38,7 @@ class CommentFieldsTest extends CommentTestBase {
 
     // Check that the 'comment_body' field is present on the comment bundle.
     $field = FieldConfig::loadByName('comment', 'comment', 'comment_body');
-    $this->assertTrue(!empty($field), 'The comment_body field is added when a comment bundle is created');
+    $this->assertNotEmpty($field, 'The comment_body field is added when a comment bundle is created');
 
     $field->delete();
 
@@ -183,7 +183,7 @@ class CommentFieldsTest extends CommentTestBase {
     $this->drupalGet('admin/config/people/accounts/fields/user.user.field_user_comment/storage');
     $this->submitForm($edit, 'Save field settings');
     // We shouldn't get an error message.
-    $this->assertNoText('An illegal choice has been detected. Please contact the site administrator.');
+    $this->assertSession()->pageTextNotContains('An illegal choice has been detected. Please contact the site administrator.');
   }
 
   /**

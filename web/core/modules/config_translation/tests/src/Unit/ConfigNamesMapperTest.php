@@ -506,7 +506,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $this->typedConfigManager
       ->expects($this->any())
       ->method('hasConfigSchema')
-      ->will($this->returnValueMap($map));
+      ->willReturnMap($map);
 
     $result = $this->configNamesMapper->hasSchema();
     $this->assertSame($expected, $result);
@@ -553,7 +553,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $this->configMapperManager
       ->expects($this->any())
       ->method('hasTranslatable')
-      ->will($this->returnValueMap($map));
+      ->willReturnMap($map);
 
     $result = $this->configNamesMapper->hasTranslatable();
     $this->assertSame($expected, $result);
@@ -604,7 +604,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $this->localeConfigManager
       ->expects($this->any())
       ->method('hasTranslation')
-      ->will($this->returnValueMap($map));
+      ->willReturnMap($map);
 
     $result = $this->configNamesMapper->hasTranslation($language);
     $this->assertSame($expected, $result);
@@ -668,13 +668,14 @@ class TestConfigNamesMapper extends ConfigNamesMapper {
    *   The language code of this mapper if it is set; NULL otherwise.
    */
   public function getInternalLangcode() {
-    return isset($this->langcode) ? $this->langcode : NULL;
+    return $this->langcode ?? NULL;
   }
 
   /**
    * Sets the list of configuration names.
    *
    * @param array $config_names
+   *   The configuration names.
    */
   public function setConfigNames(array $config_names) {
     $this->pluginDefinition['names'] = $config_names;

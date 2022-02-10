@@ -85,7 +85,7 @@ class FormTest extends BrowserTestBase {
     $elements['textarea']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'textarea'];
     $elements['textarea']['empty_values'] = $empty_strings;
 
-    $elements['radios']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'radios', '#options' => ['' => t('None'), $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
+    $elements['radios']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'radios', '#options' => ['' => 'None', $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
     $elements['radios']['empty_values'] = $empty_arrays;
 
     $elements['checkbox']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'checkbox', '#required' => TRUE];
@@ -94,7 +94,7 @@ class FormTest extends BrowserTestBase {
     $elements['checkboxes']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'checkboxes', '#options' => [$this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
     $elements['checkboxes']['empty_values'] = $empty_arrays;
 
-    $elements['select']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'select', '#options' => ['' => t('None'), $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
+    $elements['select']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'select', '#options' => ['' => 'None', $this->randomMachineName(), $this->randomMachineName(), $this->randomMachineName()]];
     $elements['select']['empty_values'] = $empty_strings;
 
     $elements['file']['element'] = ['#title' => $this->randomMachineName(), '#type' => 'file'];
@@ -109,7 +109,7 @@ class FormTest extends BrowserTestBase {
           $form_id = $this->randomMachineName();
           $form = [];
           $form_state = new FormState();
-          $form['op'] = ['#type' => 'submit', '#value' => t('Submit')];
+          $form['op'] = ['#type' => 'submit', '#value' => 'Submit'];
           $element = $data['element']['#title'];
           $form[$element] = $data['element'];
           $form[$element]['#required'] = $required;
@@ -147,7 +147,7 @@ class FormTest extends BrowserTestBase {
             else {
               // Make sure there is *no* form error for this element. We're
               // not using assertEmpty() because the array key might not exist.
-              $this->assertTrue(empty($errors[$element]), "Optional '$type' field '$element' has no errors with empty input");
+              $this->assertArrayNotHasKey($element, $errors, "Optional '$type' field '$element' should have no errors with empty input.");
             }
           }
         }
@@ -185,7 +185,7 @@ class FormTest extends BrowserTestBase {
         $expected[] = $form[$key]['#form_test_required_error'];
       }
       else {
-        $expected[] = t('@name field is required.', ['@name' => $form[$key]['#title']]);
+        $expected[] = $form[$key]['#title'] . ' field is required.';
       }
     }
 
@@ -232,7 +232,7 @@ class FormTest extends BrowserTestBase {
     // Verify that no error message is displayed when all required fields are
     // filled.
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "error")]');
-    $this->assertRaw("The form_test_validate_required_form form was submitted successfully.");
+    $this->assertSession()->pageTextContains("The form_test_validate_required_form form was submitted successfully.");
   }
 
   /**
@@ -333,7 +333,7 @@ class FormTest extends BrowserTestBase {
     $this->drupalLogin($account);
 
     $this->drupalGet(Url::fromRoute('form_test.get_form'));
-    $this->assertNoRaw('form_token');
+    $this->assertSession()->responseNotContains('form_token');
   }
 
   /**
@@ -351,7 +351,7 @@ class FormTest extends BrowserTestBase {
     $edit = [];
     $this->drupalGet('form-test/validate-required-no-title');
     $this->submitForm($edit, 'Submit');
-    $this->assertNoRaw("The form_test_validate_required_form_no_title form was submitted successfully.");
+    $this->assertSession()->pageTextNotContains("The form_test_validate_required_form_no_title form was submitted successfully.");
 
     // Check the page for the error class on the textfield.
     $this->assertSession()->elementExists('xpath', '//input[contains(@class, "error")]');
@@ -367,7 +367,7 @@ class FormTest extends BrowserTestBase {
     $this->submitForm($edit, 'Submit');
     // Verify that no error input form element class is present.
     $this->assertSession()->elementNotExists('xpath', '//input[contains(@class, "error")]');
-    $this->assertRaw("The form_test_validate_required_form_no_title form was submitted successfully.");
+    $this->assertSession()->pageTextContains("The form_test_validate_required_form_no_title form was submitted successfully.");
   }
 
   /**
@@ -380,7 +380,7 @@ class FormTest extends BrowserTestBase {
     $edit = [];
     $this->drupalGet('form-test/checkbox');
     $this->submitForm($edit, 'Submit');
-    $this->assertRaw(t('@name field is required.', ['@name' => 'required_checkbox']));
+    $this->assertSession()->pageTextContains("required_checkbox field is required.");
 
     // Now try to submit the form correctly.
     $this->submitForm(['required_checkbox' => 1], 'Submit');
@@ -411,7 +411,7 @@ class FormTest extends BrowserTestBase {
 
     // Verify that the options are escaped as expected.
     $this->assertSession()->assertEscaped('<strong>four</strong>');
-    $this->assertNoRaw('<strong>four</strong>');
+    $this->assertSession()->responseNotContains('<strong>four</strong>');
 
     // Posting without any values should throw validation errors.
     $this->submitForm([], 'Submit');
@@ -428,7 +428,7 @@ class FormTest extends BrowserTestBase {
         'multiple_no_default',
     ];
     foreach ($no_errors as $key) {
-      $this->assertNoText($form[$key]['#title'] . ' field is required.');
+      $this->assertSession()->pageTextNotContains($form[$key]['#title'] . ' field is required.');
     }
 
     $expected_errors = [
@@ -651,18 +651,18 @@ class FormTest extends BrowserTestBase {
         // Create placeholder array.
         $placeholders = [
           '%name' => $form[$element]['#title'],
-          '%min' => isset($form[$element]['#min']) ? $form[$element]['#min'] : '0',
-          '%max' => isset($form[$element]['#max']) ? $form[$element]['#max'] : '0',
+          '%min' => $form[$element]['#min'] ?? '0',
+          '%max' => $form[$element]['#max'] ?? '0',
         ];
 
         foreach ($error_messages as $id => $message) {
           // Check if the error exists on the page, if the current message ID is
           // expected. Otherwise ensure that the error message is not present.
           if ($id === $error) {
-            $this->assertRaw(new FormattableMarkup($message, $placeholders));
+            $this->assertSession()->responseContains(new FormattableMarkup($message, $placeholders));
           }
           else {
-            $this->assertNoRaw(new FormattableMarkup($message, $placeholders));
+            $this->assertSession()->responseNotContains(new FormattableMarkup($message, $placeholders));
           }
         }
       }
@@ -721,7 +721,7 @@ class FormTest extends BrowserTestBase {
       ];
       $this->drupalGet('form-test/color');
       $this->submitForm($edit, 'Submit');
-      $this->assertRaw(t('%name must be a valid color.', ['%name' => 'Color']));
+      $this->assertSession()->pageTextContains("Color must be a valid color.");
     }
   }
 
@@ -790,8 +790,10 @@ class FormTest extends BrowserTestBase {
 
   /**
    * Assert that the values submitted to a form matches the default values of the elements.
+   *
+   * @internal
    */
-  public function assertFormValuesDefault($values, $form) {
+  public function assertFormValuesDefault(array $values, array $form): void {
     foreach (Element::children($form) as $key) {
       if (isset($form[$key]['#default_value'])) {
         if (isset($form[$key]['#expected_value'])) {
@@ -860,7 +862,7 @@ class FormTest extends BrowserTestBase {
       $element = $this->xpath($path, [
         ':name' => Html::escape($name),
         ':div-class' => $class,
-        ':value' => isset($item['#value']) ? $item['#value'] : '',
+        ':value' => $item['#value'] ?? '',
       ]);
       $this->assertTrue(isset($element[0]), new FormattableMarkup('Disabled form element class found for #type %type.', ['%type' => $item['#type']]));
     }

@@ -99,7 +99,7 @@ abstract class AggregatorTestBase extends BrowserTestBase {
   public function deleteFeed(FeedInterface $feed) {
     $this->drupalGet('aggregator/sources/' . $feed->id() . '/delete');
     $this->submitForm([], 'Delete');
-    $this->assertRaw(t('The feed %title has been deleted.', ['%title' => $feed->label()]));
+    $this->assertSession()->pageTextContains('The feed ' . $feed->label() . ' has been deleted.');
   }
 
   /**
@@ -222,7 +222,7 @@ abstract class AggregatorTestBase extends BrowserTestBase {
   public function deleteFeedItems(FeedInterface $feed) {
     $this->drupalGet('admin/config/services/aggregator/delete/' . $feed->id());
     $this->submitForm([], 'Delete items');
-    $this->assertRaw(t('The news items from %title have been deleted.', ['%title' => $feed->label()]));
+    $this->assertSession()->pageTextContains('The news items from ' . $feed->label() . ' have been deleted.');
   }
 
   /**
@@ -356,7 +356,7 @@ EOF;
    *   Path to the feed.
    */
   public function getRSS091Sample() {
-    return $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'aggregator') . '/tests/modules/aggregator_test/aggregator_test_rss091.xml';
+    return $GLOBALS['base_url'] . '/' . $this->getModulePath('aggregator') . '/tests/modules/aggregator_test/aggregator_test_rss091.xml';
   }
 
   /**
@@ -368,7 +368,7 @@ EOF;
   public function getAtomSample() {
     // The content of this sample ATOM feed is based directly off of the
     // example provided in RFC 4287.
-    return $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'aggregator') . '/tests/modules/aggregator_test/aggregator_test_atom.xml';
+    return $GLOBALS['base_url'] . '/' . $this->getModulePath('aggregator') . '/tests/modules/aggregator_test/aggregator_test_atom.xml';
   }
 
   /**
@@ -378,7 +378,7 @@ EOF;
    *   Path to the feed.
    */
   public function getHtmlEntitiesSample() {
-    return $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'aggregator') . '/tests/modules/aggregator_test/aggregator_test_title_entities.xml';
+    return $GLOBALS['base_url'] . '/' . $this->getModulePath('aggregator') . '/tests/modules/aggregator_test/aggregator_test_title_entities.xml';
   }
 
   /**

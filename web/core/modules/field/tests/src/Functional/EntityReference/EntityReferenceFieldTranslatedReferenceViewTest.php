@@ -175,25 +175,29 @@ class EntityReferenceFieldTranslatedReferenceViewTest extends BrowserTestBase {
 
   /**
    * Assert entity reference display.
+   *
+   * @internal
    */
-  protected function assertEntityReferenceDisplay() {
+  protected function assertEntityReferenceDisplay(): void {
     $url = $this->referrerEntity->toUrl();
     $translation_url = $this->referrerEntity->toUrl('canonical', ['language' => ConfigurableLanguage::load($this->translateToLangcode)]);
 
     $this->drupalGet($url);
     $this->assertSession()->pageTextContains($this->labelOfNotTranslatedReference);
     $this->assertSession()->pageTextContains($this->originalLabel);
-    $this->assertNoText($this->translatedLabel);
+    $this->assertSession()->pageTextNotContains($this->translatedLabel);
     $this->drupalGet($translation_url);
     $this->assertSession()->pageTextContains($this->labelOfNotTranslatedReference);
-    $this->assertNoText($this->originalLabel);
+    $this->assertSession()->pageTextNotContains($this->originalLabel);
     $this->assertSession()->pageTextContains($this->translatedLabel);
   }
 
   /**
    * Assert entity reference form display.
+   *
+   * @internal
    */
-  protected function assertEntityReferenceFormDisplay() {
+  protected function assertEntityReferenceFormDisplay(): void {
     $this->drupalLogin($this->webUser);
     $url = $this->referrerEntity->toUrl('edit-form');
     $translation_url = $this->referrerEntity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($this->translateToLangcode)]);

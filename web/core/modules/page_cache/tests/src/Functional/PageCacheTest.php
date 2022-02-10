@@ -137,7 +137,7 @@ class PageCacheTest extends BrowserTestBase {
     // Verify that HTML page was cached.
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
     // Verify that the correct HTML response was returned.
-    $this->assertRaw('<p>oh hai this is html.</p>');
+    $this->assertSession()->responseContains('<p>oh hai this is html.</p>');
 
     $this->drupalGet($accept_header_cache_url_with_json);
     // Verify that JSON response was not yet cached.
@@ -146,7 +146,7 @@ class PageCacheTest extends BrowserTestBase {
     // Verify that JSON response was cached.
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
     // Verify that the correct JSON response was returned.
-    $this->assertRaw('{"content":"oh hai this is json"}');
+    $this->assertSession()->responseContains('{"content":"oh hai this is json"}');
 
     // Enable REST support for nodes and hal+json.
     \Drupal::service('module_installer')->install(['node', 'rest', 'hal', 'basic_auth']);
@@ -610,7 +610,7 @@ class PageCacheTest extends BrowserTestBase {
       ],
     ];
 
-    foreach ($tests as list($url_raw, $url_normalized)) {
+    foreach ($tests as [$url_raw, $url_normalized]) {
       // Initialize cache on raw URL.
       $headers = $this->getHeaders($url_raw);
       $this->assertEquals('MISS', $headers['X-Drupal-Cache']);
@@ -651,7 +651,7 @@ class PageCacheTest extends BrowserTestBase {
     $headers = [];
     foreach (explode("\n", $output) as $header) {
       if (strpos($header, ':')) {
-        list($key, $value) = explode(':', $header, 2);
+        [$key, $value] = explode(':', $header, 2);
         $headers[trim($key)] = trim($value);
       }
     }

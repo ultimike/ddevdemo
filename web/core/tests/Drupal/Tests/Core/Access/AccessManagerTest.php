@@ -97,6 +97,7 @@ class AccessManagerTest extends UnitTestCase {
     $this->container = new ContainerBuilder();
     $cache_contexts_manager = $this->prophesize(CacheContextsManager::class)->reveal();
     $this->container->set('cache_contexts_manager', $cache_contexts_manager);
+    $this->container->setParameter('dynamic_access_check_services', []);
     \Drupal::setContainer($this->container);
 
     $this->routeCollection = new RouteCollection();
@@ -113,7 +114,7 @@ class AccessManagerTest extends UnitTestCase {
     $map[] = ['test_route_4', $this->routeCollection->get('test_route_4')];
     $this->routeProvider->expects($this->any())
       ->method('getRouteByName')
-      ->will($this->returnValueMap($map));
+      ->willReturnMap($map);
 
     $map = [];
     $map[] = ['test_route_1', [], '/test-route-1'];
@@ -162,6 +163,7 @@ class AccessManagerTest extends UnitTestCase {
     // Setup the dynamic access checker.
     $access_check = $this->createMock('Drupal\Tests\Core\Access\TestAccessCheckInterface');
     $this->container->set('test_access', $access_check);
+    $this->container->setParameter('dynamic_access_check_services', ['test_access']);
     $this->checkProvider->addCheckService('test_access', 'access');
 
     $route = new Route('/test-path', [], ['_foo' => '1', '_bar' => '1']);
@@ -173,9 +175,9 @@ class AccessManagerTest extends UnitTestCase {
     $access_check->expects($this->exactly(2))
       ->method('applies')
       ->with($this->isInstanceOf('Symfony\Component\Routing\Route'))
-      ->will($this->returnCallback(function (Route $route) {
-         return $route->getRequirement('_bar') == 2;
-      }));
+      ->willReturnCallback(function (Route $route) {
+        return $route->getRequirement('_bar') == 2;
+      });
 
     $this->checkProvider->setChecks($collection);
     $this->assertEmpty($route->getOption('_access_checks'));
@@ -387,6 +389,7 @@ class AccessManagerTest extends UnitTestCase {
       ->will($this->returnValue(AccessResult::forbidden()));
 
     $this->container->set('test_access', $access_check);
+    $this->container->setParameter('dynamic_access_check_services', ['test_access']);
 
     $this->checkProvider->addCheckService('test_access', 'access');
     $this->checkProvider->setChecks($this->routeCollection);
@@ -435,6 +438,7 @@ class AccessManagerTest extends UnitTestCase {
       ->will($this->returnValue(AccessResult::forbidden()));
 
     $this->container->set('test_access', $access_check);
+    $this->container->setParameter('dynamic_access_check_services', ['test_access']);
 
     $this->checkProvider->addCheckService('test_access', 'access');
     $this->checkProvider->setChecks($this->routeCollection);
@@ -535,15 +539,16 @@ class AccessManagerTest extends UnitTestCase {
     }
     return $this->argumentsResolverFactory->expects($constraint)
       ->method('getArgumentsResolver')
-      ->will($this->returnCallback(function ($route_match, $account) {
+      ->willReturnCallback(function ($route_match, $account) {
         $resolver = $this->createMock('Drupal\Component\Utility\ArgumentsResolverInterface');
         $resolver->expects($this->any())
           ->method('getArguments')
           ->will($this->returnCallback(function ($callable) use ($route_match) {
             return [$route_match->getRouteObject()];
           }));
+
         return $resolver;
-      }));
+      });
   }
 
 }
