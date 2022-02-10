@@ -324,7 +324,7 @@ class FieldPluginBaseTest extends UnitTestCase {
       'path' => $path,
     ];
 
-    $final_html = isset($final_html) ? $final_html : $link_html;
+    $final_html = $final_html ?? $link_html;
 
     $this->setUpUrlIntegrationServices();
     $this->setupDisplayWithEmptyArgumentsAndFields();
@@ -398,7 +398,7 @@ class FieldPluginBaseTest extends UnitTestCase {
       'url' => $url,
     ];
 
-    $final_html = isset($final_html) ? $final_html : $link_html;
+    $final_html = $final_html ?? $link_html;
 
     $this->setUpUrlIntegrationServices();
     $this->setupDisplayWithEmptyArgumentsAndFields();
@@ -653,7 +653,7 @@ class FieldPluginBaseTest extends UnitTestCase {
   protected function setupTestField(array $options = []) {
     /** @var \Drupal\Tests\views\Unit\Plugin\field\FieldPluginBaseTestField $field */
     $field = $this->getMockBuilder('Drupal\Tests\views\Unit\Plugin\field\FieldPluginBaseTestField')
-      ->setMethods(['l'])
+      ->addMethods(['l'])
       ->setConstructorArgs([$this->configuration, $this->pluginId, $this->pluginDefinition])
       ->getMock();
     $field->init($this->executable, $this->display, $options);

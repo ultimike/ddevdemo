@@ -92,7 +92,7 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
       'field_telephone[0][value]' => "123456789",
     ];
     $this->submitForm($edit, 'Save');
-    $this->assertRaw('<a href="tel:123456789">');
+    $this->assertSession()->responseContains('<a href="tel:123456789">');
 
     // Test that the module can't be uninstalled from the UI while there is data
     // for its fields.
@@ -127,10 +127,13 @@ class ReEnableModuleFieldTest extends BrowserTestBase {
     $field_storage2->delete();
 
     $this->drupalGet('admin/modules/uninstall');
+    $this->assertSession()->pageTextContains('Uninstall');
     $this->assertSession()->pageTextContains('Fields pending deletion');
     $this->cronRun();
-    $this->assertNoText("The Telephone number field type is used in the following field: node.field_telephone");
-    $this->assertNoText('Fields pending deletion');
+    $this->drupalGet('admin/modules/uninstall');
+    $this->assertSession()->pageTextContains('Uninstall');
+    $this->assertSession()->pageTextNotContains("The Telephone number field type is used in the following field: node.field_telephone");
+    $this->assertSession()->pageTextNotContains('Fields pending deletion');
   }
 
 }

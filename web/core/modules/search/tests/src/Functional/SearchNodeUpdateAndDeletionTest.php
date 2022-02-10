@@ -109,7 +109,7 @@ class SearchNodeUpdateAndDeletionTest extends BrowserTestBase {
       ->condition('word', 'dragons')
       ->execute()
       ->fetchField();
-    $this->assertNotFalse($search_index_dataset, t('Node info found on the search_index'));
+    $this->assertNotFalse($search_index_dataset, 'Node info found on the search_index');
 
     // Delete the node.
     $node->delete();
@@ -126,7 +126,7 @@ class SearchNodeUpdateAndDeletionTest extends BrowserTestBase {
     // Search again to verify the node doesn't appear anymore.
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
-    $this->assertNoText($node->label());
+    $this->assertSession()->pageTextNotContains($node->label());
   }
 
 }

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -98,7 +97,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
     $this->config('update_test.settings')->set('xml_map', $xml_map)->save();
     // Manually check the update status.
     $this->drupalGet('admin/reports/updates');
-    $this->clickLink(t('Check manually'));
+    $this->clickLink('Check manually');
     $this->checkForMetaRefresh();
   }
 
@@ -108,8 +107,10 @@ abstract class UpdateTestBase extends BrowserTestBase {
   protected function standardTests() {
     $this->assertSession()->responseContains('<h3>Drupal core</h3>');
     // Verify that the link to the Drupal project appears.
-    $this->assertRaw(Link::fromTextAndUrl(t('Drupal'), Url::fromUri('http://example.com/project/drupal'))->toString());
-    $this->assertNoText('No available releases found');
+    $this->assertSession()->linkExists('Drupal');
+    $this->assertSession()->linkByHrefExists('http://example.com/project/drupal');
+    $this->assertSession()->pageTextNotContains('No available releases found');
+    $this->assertSession()->pageTextContains('Last checked:');
   }
 
   /**
@@ -219,7 +220,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    */
   protected function confirmRevokedStatus($revoked_version, $newer_version, $new_version_label) {
     $this->drupalGet('admin/reports/updates');
-    $this->clickLink(t('Check manually'));
+    $this->clickLink('Check manually');
     $this->checkForMetaRefresh();
     $this->assertUpdateTableTextContains('Revoked!');
     $this->assertUpdateTableTextContains($revoked_version);
@@ -241,7 +242,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    */
   protected function confirmUnsupportedStatus($unsupported_version, $newer_version, $new_version_label) {
     $this->drupalGet('admin/reports/updates');
-    $this->clickLink(t('Check manually'));
+    $this->clickLink('Check manually');
     $this->checkForMetaRefresh();
     $this->assertUpdateTableTextContains('Not supported!');
     $this->assertUpdateTableTextContains($unsupported_version);

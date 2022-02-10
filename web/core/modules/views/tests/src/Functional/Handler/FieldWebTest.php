@@ -84,17 +84,16 @@ class FieldWebTest extends ViewTestBase {
     $this->assertCacheContexts($expected_contexts);
 
     // Clicking a click sort should change the order.
-    $this->clickLink(t('ID'));
+    $this->clickLink('ID');
     $href = Url::fromRoute('<none>', [], ['query' => ['order' => 'id', 'sort' => 'desc']])->toString();
     $this->assertSession()->linkByHrefExists($href);
     // Check that the output has the expected order (asc).
     $ids = $this->clickSortLoadIdsFromOutput();
     $this->assertEquals(range(1, 5), $ids);
     // Check that the rel attribute has the correct value.
-    $result = $this->xpath('//a[@href="' . $href . '"]');
-    $this->assertEquals('nofollow', $result[0]->getAttribute('rel'));
+    $this->assertSession()->elementAttributeContains('xpath', "//a[@href='$href']", 'rel', 'nofollow');
 
-    $this->clickLink(t('ID Sort descending'));
+    $this->clickLink('ID Sort descending');
     // Check that the output has the expected order (desc).
     $ids = $this->clickSortLoadIdsFromOutput();
     $this->assertEquals(range(5, 1, -1), $ids);
@@ -142,10 +141,10 @@ class FieldWebTest extends ViewTestBase {
    *   The value to search for.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
+   *
+   * @internal
    */
-  protected function assertSubString($haystack, $needle, $message = '', $group = 'Other') {
+  protected function assertSubString(string $haystack, string $needle, string $message = ''): void {
     $this->assertStringContainsString($needle, $haystack, $message);
   }
 
@@ -158,10 +157,10 @@ class FieldWebTest extends ViewTestBase {
    *   The value to search for.
    * @param string $message
    *   The message to display along with the assertion.
-   * @param string $group
-   *   The type of assertion - examples are "Browser", "PHP".
+   *
+   * @internal
    */
-  protected function assertNotSubString($haystack, $needle, $message = '', $group = 'Other') {
+  protected function assertNotSubString(string $haystack, string $needle, string $message = ''): void {
     $this->assertStringNotContainsString($needle, $haystack, $message);
   }
 
@@ -474,7 +473,7 @@ class FieldWebTest extends ViewTestBase {
 
     // Tests the element classes/element.
 
-    // Set some common element element types and see whether they appear with and without a custom class set.
+    // Set some common element types and see whether they appear with and without a custom class set.
     foreach (['h1', 'span', 'p', 'div'] as $element_type) {
       $id_field->options['element_type'] = $element_type;
 

@@ -355,8 +355,8 @@ function drupal_attach_tabledrag(&$element, array $options) {
   $tabledrag_id = (!isset($tabledrag_id)) ? 0 : $tabledrag_id + 1;
 
   // If a subgroup or source isn't set, assume it is the same as the group.
-  $target = isset($options['subgroup']) ? $options['subgroup'] : $group;
-  $source = isset($options['source']) ? $options['source'] : $target;
+  $target = $options['subgroup'] ?? $group;
+  $source = $options['source'] ?? $target;
   $element['#attached']['drupalSettings']['tableDrag'][$options['table_id']][$group][$tabledrag_id] = [
     'target' => $target,
     'source' => $source,
@@ -382,11 +382,16 @@ function drupal_attach_tabledrag(&$element, array $options) {
  * @return
  *   The rendered element.
  *
+ * @deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use
+ *   \Drupal\Core\Render\RendererInterface::render() instead.
+ *
+ * @see https://www.drupal.org/node/2939099
  * @see \Drupal\Core\Render\RendererInterface
  * @see show()
  * @see hide()
  */
 function render(&$element) {
+  @trigger_error('The render() function is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use \Drupal\Core\Render\RendererInterface::render() instead. See https://www.drupal.org/node/2939099', E_USER_DEPRECATED);
   if (!$element && $element !== 0) {
     return NULL;
   }
@@ -408,13 +413,13 @@ function render(&$element) {
 /**
  * Hides an element from later rendering.
  *
- * The first time render() or drupal_render() is called on an element tree,
- * as each element in the tree is rendered, it is marked with a #printed flag
- * and the rendered children of the element are cached. Subsequent calls to
- * render() or drupal_render() will not traverse the child tree of this element
- * again: they will just use the cached children. So if you want to hide an
- * element, be sure to call hide() on the element before its parent tree is
- * rendered for the first time, as it will have no effect on subsequent
+ * The first time render() or RenderInterface::render() is called on an element
+ * tree, as each element in the tree is rendered, it is marked with a #printed
+ * flag and the rendered children of the element are cached. Subsequent calls to
+ * render() or RenderInterface::render() will not traverse the child tree of
+ * this element again: they will just use the cached children. So if you want to
+ * hide an element, be sure to call hide() on the element before its parent tree
+ * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
  * @param $element
@@ -423,6 +428,7 @@ function render(&$element) {
  * @return
  *   The element.
  *
+ * @see \Drupal\Core\Render\RendererInterface
  * @see render()
  * @see show()
  */
@@ -437,13 +443,13 @@ function hide(&$element) {
  * You can also use render($element), which shows the element while rendering
  * it.
  *
- * The first time render() or drupal_render() is called on an element tree,
- * as each element in the tree is rendered, it is marked with a #printed flag
- * and the rendered children of the element are cached. Subsequent calls to
- * render() or drupal_render() will not traverse the child tree of this element
- * again: they will just use the cached children. So if you want to show an
- * element, be sure to call show() on the element before its parent tree is
- * rendered for the first time, as it will have no effect on subsequent
+ * The first time render() or RenderInterface::render() is called on an element
+ * tree, as each element in the tree is rendered, it is marked with a #printed
+ * flag and the rendered children of the element are cached. Subsequent calls to
+ * render() or RenderInterface::render() will not traverse the child tree of
+ * this element again: they will just use the cached children. So if you want to
+ * show an element, be sure to call show() on the element before its parent tree
+ * is rendered for the first time, as it will have no effect on subsequent
  * renderings of the parent tree.
  *
  * @param $element
@@ -452,6 +458,7 @@ function hide(&$element) {
  * @return
  *   The element.
  *
+ * @see \Drupal\Core\Render\RendererInterface
  * @see render()
  * @see hide()
  */

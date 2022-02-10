@@ -50,7 +50,9 @@ class ImageDimensionsTest extends BrowserTestBase {
     $style = ImageStyle::create(['name' => 'test', 'label' => 'Test']);
     $style->save();
     $generated_uri = 'public://styles/test/public/' . $file_system->basename($original_uri);
-    $url = file_url_transform_relative($style->buildUrl($original_uri));
+    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+    $file_url_generator = \Drupal::service('file_url_generator');
+    $url = $file_url_generator->transformRelative($style->buildUrl($original_uri));
 
     $variables = [
       '#theme' => 'image_style',
@@ -266,7 +268,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     ];
     // PNG original image. Should be resized to 100x100.
     $generated_uri = 'public://styles/test_uri/public/' . $file_system->basename($original_uri);
-    $url = file_url_transform_relative($style->buildUrl($original_uri));
+    $url = \Drupal::service('file_url_generator')->transformRelative($style->buildUrl($original_uri));
     $this->assertEquals('<img src="' . $url . '" width="100" height="100" alt="" loading="lazy" class="image-style-test-uri" />', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
     $this->drupalGet($this->getAbsoluteUrl($url));
@@ -279,7 +281,7 @@ class ImageDimensionsTest extends BrowserTestBase {
     $file = $files[1];
     $original_uri = $file_system->copy($file->uri, 'public://', FileSystemInterface::EXISTS_RENAME);
     $generated_uri = 'public://styles/test_uri/public/' . $file_system->basename($original_uri);
-    $url = file_url_transform_relative($style->buildUrl($original_uri));
+    $url = $file_url_generator->transformRelative($style->buildUrl($original_uri));
     $variables['#uri'] = $original_uri;
     $this->assertEquals('<img src="' . $url . '" width="50" height="50" alt="" loading="lazy" class="image-style-test-uri" />', $this->getImageTag($variables));
     $this->assertFileDoesNotExist($generated_uri);
@@ -294,14 +296,15 @@ class ImageDimensionsTest extends BrowserTestBase {
   /**
    * Render an image style element.
    *
-   * Function drupal_render() alters the passed $variables array by adding a new
-   * key '#printed' => TRUE. This prevents next call to re-render the element.
-   * We wrap drupal_render() in a helper protected method and pass each time a
-   * fresh array so that $variables won't get altered and the element is
-   * re-rendered each time.
+   * Function \Drupal\Core\Render\RendererInterface::render() alters the passed
+   * $variables array by adding a new key '#printed' => TRUE. This prevents next
+   * call to re-render the element. We wrap
+   * \Drupal\Core\Render\RendererInterface::render() in a helper protected
+   * method and pass each time a fresh array so that $variables won't get
+   * altered and the element is re-rendered each time.
    */
   protected function getImageTag($variables) {
-    return str_replace("\n", NULL, \Drupal::service('renderer')->renderRoot($variables));
+    return str_replace("\n", '', \Drupal::service('renderer')->renderRoot($variables));
   }
 
 }

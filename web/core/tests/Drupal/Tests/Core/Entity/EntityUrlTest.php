@@ -433,7 +433,7 @@ class EntityUrlTest extends UnitTestCase {
     // add method prophecies later while still revealing the prophecy now.
     $entity = $this->getMockBuilder($class)
       ->setConstructorArgs([$values, $this->entityTypeId])
-      ->setMethods($methods)
+      ->onlyMethods($methods)
       ->getMockForAbstractClass();
 
     $this->entityType = $this->prophesize(EntityTypeInterface::class);
@@ -460,8 +460,10 @@ class EntityUrlTest extends UnitTestCase {
    *   Whether or not the URL is expected to have a language option.
    * @param \Drupal\Core\Url $url
    *   The URL option to make the assertions on.
+   *
+   * @internal
    */
-  protected function assertUrl($expected_route_name, array $expected_route_parameters, $entity, $has_language, Url $url) {
+  protected function assertUrl(string $expected_route_name, array $expected_route_parameters, $entity, bool $has_language, Url $url): void {
     $this->assertEquals($expected_route_name, $url->getRouteName());
     $this->assertEquals($expected_route_parameters, $url->getRouteParameters());
     $this->assertEquals($this->entityTypeId, $url->getOption('entity_type'));

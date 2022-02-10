@@ -45,7 +45,7 @@ class ForumUninstallTest extends BrowserTestBase {
 
     // Create a taxonomy term.
     $term = Term::create([
-      'name' => t('A term'),
+      'name' => 'A term',
       'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
       'description' => '',
       'parent' => [0],
@@ -123,7 +123,7 @@ class ForumUninstallTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save content type');
     $this->assertTrue((bool) NodeType::load('forum'), 'Node type with machine forum created.');
     $this->drupalGet('admin/structure/types/manage/forum');
-    $this->clickLink(t('Delete'));
+    $this->clickLink('Delete');
     $this->submitForm([], 'Delete');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertFalse((bool) NodeType::load('forum'), 'Node type with machine forum deleted.');

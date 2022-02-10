@@ -35,7 +35,7 @@
         "drupal/select2_all": "^1.0@alpha",
         "drush/drush": "^10.5",
         "pantheon-systems/drupal-integrations": "^9.0",
-        "topfloor/composer-cleanup-vcs-dirs": "dev-composer-2",
+        "topfloor/composer-cleanup-vcs-dirs": "^1.1",
         "ultimike/ddevdrupalgitpod": "dev-main"
     },
     "conflict": {
@@ -44,7 +44,13 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true,
+            "topfloor/composer-cleanup-vcs-dirs": true
+        }
     },
     "extra": {
         "drupal-scaffold": {

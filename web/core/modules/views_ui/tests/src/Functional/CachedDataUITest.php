@@ -62,7 +62,7 @@ class CachedDataUITest extends UITestBase {
     // Test we have the break lock link.
     $this->assertSession()->linkByHrefExists('admin/structure/views/view/test_view/break-lock');
     // Break the lock.
-    $this->clickLink(t('break this lock'));
+    $this->clickLink('break this lock');
     $this->submitForm([], 'Break lock');
     // Test that save and cancel buttons are shown.
     $this->assertSession()->buttonExists('Save');
@@ -70,7 +70,7 @@ class CachedDataUITest extends UITestBase {
     // Test we can save the view.
     $this->drupalGet('admin/structure/views/view/test_view/edit');
     $this->submitForm([], 'Save');
-    $this->assertRaw(t('The view %view has been saved.', ['%view' => 'Test view']));
+    $this->assertSession()->pageTextContains("The view Test view has been saved.");
 
     // Test that a deleted view has no tempstore data.
     $this->drupalGet('admin/structure/views/nojs/display/test_view/default/title');

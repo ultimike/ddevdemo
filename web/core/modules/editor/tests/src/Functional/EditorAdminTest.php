@@ -71,7 +71,7 @@ class EditorAdminTest extends BrowserTestBase {
     $options = $select->findAll('css', 'option');
     $this->assertCount(1, $options);
     $this->assertSame('None', $options[0]->getText(), 'Option 1 in the Text Editor select is "None".');
-    $this->assertRaw('This option is disabled because no modules that provide a text editor are currently enabled.');
+    $this->assertSession()->pageTextContains('This option is disabled because no modules that provide a text editor are currently enabled.');
   }
 
   /**
@@ -113,7 +113,7 @@ class EditorAdminTest extends BrowserTestBase {
     $this->container->get('module_installer')->install(['node']);
     $this->resetAll();
     // Create a new node type and attach the 'body' field to it.
-    $node_type = NodeType::create(['type' => mb_strtolower($this->randomMachineName())]);
+    $node_type = NodeType::create(['type' => mb_strtolower($this->randomMachineName()), 'name' => $this->randomString()]);
     $node_type->save();
     node_add_body_field($node_type, $this->randomString());
 
@@ -143,14 +143,14 @@ class EditorAdminTest extends BrowserTestBase {
 
     // Go to node edit form.
     $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertRaw($text);
+    $this->assertSession()->responseContains($text);
 
     // Disable the format assigned to the 'body' field of the node.
     FilterFormat::load('monoceros')->disable()->save();
 
     // Edit again the node.
     $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertRaw($text);
+    $this->assertSession()->responseContains($text);
   }
 
   /**
@@ -216,7 +216,7 @@ class EditorAdminTest extends BrowserTestBase {
     $this->assertSame('Unicorn Editor', $options[1]->getText(), 'Option 2 in the Text Editor select is "Unicorn Editor".');
     $this->assertTrue($options[0]->hasAttribute('selected'), 'Option 1 ("None") is selected.');
     // Ensure the none option is selected.
-    $this->assertNoRaw('This option is disabled because no modules that provide a text editor are currently enabled.');
+    $this->assertSession()->pageTextNotContains('This option is disabled because no modules that provide a text editor are currently enabled.');
 
     // Select the "Unicorn Editor" editor and click the "Configure" button.
     $edit = [

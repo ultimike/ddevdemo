@@ -37,7 +37,7 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
 
     // Clear all caches so that the base field definition, its cache in the
     // entity field manager, the t() cache, etc. are all cleared.
-    drupal_flush_all_caches();
+    $this->resetAll();
   }
 
   /**
@@ -93,7 +93,7 @@ class LocaleTranslatedSchemaDefinitionTest extends BrowserTestBase {
     $this->drupalGet($update_url . '/selection', ['external' => TRUE]);
     $this->updateRequirementsProblem();
     $this->drupalGet($update_url . '/selection', ['external' => TRUE]);
-    $this->assertRaw('messages--status');
+    $this->assertSession()->responseContains('messages--status');
     $this->assertSession()->linkByHrefNotExists('fr/update.php/run', 'No link to run updates.');
   }
 

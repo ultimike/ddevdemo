@@ -7,7 +7,7 @@ use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Tests the markup of core render element types passed to drupal_render().
+ * Tests the rendered markup of core render element types.
  *
  * @group Common
  */
@@ -34,8 +34,10 @@ class RenderElementTypesTest extends KernelTestBase {
    *   The expected markup.
    * @param string $message
    *   Assertion message.
+   *
+   * @internal
    */
-  protected function assertElements(array $elements, $expected_html, $message) {
+  protected function assertElements(array $elements, string $expected_html, string $message): void {
     $actual_html = (string) \Drupal::service('renderer')->renderRoot($elements);
     $this->assertSame($expected_html, $actual_html, Html::escape($message));
   }
@@ -182,7 +184,7 @@ class RenderElementTypesTest extends KernelTestBase {
     foreach ($elements as $element) {
       $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
       $result = $xml->xpath($element['expected']);
-      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly by drupal_render().');
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" input rendered correctly.');
     }
   }
 
@@ -213,7 +215,7 @@ class RenderElementTypesTest extends KernelTestBase {
     foreach ($elements as $element) {
       $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
       $result = $xml->xpath($element['expected']);
-      $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly by drupal_render().');
+      $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
     }
 
     // Set admin compact mode on for additional tests.
@@ -229,7 +231,7 @@ class RenderElementTypesTest extends KernelTestBase {
 
     $xml = new \SimpleXMLElement(\Drupal::service('renderer')->renderRoot($element['value']));
     $result = $xml->xpath($element['expected']);
-    $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly by drupal_render().');
+    $this->assertNotEmpty($result, '"' . $element['name'] . '" is rendered correctly.');
   }
 
 }

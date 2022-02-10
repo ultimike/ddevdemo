@@ -92,6 +92,35 @@ class Connection extends DatabaseConnection {
   /**
    * {@inheritdoc}
    */
+  public function __construct(\PDO $connection, array $connection_options) {
+    // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
+    // combination mode), then MySQL doesn't interpret a double quote as an
+    // identifier quote, in which case use the non-ANSI-standard backtick.
+    //
+    // Because we still support MySQL 5.7, check for the deprecated combination
+    // modes as well.
+    //
+    // @see https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_ansi_quotes
+    $ansi_quotes_modes = ['ANSI_QUOTES', 'ANSI', 'DB2', 'MAXDB', 'MSSQL', 'ORACLE', 'POSTGRESQL'];
+    $is_ansi_quotes_mode = FALSE;
+    foreach ($ansi_quotes_modes as $mode) {
+      // None of the modes in $ansi_quotes_modes are substrings of other modes
+      // that are not in $ansi_quotes_modes, so a simple stripos() does not
+      // return false positives.
+      if (stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
+        $is_ansi_quotes_mode = TRUE;
+        break;
+      }
+    }
+    if ($this->identifierQuotes === ['"', '"'] && !$is_ansi_quotes_mode) {
+      $this->identifierQuotes = ['`', '`'];
+    }
+    parent::__construct($connection, $connection_options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function handleQueryException(\PDOException $e, $query, array $args = [], $options = []) {
     // In case of attempted INSERT of a record with an undefined column and no
     // default value indicated in schema, MySql returns a 1364 error code.
@@ -150,6 +179,11 @@ class Connection extends DatabaseConnection {
       \PDO::ATTR_EMULATE_PREPARES => TRUE,
       // Limit SQL to a single statement like mysqli.
       \PDO::MYSQL_ATTR_MULTI_STATEMENTS => FALSE,
+      // Convert numeric values to strings when fetching. In PHP 8.1,
+      // \PDO::ATTR_EMULATE_PREPARES now behaves the same way as non emulated
+      // prepares and returns integers. See https://externals.io/message/113294
+      // for further discussion.
+      \PDO::ATTR_STRINGIFY_FETCHES => TRUE,
     ];
 
     try {
@@ -214,7 +248,11 @@ class Connection extends DatabaseConnection {
     return $this->query($query . ' LIMIT ' . (int) $from . ', ' . (int) $count, $args, $options);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function queryTemporary($query, array $args = [], array $options = []) {
+    @trigger_error('Connection::queryTemporary() is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. There is no replacement. See https://www.drupal.org/node/3211781', E_USER_DEPRECATED);
     $tablename = $this->generateTemporaryTableName();
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} Engine=MEMORY ' . $query, $args, $options);
     return $tablename;

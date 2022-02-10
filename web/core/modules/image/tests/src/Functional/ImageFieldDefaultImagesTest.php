@@ -200,7 +200,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     // Confirm the default image is shown on the node form.
     $file = File::load($default_images['field_new']->id());
     $this->drupalGet('node/add/article');
-    $this->assertRaw($file->getFilename());
+    $this->assertSession()->responseContains($file->getFilename());
 
     // Remove the field default from articles.
     $default_image_settings = $field->getSetting('default_image');
@@ -229,7 +229,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     // Confirm the default image is shown on the node form.
     $file = File::load($default_images['field_storage_new']->id());
     $this->drupalGet('node/add/article');
-    $this->assertRaw($file->getFilename());
+    $this->assertSession()->responseContains($file->getFilename());
 
     // Change the default image for the field storage and also change the upload
     // destination to the private filesystem at the same time.
@@ -251,8 +251,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     $field->setSetting('default_image', $default_image_settings);
     $field->save();
 
-    // Confirm the new field field default is used on the article field
-    // admin form.
+    // Confirm the new field default is used on the article field admin form.
     $this->drupalGet("admin/structure/types/manage/article/fields/$field_id");
     $this->assertSession()->hiddenFieldValueEquals('settings[default_image][uuid][fids]', $default_images['field_private']->id());
   }

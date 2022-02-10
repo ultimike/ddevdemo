@@ -178,7 +178,7 @@ class SearchCommentTest extends BrowserTestBase {
     // Verify that comment is rendered using proper format.
     $this->assertSession()->pageTextContains($comment_body);
     // Verify that HTML in comment body is not hidden.
-    $this->assertNoRaw(t('n/a'));
+    $this->assertSession()->pageTextNotContains('n/a');
     $this->assertSession()->assertNoEscaped($edit_comment['comment_body[0][value]']);
 
     // Search for the evil script comment subject.
@@ -189,8 +189,8 @@ class SearchCommentTest extends BrowserTestBase {
     $this->submitForm($edit, 'Search');
 
     // Verify the evil comment subject is escaped in search results.
-    $this->assertRaw('&lt;script&gt;alert(&#039;<strong>subjectkeyword</strong>&#039;);');
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseContains('&lt;script&gt;alert(&#039;<strong>subjectkeyword</strong>&#039;);');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Search for the keyword near the evil script tag in the comment body.
     $edit = [
@@ -201,8 +201,8 @@ class SearchCommentTest extends BrowserTestBase {
 
     // Verify that nearby script tag in the evil comment body is stripped from
     // search results.
-    $this->assertRaw('<strong>nearbykeyword</strong>');
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseContains('<strong>nearbykeyword</strong>');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Search for contents inside the evil script tag in the comment body.
     $edit = [
@@ -215,7 +215,7 @@ class SearchCommentTest extends BrowserTestBase {
     //   https://www.drupal.org/node/2551135
 
     // Verify there is no script tag in search results.
-    $this->assertNoRaw('<script>');
+    $this->assertSession()->responseNotContains('<script>');
 
     // Hide comments.
     $this->drupalLogin($this->adminUser);
@@ -307,8 +307,10 @@ class SearchCommentTest extends BrowserTestBase {
 
   /**
    * Update search index and search for comment.
+   *
+   * @internal
    */
-  public function assertCommentAccess($assume_access, $message) {
+  public function assertCommentAccess(bool $assume_access, string $message): void {
     // Invoke search index update.
     \Drupal::service('search.index')->markForReindex('node_search', $this->node->id());
     $this->cronRun();
@@ -326,7 +328,7 @@ class SearchCommentTest extends BrowserTestBase {
         $this->assertSession()->pageTextContains($this->commentSubject);
       }
       else {
-        $this->assertSession()->pageTextContains(t('Your search yielded no results.'));
+        $this->assertSession()->pageTextContains('Your search yielded no results.');
       }
     }
     catch (ResponseTextException $exception) {
@@ -375,7 +377,7 @@ class SearchCommentTest extends BrowserTestBase {
     $this->drupalGet('search/node');
     $this->submitForm(['keys' => 'short'], 'Search');
     $this->assertSession()->pageTextContains($node->label());
-    $this->assertNoText('Add new comment');
+    $this->assertSession()->pageTextNotContains('Add new comment');
   }
 
 }

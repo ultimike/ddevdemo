@@ -67,10 +67,10 @@ class PagerTest extends BrowserTestBase {
     $this->assertPagerItems($current_page);
 
     // Verify last page.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    preg_match('@page=(\d+)@', $elements[0]->getAttribute('href'), $matches);
+    $element = $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a');
+    preg_match('@page=(\d+)@', $element->getAttribute('href'), $matches);
     $current_page = (int) $matches[1];
-    $this->drupalGet($GLOBALS['base_root'] . parse_url($this->getUrl())['path'] . $elements[0]->getAttribute('href'), ['external' => TRUE]);
+    $this->drupalGet($GLOBALS['base_root'] . parse_url($this->getUrl())['path'] . $element->getAttribute('href'), ['external' => TRUE]);
     $this->assertPagerItems($current_page);
 
     // Verify the pager does not render on a list without pagination.
@@ -90,8 +90,7 @@ class PagerTest extends BrowserTestBase {
     $this->assertCacheContext('url.query_args');
 
     // Go to last page, the count of pager calls need to go to 1.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    $elements[0]->click();
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a')->click();
     $this->assertSession()->pageTextContains('Pager calls: 1');
     $this->assertSession()->pageTextContains('[url.query_args.pagers:0]=0.60');
     $this->assertCacheContext('url.query_args');
@@ -99,10 +98,8 @@ class PagerTest extends BrowserTestBase {
     // Reset counter to 0.
     $this->drupalGet('pager-test/query-parameters');
     // Go back to first page, the count of pager calls need to go to 2.
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--last']);
-    $elements[0]->click();
-    $elements = $this->xpath('//li[contains(@class, :class)]/a', [':class' => 'pager__item--first']);
-    $elements[0]->click();
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a')->click();
+    $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--first")]/a')->click();
     $this->assertSession()->pageTextContains('Pager calls: 2');
     $this->assertSession()->pageTextContains('[url.query_args.pagers:0]=0.0');
     $this->assertCacheContext('url.query_args');
@@ -121,7 +118,7 @@ class PagerTest extends BrowserTestBase {
     $test_data = [
       // With no query, all pagers set to first page.
       [
-        'input_query' => NULL,
+        'input_query' => '',
         'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
         'expected_query' => '?page=0,0,,,0',
       ],
@@ -219,8 +216,10 @@ class PagerTest extends BrowserTestBase {
    *
    * @param int $current_page
    *   The current pager page the internal browser is on.
+   *
+   * @internal
    */
-  protected function assertPagerItems($current_page) {
+  protected function assertPagerItems(int $current_page): void {
     $elements = $this->xpath('//ul[contains(@class, :class)]/li', [':class' => 'pager__items']);
     $this->assertNotEmpty($elements, 'Pager found.');
 
@@ -322,8 +321,10 @@ class PagerTest extends BrowserTestBase {
    *   The class to assert.
    * @param string $message
    *   (optional) A verbose message to output.
+   *
+   * @internal
    */
-  protected function assertClass(NodeElement $element, $class, $message = NULL) {
+  protected function assertClass(NodeElement $element, string $class, string $message = NULL): void {
     if (!isset($message)) {
       $message = "Class .$class found.";
     }
@@ -339,8 +340,10 @@ class PagerTest extends BrowserTestBase {
    *   The class to assert.
    * @param string $message
    *   (optional) A verbose message to output.
+   *
+   * @internal
    */
-  protected function assertNoClass(NodeElement $element, $class, $message = NULL) {
+  protected function assertNoClass(NodeElement $element, string $class, string $message = NULL): void {
     if (!isset($message)) {
       $message = "Class .$class not found.";
     }

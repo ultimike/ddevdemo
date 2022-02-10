@@ -34,7 +34,7 @@ class ConfirmFormTest extends BrowserTestBase {
     $this->assertSession()->buttonExists('ConfirmFormTestForm::getConfirmText().');
 
     // Test cancelling the form.
-    $this->clickLink(t('ConfirmFormTestForm::getCancelText().'));
+    $this->clickLink('ConfirmFormTestForm::getCancelText().');
     $this->assertSession()->addressEquals('form-test/autocomplete');
 
     // Test submitting the form.
@@ -50,7 +50,7 @@ class ConfirmFormTest extends BrowserTestBase {
 
     // Test cancelling the form with a complex destination.
     $this->drupalGet('form-test/confirm-form-array-path');
-    $this->clickLink(t('ConfirmFormArrayPathTestForm::getCancelText().'));
+    $this->clickLink('ConfirmFormArrayPathTestForm::getCancelText().');
     // Verify that the form's complex cancel link was followed.
     $this->assertSession()->addressEquals('form-test/confirm-form?destination=admin/config');
   }
@@ -79,13 +79,13 @@ class ConfirmFormTest extends BrowserTestBase {
    *   The url to check for.
    * @param string $message
    *   The assert message.
-   * @param string $group
-   *   The assertion group.
+   *
+   * @internal
    */
-  public function assertCancelLinkUrl(Url $url, $message = '', $group = 'Other') {
+  public function assertCancelLinkUrl(Url $url, string $message = ''): void {
     $links = $this->xpath('//a[@href=:url]', [':url' => $url->toString()]);
     $message = ($message ? $message : new FormattableMarkup('Cancel link with URL %url found.', ['%url' => $url->toString()]));
-    $this->assertTrue(isset($links[0]), $message, $group);
+    $this->assertTrue(isset($links[0]), $message);
   }
 
 }

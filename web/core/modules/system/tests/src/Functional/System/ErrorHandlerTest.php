@@ -33,19 +33,19 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%type' => 'Notice',
       '@message' => 'Object of class stdClass could not be converted to int',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $error_warning = [
       '%type' => 'Warning',
       '@message' => 'var_export does not handle circular references',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $error_user_notice = [
       '%type' => 'User warning',
       '@message' => 'Drupal & awesome',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
 
     // Set error reporting to display verbose notices.
@@ -55,10 +55,10 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertErrorMessage($error_notice);
     $this->assertErrorMessage($error_warning);
     $this->assertErrorMessage($error_user_notice);
-    $this->assertRaw('<pre class="backtrace">');
+    $this->assertSession()->responseContains('<pre class="backtrace">');
     // Ensure we are escaping but not double escaping.
-    $this->assertRaw('&amp;');
-    $this->assertNoRaw('&amp;amp;');
+    $this->assertSession()->responseContains('&amp;');
+    $this->assertSession()->responseNotContains('&amp;amp;');
 
     // Set error reporting to display verbose notices.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
@@ -70,7 +70,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertErrorMessage($error_notice);
     $this->assertErrorMessage($error_warning);
     $this->assertErrorMessage($error_user_notice);
-    $this->assertNoRaw('<pre class="backtrace">');
+    $this->assertSession()->responseNotContains('<pre class="backtrace">');
 
     // Set error reporting to not collect notices.
     $config->set('error_level', ERROR_REPORTING_DISPLAY_SOME)->save();
@@ -79,7 +79,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertNoErrorMessage($error_notice);
     $this->assertErrorMessage($error_warning);
     $this->assertErrorMessage($error_user_notice);
-    $this->assertNoRaw('<pre class="backtrace">');
+    $this->assertSession()->responseNotContains('<pre class="backtrace">');
 
     // Set error reporting to not show any errors.
     $config->set('error_level', ERROR_REPORTING_HIDE)->save();
@@ -89,7 +89,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     $this->assertNoErrorMessage($error_warning);
     $this->assertNoErrorMessage($error_user_notice);
     $this->assertNoMessages();
-    $this->assertNoRaw('<pre class="backtrace">');
+    $this->assertSession()->responseNotContains('<pre class="backtrace">');
   }
 
   /**
@@ -101,21 +101,21 @@ class ErrorHandlerTest extends BrowserTestBase {
       '@message' => 'Drupal & awesome',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerException()',
       '%line' => 56,
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $error_pdo_exception = [
       '%type' => 'DatabaseExceptionWrapper',
       '@message' => 'SELECT "b".* FROM {bananas_are_awesome} "b"',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerPDOException()',
       '%line' => 64,
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $error_renderer_exception = [
       '%type' => 'Exception',
       '@message' => 'This is an exception that occurs during rendering',
       '%function' => 'Drupal\error_test\Controller\ErrorTestController->Drupal\error_test\Controller\{closure}()',
       '%line' => 82,
-      '%file' => drupal_get_path('module', 'error_test') . '/error_test.module',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
 
     $this->drupalGet('error-test/trigger-exception');
@@ -131,7 +131,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     // error message.
     $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
     $error_details = new FormattableMarkup('in %function (line ', $error_pdo_exception);
-    $this->assertRaw($error_details);
+    $this->assertSession()->responseContains($error_details);
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertErrorMessage($error_renderer_exception);
@@ -150,18 +150,22 @@ class ErrorHandlerTest extends BrowserTestBase {
 
   /**
    * Helper function: assert that the error message is found.
+   *
+   * @internal
    */
-  public function assertErrorMessage(array $error) {
+  public function assertErrorMessage(array $error): void {
     $message = new FormattableMarkup('%type: @message in %function (line ', $error);
-    $this->assertRaw($message);
+    $this->assertSession()->responseContains($message);
   }
 
   /**
    * Helper function: assert that the error message is not found.
+   *
+   * @internal
    */
-  public function assertNoErrorMessage(array $error) {
+  public function assertNoErrorMessage(array $error): void {
     $message = new FormattableMarkup('%type: @message in %function (line ', $error);
-    $this->assertNoRaw($message);
+    $this->assertSession()->responseNotContains($message);
   }
 
   /**
@@ -169,8 +173,10 @@ class ErrorHandlerTest extends BrowserTestBase {
    *
    * Ensures that no messages div exists, which proves that no messages were
    * generated by the error handler, not even an empty one.
+   *
+   * @internal
    */
-  protected function assertNoMessages() {
+  protected function assertNoMessages(): void {
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages")]');
   }
 

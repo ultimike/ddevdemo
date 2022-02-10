@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\views_ui\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\Tests\ViewTestData;
@@ -74,8 +73,8 @@ class HandlerTest extends UITestBase {
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['uid'] = [
-      'title' => t('UID'),
-      'help' => t('The test data UID'),
+      'title' => 'UID',
+      'help' => 'The test data UID',
       'relationship' => [
         'id' => 'standard',
         'base' => 'users_field_data',
@@ -85,7 +84,7 @@ class HandlerTest extends UITestBase {
 
     // Create a dummy field with no help text.
     $data['views_test_data']['no_help'] = $data['views_test_data']['name'];
-    $data['views_test_data']['no_help']['field']['title'] = t('No help');
+    $data['views_test_data']['no_help']['field']['title'] = 'No help';
     $data['views_test_data']['no_help']['field']['real field'] = 'name';
     unset($data['views_test_data']['no_help']['help']);
 
@@ -134,10 +133,9 @@ class HandlerTest extends UITestBase {
 
       // Verify that the user got redirected to the views edit form.
       $this->assertSession()->addressEquals('admin/structure/views/view/test_view_empty/edit/default');
-
       $this->assertSession()->linkByHrefExists($edit_handler_url, 0, 'The handler edit link appears in the UI.');
-      $links = $this->xpath('//a[starts-with(normalize-space(text()), :label)]', [':label' => $random_label]);
-      $this->assertTrue(isset($links[0]), 'The handler edit link has the right label');
+      // Test that the  handler edit link has the right label.
+      $this->assertSession()->elementExists('xpath', "//a[starts-with(normalize-space(text()), '{$random_label}')]");
 
       // Save the view and have a look whether the handler was added as expected.
       $this->submitForm([], 'Save');
@@ -228,17 +226,14 @@ class HandlerTest extends UITestBase {
       $this->drupalGet('admin/structure/views/view/test_view_broken/edit');
 
       $href = "admin/structure/views/nojs/handler/test_view_broken/default/$type/id_broken";
-
-      $result = $this->xpath('//a[contains(@href, :href)]', [':href' => $href]);
-      $this->assertCount(1, $result, new FormattableMarkup('Handler (%type) edit link found.', ['%type' => $type]));
-
       $text = 'Broken/missing handler';
 
-      $this->assertSame($text, $result[0]->getText(), 'Ensure the broken handler text was found.');
+      // Test that the handler edit link is present.
+      $this->assertSession()->elementsCount('xpath', "//a[contains(@href, '{$href}')]", 1);
+      $result = $this->assertSession()->elementTextEquals('xpath', "//a[contains(@href, '{$href}')]", $text);
 
       $this->drupalGet($href);
-      $result = $this->xpath('//h1[@class="page-title"]');
-      $this->assertStringContainsString($text, $result[0]->getText(), 'Ensure the broken handler text was found.');
+      $this->assertSession()->elementTextContains('xpath', '//h1[@class="page-title"]', $text);
 
       $original_configuration = [
         'field' => 'id_broken',
@@ -284,12 +279,12 @@ class HandlerTest extends UITestBase {
     // Test that the error message is not shown for entity fields but an empty
     // description field is shown instead.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_node_view/default/field');
-    $this->assertNoText('Error: missing help');
-    $this->assertRaw('<td class="description"></td>');
+    $this->assertSession()->pageTextNotContains('Error: missing help');
+    $this->assertSession()->responseContains('<td class="description"></td>');
 
     // Test that no error message is shown for other fields.
     $this->drupalGet('admin/structure/views/nojs/add-handler/test_view_empty/default/field');
-    $this->assertNoText('Error: missing help');
+    $this->assertSession()->pageTextNotContains('Error: missing help');
   }
 
   /**
@@ -299,8 +294,10 @@ class HandlerTest extends UITestBase {
    *   The field name.
    * @param string $entity_type
    *   The entity type to which the field belongs.
+   *
+   * @internal
    */
-  public function assertNoDuplicateField($field_name, $entity_type) {
+  public function assertNoDuplicateField(string $field_name, string $entity_type): void {
     $elements = $this->xpath('//td[.=:entity_type]/preceding-sibling::td[@class="title" and .=:title]', [':title' => $field_name, ':entity_type' => $entity_type]);
     $this->assertCount(1, $elements, $field_name . ' appears just once in ' . $entity_type . '.');
   }

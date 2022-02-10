@@ -59,17 +59,17 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Test getOperations() method.
     $expected_operations = [
       'edit' => [
-        'title' => t('Edit'),
+        'title' => 'Edit',
         'weight' => 10,
         'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
       'disable' => [
-        'title' => t('Disable'),
+        'title' => 'Disable',
         'weight' => 40,
         'url' => $entity->toUrl('disable')->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
       'delete' => [
-        'title' => t('Delete'),
+        'title' => 'Delete',
         'weight' => 100,
         'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
@@ -134,12 +134,12 @@ class ConfigEntityListTest extends BrowserTestBase {
     // Test getOperations() method.
     $expected_operations = [
       'edit' => [
-        'title' => t('Edit'),
+        'title' => 'Edit',
         'weight' => 10,
         'url' => $entity->toUrl()->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
       'delete' => [
-        'title' => t('Delete'),
+        'title' => 'Delete',
         'weight' => 100,
         'url' => $entity->toUrl('delete-form')->setOption('query', $this->getRedirectDestination()->getAsArray()),
       ],
@@ -273,14 +273,14 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/config_test');
 
     // Item 51 should not be present.
-    $this->assertRaw('Test config entity 50');
-    $this->assertNoRaw('Test config entity 51');
+    $this->assertSession()->pageTextContains('Test config entity 50');
+    $this->assertSession()->responseNotContains('Test config entity 51');
 
     // Browse to the next page, test config entity 51 is on page 2.
-    $this->clickLink(t('Page 2'));
-    $this->assertNoRaw('Test config entity 50');
-    $this->assertRaw('dotted.default');
-    $this->assertRaw('Test config entity 51');
+    $this->clickLink('Page 2');
+    $this->assertSession()->responseNotContains('Test config entity 50');
+    $this->assertSession()->responseContains('dotted.default');
+    $this->assertSession()->pageTextContains('Test config entity 51');
   }
 
 }
