@@ -180,7 +180,12 @@ abstract class Schema implements PlaceholderInterface {
    * Finds all tables that are like the specified base table name.
    *
    * @param string $table_expression
-   *   An SQL expression, for example "cache_%" (without the quotes).
+   *   A case-insensitive pattern against which table names are compared. Both
+   *   '_' and '%' are treated like wildcards in MySQL 'LIKE' expressions, where
+   *   '_' matches any single character and '%' matches an arbitrary number of
+   *   characters (including zero characters). So 'foo%bar' matches table names
+   *   like 'foobar', 'fooXBar', 'fooXBaR',  or 'fooXxBar'; whereas 'foo_bar'
+   *   matches 'fooXBar' and 'fooXBaR' but not 'fooBar' or 'fooXxxBar'.
    *
    * @return array
    *   Both the keys and the values are the matching tables.
@@ -310,7 +315,7 @@ abstract class Schema implements PlaceholderInterface {
    *   created field will be set to the value of the key in all rows.
    *   This is most useful for creating NOT NULL columns with no default
    *   value in existing tables.
-   *   Alternatively, the 'initial_form_field' key may be used, which will
+   *   Alternatively, the 'initial_from_field' key may be used, which will
    *   auto-populate the new field with values from the specified field.
    * @param $keys_new
    *   (optional) Keys and indexes specification to be created on the
