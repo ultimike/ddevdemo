@@ -3,7 +3,7 @@
         'name' => 'drupaleasy/ddevdemo',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'd8454d70b0116194eae97ed6b7256b1f54c4ddee',
+        'reference' => 'f540e3bafa47f42eb67d0735df9471cd9daa22c4',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -523,7 +523,7 @@
         'drupaleasy/ddevdemo' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'd8454d70b0116194eae97ed6b7256b1f54c4ddee',
+            'reference' => 'f540e3bafa47f42eb67d0735df9471cd9daa22c4',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
