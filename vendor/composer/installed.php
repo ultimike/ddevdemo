@@ -3,7 +3,7 @@
         'name' => 'drupaleasy/ddevdemo',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'f540e3bafa47f42eb67d0735df9471cd9daa22c4',
+        'reference' => '0bd5a6615d3a033249ed8b2b00846056f5331f3e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -502,15 +502,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'drupal/select2_all' => array(
-            'pretty_version' => '1.0.0-alpha6',
-            'version' => '1.0.0.0-alpha6',
-            'reference' => '8.x-1.0-alpha6',
-            'type' => 'drupal-module',
-            'install_path' => __DIR__ . '/../../web/modules/contrib/select2_all',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'drupal/token' => array(
             'pretty_version' => '1.11.0',
             'version' => '1.11.0.0',
@@ -523,7 +514,7 @@
         'drupaleasy/ddevdemo' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'f540e3bafa47f42eb67d0735df9471cd9daa22c4',
+            'reference' => '0bd5a6615d3a033249ed8b2b00846056f5331f3e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

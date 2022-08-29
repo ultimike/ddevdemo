@@ -32,7 +32,6 @@
         "drupal/devel": "^4.0",
         "drupal/pathauto": "^1.2",
         "drupal/redirect": "^1.6",
-        "drupal/select2_all": "^1.0@alpha",
         "drush/drush": "^10.5",
         "pantheon-systems/drupal-integrations": "^9.0",
         "topfloor/composer-cleanup-vcs-dirs": "^1.1",
