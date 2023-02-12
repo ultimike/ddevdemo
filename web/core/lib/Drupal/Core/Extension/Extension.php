@@ -10,6 +10,7 @@ namespace Drupal\Core\Extension;
  *
  * @see https://bugs.php.net/bug.php?id=66052
  */
+#[\AllowDynamicProperties]
 class Extension {
 
   /**
@@ -48,6 +49,11 @@ class Extension {
    * @var string
    */
   protected $root;
+
+  /**
+   * The extension info array.
+   */
+  public array $info;
 
   /**
    * Constructs a new Extension object.

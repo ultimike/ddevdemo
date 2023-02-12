@@ -35,7 +35,7 @@ abstract class FileTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     // \Drupal\KernelTests\KernelTestBase::bootKernel() sets a global override
     // for the default scheme because core relies on it in
@@ -66,8 +66,6 @@ abstract class FileTestBase extends KernelTestBase {
   protected function setUpFilesystem() {
     $public_file_directory = $this->siteDirectory . '/files';
     $private_file_directory = $this->siteDirectory . '/private';
-
-    require_once 'core/includes/file.inc';
 
     mkdir($this->siteDirectory, 0775);
     mkdir($this->siteDirectory . '/files', 0775);
@@ -153,11 +151,11 @@ abstract class FileTestBase extends KernelTestBase {
   /**
    * Create a directory and assert it exists.
    *
-   * @param $path
+   * @param string $path
    *   Optional string with a directory path. If none is provided, a random
    *   name in the site's files directory will be used.
    *
-   * @return
+   * @return string
    *   The path to the directory.
    */
   public function createDirectory($path = NULL) {
@@ -183,7 +181,7 @@ abstract class FileTestBase extends KernelTestBase {
    *   Optional string indicating the stream scheme to use. Drupal core includes
    *   public, private, and temporary. The public wrapper is the default.
    *
-   * @return
+   * @return string
    *   File URI.
    */
   public function createUri($filepath = NULL, $contents = NULL, $scheme = NULL) {

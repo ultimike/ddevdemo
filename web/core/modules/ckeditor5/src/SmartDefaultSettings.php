@@ -122,7 +122,7 @@ final class SmartDefaultSettings {
       // Overwrite the Editor config entity object's $filterFormat property, to
       // prevent calls to Editor::hasAssociatedFilterFormat() and
       // Editor::getFilterFormat() from loading the FilterFormat from storage.
-      // @todo Remove in https://www.drupal.org/project/ckeditor5/issues/3218985.
+      // @todo Remove in https://www.drupal.org/project/drupal/issues/3231347.
       $reflector = new \ReflectionObject($text_editor);
       $property = $reflector->getProperty('filterFormat');
       $property->setAccessible(TRUE);
@@ -145,15 +145,26 @@ final class SmartDefaultSettings {
     $editor->setEditor('ckeditor5');
 
     $source_editing_additions = HTMLRestrictions::emptySet();
-
     // Compute the appropriate settings based on the CKEditor 4 configuration
     // if it exists.
     $old_editor = $editor->id() ? Editor::load($editor->id()) : NULL;
     $old_editor_restrictions = $old_editor ? HTMLRestrictions::fromTextFormat($old_editor->getFilterFormat()) : HTMLRestrictions::emptySet();
+    // @todo Remove in https://www.drupal.org/project/drupal/issues/3245351
+    if ($old_editor) {
+      $editor->setImageUploadSettings($old_editor->getImageUploadSettings());
+    }
     if ($old_editor && $old_editor->getEditor() === 'ckeditor') {
       [$upgraded_settings, $messages] = $this->createSettingsFromCKEditor4($old_editor->getSettings(), HTMLRestrictions::fromTextFormat($old_editor->getFilterFormat()));
       $editor->setSettings($upgraded_settings);
-      $editor->setImageUploadSettings($old_editor->getImageUploadSettings());
+      // *Before* determining which elements are still needed for this text
+      // format, ensure that all already enabled plugins that are configurable
+      // have valid settings.
+      // For all already enabled plugins, find the ones that are configurable,
+      // and add their default settings. For enabled plugins with element
+      // subsets, compute the appropriate settings to achieve the subset that
+      // matches the original text format restrictions.
+      $this->addDefaultSettingsForEnabledConfigurablePlugins($editor);
+      $this->computeSubsetSettingForEnabledPluginsWithSubsets($editor, $text_format);
     }
 
     // Add toolbar items based on HTML tags and attributes.
@@ -225,6 +236,9 @@ final class SmartDefaultSettings {
     // and add their default settings. For enabled plugins with element subsets,
     // compute the appropriate settings to achieve the subset that matches the
     // original text format restrictions.
+    // Note: if switching from CKEditor 4, this will already have happened for
+    // plugins that were already enabled in CKEditor 4. It's harmless to compute
+    // this again.
     $this->addDefaultSettingsForEnabledConfigurablePlugins($editor);
     $this->computeSubsetSettingForEnabledPluginsWithSubsets($editor, $text_format);
 
@@ -266,6 +280,7 @@ final class SmartDefaultSettings {
       }
 
       $help_enabled = $this->moduleHandler->moduleExists('help');
+      $can_access_dblog = ($this->currentUser->hasPermission('access site reports') && $this->moduleHandler->moduleExists('dblog'));
 
       if (!empty($plugins_enabled) || !$source_editing_additions->allowsNothing()) {
         $beginning = $help_enabled ?
@@ -290,7 +305,6 @@ final class SmartDefaultSettings {
             $this->t("Added these tags/attributes to the Source Editing Plugin's Manually editable HTML tags setting: @tag_list", ['@tag_list' => $source_editing_additions->toFilterHtmlAllowedTagsString()]);
         }
 
-        $can_access_dblog = ($this->currentUser->hasPermission('access site reports') && $this->moduleHandler->moduleExists('dblog'));
         $end = $can_access_dblog ?
           $this->t('Additional details are available <a target="_blank" href=":dblog_url">in your logs</a>.',
             [
@@ -781,12 +795,13 @@ final class SmartDefaultSettings {
    *   The text editor config entity to update.
    *
    * @return array|null
-   *   NULL when nothing happened, otherwise an array with three values:
+   *   NULL when nothing happened, otherwise an array with four values:
    *   1. a description (for use in a message) of which CKEditor 5 plugins were
    *      enabled to match the HTML tags allowed by the text format.
    *   2. a description (for use in a message) of which CKEditor 5 plugins were
    *      enabled to match the HTML attributes allowed by the text format.
-   *   3. the unsupported elements, in an HTMLRestrictions value object
+   *   3. the unsupported elements, in an HTMLRestrictions value object.
+   *   4. the list of enabled plugin labels.
    */
   private function addToolbarItemsToMatchHtmlElementsInFormat(FilterFormatInterface $format, EditorInterface $editor): ?array {
     $html_restrictions_needed_elements = $format->getHtmlRestrictions();
@@ -798,11 +813,9 @@ final class SmartDefaultSettings {
     $enabled_definitions = $this->pluginManager->getEnabledDefinitions($editor);
     $disabled_definitions = array_diff_key($all_definitions, $enabled_definitions);
     $enabled_plugins = array_keys($enabled_definitions);
-    $provided_elements = $this->pluginManager->getProvidedElements($enabled_plugins);
+    $provided_elements = $this->pluginManager->getProvidedElements($enabled_plugins, $editor);
     $provided = new HTMLRestrictions($provided_elements);
     $needed = HTMLRestrictions::fromTextFormat($format);
-    $still_needed = $needed->diff($provided);
-
     // Plugins only supporting <tag attr> cannot create the tag. For that, they
     // must support plain <tag> too. With this being the case, break down what
     // is needed based on what is currently provided.
@@ -813,11 +826,12 @@ final class SmartDefaultSettings {
     $provided_plain_tags = new HTMLRestrictions(
       $this->pluginManager->getProvidedElements($enabled_plugins, NULL, FALSE, TRUE)
     );
+
+    // Determine the still needed plain tags, the still needed attributes, and
+    // the union of both.
     $still_needed_plain_tags = $needed->extractPlainTagsSubset()->diff($provided_plain_tags);
-    $still_needed_attributes = $still_needed->diff($still_needed_plain_tags);
-    // Merging $still_needed_plain_tags with $still_needed_attributes must
-    // always equal $still_needed.
-    assert($still_needed_plain_tags->merge($still_needed_attributes)->diff($still_needed)->allowsNothing());
+    $still_needed_attributes = $needed->diff($provided)->diff($still_needed_plain_tags);
+    $still_needed = $still_needed_plain_tags->merge($still_needed_attributes);
 
     if (!$still_needed->allowsNothing()) {
       // Select plugins for supporting the still needed plain tags.
@@ -890,6 +904,7 @@ final class SmartDefaultSettings {
           NULL,
           NULL,
           $still_needed,
+          NULL,
         ];
       }
     }
@@ -913,14 +928,15 @@ final class SmartDefaultSettings {
     });
 
     foreach ($configurable_definitions as $plugin_name => $definition) {
-      // Skip image upload as its configuration is stored in a discrete
-      // property of the $editor object, not its settings. Also skip any plugin
+      $default_plugin_configuration = $this->pluginManager->getPlugin($plugin_name, NULL)->defaultConfiguration();
+      // Skip plugins with an empty default configuration, the plugin
+      // configuration is most likely stored elsewhere. Also skip any plugin
       // that already has configuration data as default values are not needed.
-      if ($plugin_name === 'ckeditor5_imageUpload' || isset($settings['plugins'][$plugin_name])) {
+      if ($default_plugin_configuration === [] || isset($settings['plugins'][$plugin_name])) {
         continue;
       }
       $update_settings = TRUE;
-      $settings['plugins'][$plugin_name] = $this->pluginManager->getPlugin($plugin_name, NULL)->defaultConfiguration();
+      $settings['plugins'][$plugin_name] = $default_plugin_configuration;
     }
 
     if ($update_settings) {

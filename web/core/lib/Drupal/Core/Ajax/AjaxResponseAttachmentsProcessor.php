@@ -128,7 +128,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   An array of commands ready to be returned as JSON.
    */
   protected function buildAttachmentsCommands(AjaxResponse $response, Request $request) {
-    $ajax_page_state = $request->request->get('ajax_page_state');
+    $ajax_page_state = $request->request->all('ajax_page_state');
 
     // Aggregate CSS/JS if necessary, but only during normal site operation.
     $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
@@ -174,11 +174,11 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     }
     if ($js_assets_header) {
       $js_header_render_array = $this->jsCollectionRenderer->render($js_assets_header);
-      $resource_commands[] = new PrependCommand('head', $this->renderer->renderPlain($js_header_render_array));
+      $resource_commands[] = new AddJsCommand(array_column($js_header_render_array, '#attributes'), 'head');
     }
     if ($js_assets_footer) {
       $js_footer_render_array = $this->jsCollectionRenderer->render($js_assets_footer);
-      $resource_commands[] = new AppendCommand('body', $this->renderer->renderPlain($js_footer_render_array));
+      $resource_commands[] = new AddJsCommand(array_column($js_footer_render_array, '#attributes'));
     }
     foreach (array_reverse($resource_commands) as $resource_command) {
       $response->addCommand($resource_command, TRUE);

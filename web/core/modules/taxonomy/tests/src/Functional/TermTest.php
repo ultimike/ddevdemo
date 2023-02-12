@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
 
 /**
@@ -348,6 +349,9 @@ class TermTest extends TaxonomyTestBase {
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->submitForm($edit, 'Save');
 
+    // Ensure form redirected back to term add page.
+    $this->assertSession()->addressEquals('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
+
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
@@ -371,6 +375,9 @@ class TermTest extends TaxonomyTestBase {
     // Edit the term.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
     $this->submitForm($edit, 'Save');
+
+    // Ensure form redirected back to term view.
+    $this->assertSession()->addressEquals('taxonomy/term/' . $term->id());
 
     // Check that the term is still present at admin UI after edit.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
@@ -529,96 +536,96 @@ class TermTest extends TaxonomyTestBase {
    * Tests saving a term with multiple parents through the UI.
    */
   public function testTermMultipleParentsInterface() {
-    // Add a new term to the vocabulary so that we can have multiple parents.
-    $parent = $this->createTerm($this->vocabulary);
+    // Add two new terms to the vocabulary so that we can have multiple parents.
+    // These will be terms with tids of 1 and 2 respectively.
+    $this->createTerm($this->vocabulary);
+    $this->createTerm($this->vocabulary);
 
     // Add a new term with multiple parents.
     $edit = [
       'name[0][value]' => $this->randomMachineName(12),
       'description[0][value]' => $this->randomMachineName(100),
-      'parent[]' => [0, $parent->id()],
+      'parent[]' => [0, 1],
     ];
     // Save the new term.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->submitForm($edit, 'Save');
 
     // Check that the term was successfully created.
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
-      'name' => $edit['name[0][value]'],
-    ]);
-    $term = reset($terms);
+    $term = $this->reloadTermByName($edit['name[0][value]']);
     $this->assertNotNull($term, 'Term found in database.');
     $this->assertEquals($edit['name[0][value]'], $term->getName(), 'Term name was successfully saved.');
     $this->assertEquals($edit['description[0][value]'], $term->getDescription(), 'Term description was successfully saved.');
-    // Check that the parent tid is still there. The other parent (<root>) is
-    // not added by \Drupal\taxonomy\TermStorageInterface::loadParents().
-    $parents = $this->container->get('entity_type.manager')->getStorage('taxonomy_term')->loadParents($term->id());
-    $parent = reset($parents);
-    $this->assertEquals($edit['parent[]'][1], $parent->id(), 'Term parents were successfully saved.');
+
+    // Check that we have the expected parents.
+    $this->assertEquals([0, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved.');
+
+    // Load the edit form and save again to ensure parent are preserved.
+    // Generate a new name, so we know that the term really is saved.
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $edit = [
+      'name[0][value]' => $this->randomMachineName(12),
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Updated term ' . $edit['name[0][value]']);
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Updated term ' . $edit['name[0][value]']);
+
+    // Check that we still have the expected parents.
+    $term = $this->reloadTermByName($edit['name[0][value]']);
+    $this->assertEquals([0, 1], $this->getParentTids($term), 'Term parents (root plus one) were successfully saved again.');
+
+    // Save with two real parents. i.e., not including <root>.
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $edit = [
+      'name[0][value]' => $this->randomMachineName(12),
+      'parent[]' => [1, 2],
+    ];
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('Updated term ' . $edit['name[0][value]']);
+    $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
+    $this->submitForm([], 'Save');
+    $this->assertSession()->pageTextContains('Updated term ' . $edit['name[0][value]']);
+
+    // Check that we have the expected parents.
+    $term = $this->reloadTermByName($edit['name[0][value]']);
+    $this->assertEquals([1, 2], $this->getParentTids($term), 'Term parents (two real) were successfully saved.');
   }
 
   /**
-   * Tests taxonomy_term_load_multiple_by_name().
+   * Reloads a term by name.
    *
-   * @group legacy
+   * @param string $name
+   *   The name of the term.
+   *
+   * @return \Drupal\taxonomy\TermInterface
+   *   The reloaded term.
    */
-  public function testTaxonomyGetTermByName() {
-    $term = $this->createTerm($this->vocabulary);
+  private function reloadTermByName(string $name): TermInterface {
+    \Drupal::entityTypeManager()->getStorage('taxonomy_term')->resetCache();
+    /** @var \Drupal\taxonomy\TermInterface[] $terms */
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['name' => $name]);
+    return reset($terms);
+  }
 
-    $this->expectDeprecation('taxonomy_term_load_multiple_by_name() is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use \Drupal::entityTypeManager()->getStorage("taxonomy_term")->loadByProperties(["name" => $name, "vid" => $vid]) instead, to get a list of taxonomy term entities having the same name and keyed by their term ID. See https://www.drupal.org/node/3039041');
+  /**
+   * Get the parent tids for a term including root.
+   *
+   * @param \Drupal\taxonomy\TermInterface $term
+   *   The term.
+   *
+   * @return array
+   *   A sorted array of tids and 0 if the root is a parent.
+   */
+  private function getParentTids($term) {
+    $parent_tids = [];
+    foreach ($term->get('parent') as $item) {
+      $parent_tids[] = (int) $item->target_id;
+    }
+    sort($parent_tids);
 
-    // Load the term with the exact name.
-    $terms = taxonomy_term_load_multiple_by_name($term->getName());
-    $this->assertTrue(isset($terms[$term->id()]), 'Term loaded using exact name.');
-
-    // Load the term with space concatenated.
-    $terms = taxonomy_term_load_multiple_by_name('  ' . $term->getName() . '   ');
-    $this->assertTrue(isset($terms[$term->id()]), 'Term loaded with extra whitespace.');
-
-    // Load the term with name uppercased.
-    $terms = taxonomy_term_load_multiple_by_name(strtoupper($term->getName()));
-    $this->assertTrue(isset($terms[$term->id()]), 'Term loaded with uppercased name.');
-
-    // Load the term with name lowercased.
-    $terms = taxonomy_term_load_multiple_by_name(strtolower($term->getName()));
-    $this->assertTrue(isset($terms[$term->id()]), 'Term loaded with lowercased name.');
-
-    // Try to load an invalid term name.
-    $terms = taxonomy_term_load_multiple_by_name('Banana');
-    $this->assertEmpty($terms, 'No term loaded with an invalid name.');
-
-    // Try to load the term using a substring of the name.
-    $terms = taxonomy_term_load_multiple_by_name(mb_substr($term->getName(), 2), 'No term loaded with a substring of the name.');
-    $this->assertEmpty($terms);
-
-    // Create a new term in a different vocabulary with the same name.
-    $new_vocabulary = $this->createVocabulary();
-    $new_term = Term::create([
-      'name' => $term->getName(),
-      'vid' => $new_vocabulary->id(),
-    ]);
-    $new_term->save();
-
-    // Load multiple terms with the same name.
-    $terms = taxonomy_term_load_multiple_by_name($term->getName());
-    $this->assertCount(2, $terms, 'Two terms loaded with the same name.');
-
-    // Load single term when restricted to one vocabulary.
-    $terms = taxonomy_term_load_multiple_by_name($term->getName(), $this->vocabulary->id());
-    $this->assertCount(1, $terms, 'One term loaded when restricted by vocabulary.');
-    $this->assertTrue(isset($terms[$term->id()]), 'Term loaded using exact name and vocabulary machine name.');
-
-    // Create a new term with another name.
-    $term2 = $this->createTerm($this->vocabulary);
-
-    // Try to load a term by name that doesn't exist in this vocabulary but
-    // exists in another vocabulary.
-    $terms = taxonomy_term_load_multiple_by_name($term2->getName(), $new_vocabulary->id());
-    $this->assertEmpty($terms, 'Invalid term name restricted by vocabulary machine name not loaded.');
-
-    // Try to load terms filtering by a non-existing vocabulary.
-    $terms = taxonomy_term_load_multiple_by_name($term2->getName(), 'non_existing_vocabulary');
-    $this->assertCount(0, $terms, 'No terms loaded when restricted by a non-existing vocabulary.');
+    return $parent_tids;
   }
 
   /**

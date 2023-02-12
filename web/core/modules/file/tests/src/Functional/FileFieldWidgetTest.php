@@ -139,7 +139,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     // Visit the node creation form, and upload 3 files for each field. Since
     // the field has cardinality of 3, ensure the "Upload" button is displayed
     // until after the 3rd file, and after that, isn't displayed. Because
-    // SimpleTest triggers the last button with a given name, so upload to the
+    // the last button with a given name is triggered by default, upload to the
     // second field first.
     $this->drupalGet("node/add/$type_name");
     foreach ([$field_name2, $field_name] as $each_field_name) {
@@ -230,7 +230,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->assertSameSize($upload_files_node_creation, $node->{$field_name}, 'Node was successfully saved with multiple files.');
 
     // Try to upload exactly the allowed number of files on revision.
-    $this->uploadNodeFile($test_file, $field_name, $node->id(), 1, [], TRUE);
+    $this->uploadNodeFile($test_file, $field_name, $node->id(), 1);
     $node = $node_storage->loadUnchanged($nid);
     $this->assertCount($cardinality, $node->{$field_name}, 'Node was successfully revised to maximum number of files.');
 
@@ -399,19 +399,15 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     $this->drupalGet('node/add/article');
 
-    $elements = $this->xpath($xpath);
-
     // If the field has no item, the table should not be visible.
-    $this->assertCount(0, $elements);
+    $this->assertSession()->elementNotExists('xpath', $xpath);
 
     // Upload a file.
     $edit['files[' . $field_name . '_0][]'] = $this->container->get('file_system')->realpath($file->getFileUri());
     $this->submitForm($edit, "{$field_name}_0_upload_button");
 
-    $elements = $this->xpath($xpath);
-
     // If the field has at least one item, the table should be visible.
-    $this->assertCount(1, $elements);
+    $this->assertSession()->elementsCount('xpath', $xpath, 1);
 
     // Test for AJAX error when using progress bar on file field widget.
     $http_client = $this->getHttpClient();

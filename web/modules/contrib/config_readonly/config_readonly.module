@@ -18,7 +18,7 @@ function config_readonly_form_alter(array &$form, FormStateInterface &$form_stat
   }
 
   $event = new ReadOnlyFormEvent($form_state);
-  \Drupal::service('event_dispatcher')->dispatch(ReadOnlyFormEvent::NAME, $event);
+  \Drupal::service('event_dispatcher')->dispatch($event, ReadOnlyFormEvent::NAME );
 
   if ($event->isFormReadOnly()) {
     \Drupal::messenger()->addWarning('This form will not be saved because the configuration active store is read-only.');

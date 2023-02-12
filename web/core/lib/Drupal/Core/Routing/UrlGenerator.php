@@ -104,7 +104,7 @@ class UrlGenerator implements UrlGeneratorInterface {
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): SymfonyRequestContext {
     return $this->context;
   }
 
@@ -163,7 +163,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    *   The route name or other identifying string from ::getRouteDebugMessage().
    *
    * @return string
-   *   The url path, without any base path, without the query string, not URL
+   *   The URL path, without any base path, without the query string, not URL
    *   encoded.
    *
    * @throws \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
@@ -178,7 +178,7 @@ class UrlGenerator implements UrlGeneratorInterface {
 
     // all params must be given
     if ($diff = array_diff_key($variables, $mergedParams)) {
-      throw new MissingMandatoryParametersException(sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', array_keys($diff)), $name));
+      throw new MissingMandatoryParametersException($name, array_keys($diff));
     }
 
     $url = '';

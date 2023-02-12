@@ -42,7 +42,7 @@ class FieldDiscoveryTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->fieldPluginManager = $this->prophesize(MigrateFieldPluginManagerInterface::class);
     $this->migrationPluginManager = $this->prophesize(MigrationPluginManagerInterface::class);
@@ -178,7 +178,7 @@ class FieldDiscoveryTest extends UnitTestCase {
         'entity_type_id' => 'user',
         'bundle' => 'user',
         'expected_fields' => [
-            'user_field_1' => ['field_info_key' => 'user_field_1_data'],
+          'user_field_1' => ['field_info_key' => 'user_field_1_data'],
         ],
       ],
       'Comment - Content Type 1' => [

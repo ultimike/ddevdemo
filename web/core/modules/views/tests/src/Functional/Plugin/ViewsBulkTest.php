@@ -30,7 +30,10 @@ class ViewsBulkTest extends ViewTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp($import_test_views, $modules);
 
     $this->drupalCreateContentType(['type' => 'page']);

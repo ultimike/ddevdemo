@@ -23,7 +23,7 @@ abstract class BaseFieldDefinitionTestBase extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // getModuleAndPath() returns an array of the module name and directory.
@@ -36,7 +36,7 @@ abstract class BaseFieldDefinitionTestBase extends UnitTestCase {
     $module_handler->expects($this->once())
       ->method('moduleExists')
       ->with($module_name)
-      ->will($this->returnValue(TRUE));
+      ->willReturn(TRUE);
     $typed_data_manager = $this->createMock(TypedDataManagerInterface::class);
     $plugin_manager = new FieldTypePluginManager(
       $namespaces,

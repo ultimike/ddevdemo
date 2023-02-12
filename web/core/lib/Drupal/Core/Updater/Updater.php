@@ -8,7 +8,7 @@ use Drupal\Core\FileTransfer\FileTransfer;
 /**
  * Defines the base class for Updaters used in Drupal.
  */
-class Updater {
+abstract class Updater {
 
   /**
    * Directory to install from.
@@ -23,6 +23,16 @@ class Updater {
    * @var string
    */
   protected $root;
+
+  /**
+   * The name of the project directory (basename).
+   */
+  protected string $name;
+
+  /**
+   * The title of the project.
+   */
+  protected string $title;
 
   /**
    * Constructs a new updater.
@@ -183,6 +193,14 @@ class Updater {
     }
     return $info['name'];
   }
+
+  /**
+   * Returns the path to the default install location for the current project.
+   *
+   * @return string
+   *   The absolute path of the directory.
+   */
+  abstract public function getInstallDirectory();
 
   /**
    * Stores the default parameters for the Updater.

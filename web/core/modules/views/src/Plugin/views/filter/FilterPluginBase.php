@@ -46,6 +46,8 @@ use Drupal\views\ViewExecutable;
 abstract class FilterPluginBase extends HandlerBase implements CacheableDependencyInterface {
 
   /**
+   * The value.
+   *
    * Contains the actual value of the field,either configured in the views ui
    * or entered in the exposed filters.
    */
@@ -704,7 +706,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         // types). Ensure at least the minimum number of values is present for
         // this entry to be considered valid.
         $min_values = $operators[$group['operator']]['values'];
-        $actual_values = count(array_filter($group['value'], 'static::arrayFilterZero'));
+        $actual_values = count(array_filter($group['value'], [static::class, 'arrayFilterZero']));
         return $actual_values >= $min_values;
       }
     }
@@ -858,7 +860,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     }
     foreach ($this->options['group_info']['group_items'] as $id => $group) {
       if (!empty($group['title'])) {
-        $groups[$id] = $id != 'All' ? $this->t($group['title']) : $group['title'];
+        $groups[$id] = $group['title'];
       }
     }
 
@@ -1507,7 +1509,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         }
 
         if ($this->operator != 'empty' && $this->operator != 'not empty') {
-          if ($value == 'All' || $value === []) {
+          if ($value == 'All' || $value === 0 || $value === []) {
             return FALSE;
           }
 

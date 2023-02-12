@@ -85,6 +85,8 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   protected static $patchProtectedFieldNames;
 
   /**
+   * The unique field names.
+   *
    * The fields that need a different (random) value for each new entity created
    * by a POST request.
    *
@@ -93,6 +95,8 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   protected static $uniqueFieldNames = [];
 
   /**
+   * The field name for the label.
+   *
    * Optionally specify which field is the 'label' field. Some entities do not
    * specify a 'label' entity key. For example: User.
    *
@@ -175,7 +179,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Calculate REST Resource config entity ID.
@@ -432,7 +436,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'MISS', FALSE);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "GET ' . str_replace($this->baseUrl, '', $this->getEntityResourceUrl()->setAbsolute()->toString()) . '"', $response);
+      $this->assertResourceErrorResponse(404, 'No route found for "GET ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
     }
 
     $this->provisionEntityResource();
@@ -519,19 +523,18 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // @see \Drupal\rest\EventSubscriber\ResourceResponseSubscriber::flattenResponse()
     $cache_items = $this->container->get('database')
       ->select('cache_dynamic_page_cache', 'c')
-      ->fields('c', ['cid', 'data'])
+      ->fields('c', ['data'])
       ->condition('c.cid', '%[route]=rest.%', 'LIKE')
       ->execute()
-      ->fetchAllAssoc('cid');
+      ->fetchAll();
     if (!$is_cacheable_by_dynamic_page_cache) {
       $this->assertCount(0, $cache_items);
     }
     else {
-      $this->assertCount(2, $cache_items);
-      $found_cache_redirect = FALSE;
+      $this->assertLessThanOrEqual(2, count($cache_items));
       $found_cached_200_response = FALSE;
       $other_cached_responses_are_4xx = TRUE;
-      foreach ($cache_items as $cid => $cache_item) {
+      foreach ($cache_items as $cache_item) {
         $cached_data = unserialize($cache_item->data);
         if (!isset($cached_data['#cache_redirect'])) {
           $cached_response = $cached_data['#response'];
@@ -544,11 +547,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
           $this->assertNotInstanceOf(ResourceResponseInterface::class, $cached_response);
           $this->assertInstanceOf(CacheableResponseInterface::class, $cached_response);
         }
-        else {
-          $found_cache_redirect = TRUE;
-        }
       }
-      $this->assertTrue($found_cache_redirect);
       $this->assertTrue($found_cached_200_response);
       $this->assertTrue($other_cached_responses_are_4xx);
     }
@@ -581,7 +580,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
           ? $link_relation_type->getRegisteredName()
           : $link_relation_type->getExtensionUri();
       }, array_keys($this->entity->getEntityType()->getLinkTemplates()));
-      $parse_rel_from_link_header = function ($value) use ($link_relation_type_manager) {
+      $parse_rel_from_link_header = function ($value) {
         $matches = [];
         if (preg_match('/rel="([^"]+)"/', $value, $matches) === 1) {
           return $matches[1];
@@ -717,7 +716,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 404 when resource not provisioned.
     $response = $this->request('POST', $url, $request_options);
-    $this->assertResourceErrorResponse(404, 'No route found for "POST ' . str_replace($this->baseUrl, '', $this->getEntityResourcePostUrl()->setAbsolute()->toString()) . '"', $response);
+    $this->assertResourceErrorResponse(404, 'No route found for "POST ' . $this->getEntityResourcePostUrl()->setAbsolute()->toString() . '"', $response);
 
     $this->provisionEntityResource();
     // Simulate the developer again forgetting the ?_format query string.
@@ -906,10 +905,10 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 404 when resource not provisioned, 405 if canonical route.
     $response = $this->request('PATCH', $url, $request_options);
     if ($has_canonical_url) {
-      $this->assertResourceErrorResponse(405, 'No route found for "PATCH ' . str_replace($this->baseUrl, '', $this->getEntityResourceUrl()->setAbsolute()->toString()) . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
+      $this->assertResourceErrorResponse(405, 'No route found for "PATCH ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "PATCH ' . str_replace($this->baseUrl, '', $this->getEntityResourceUrl()->setAbsolute()->toString()) . '"', $response);
+      $this->assertResourceErrorResponse(404, 'No route found for "PATCH ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
     }
 
     $this->provisionEntityResource();
@@ -1132,10 +1131,10 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('DELETE', $url, $request_options);
     if ($has_canonical_url) {
       $this->assertSame(['GET, POST, HEAD'], $response->getHeader('Allow'));
-      $this->assertResourceErrorResponse(405, 'No route found for "DELETE ' . str_replace($this->baseUrl, '', $this->getEntityResourceUrl()->setAbsolute()->toString()) . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
+      $this->assertResourceErrorResponse(405, 'No route found for "DELETE ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '": Method Not Allowed (Allow: GET, POST, HEAD)', $response);
     }
     else {
-      $this->assertResourceErrorResponse(404, 'No route found for "DELETE ' . str_replace($this->baseUrl, '', $this->getEntityResourceUrl()->setAbsolute()->toString()) . '"', $response);
+      $this->assertResourceErrorResponse(404, 'No route found for "DELETE ' . $this->getEntityResourceUrl()->setAbsolute()->toString() . '"', $response);
     }
 
     $this->provisionEntityResource();

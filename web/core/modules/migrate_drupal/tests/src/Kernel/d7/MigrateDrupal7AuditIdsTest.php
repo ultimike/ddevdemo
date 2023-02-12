@@ -39,6 +39,7 @@ class MigrateDrupal7AuditIdsTest extends MigrateDrupal7TestBase {
     $this->installSchema('node', ['node_access']);
     $this->installSchema('search', ['search_dataset']);
     $this->installSchema('system', ['sequences']);
+    // @todo Remove tracker in https://www.drupal.org/project/drupal/issues/3261452
     $this->installSchema('tracker', ['tracker_node', 'tracker_user']);
 
     // Enable content moderation for nodes of type page.
@@ -127,9 +128,6 @@ class MigrateDrupal7AuditIdsTest extends MigrateDrupal7TestBase {
     );
 
     $expected = [
-      // @todo Remove aggregator in https://www.drupal.org/project/drupal/issues/3264120
-      'd7_aggregator_feed',
-      'd7_aggregator_item',
       'd7_comment',
       'd7_custom_block',
       'd7_file',

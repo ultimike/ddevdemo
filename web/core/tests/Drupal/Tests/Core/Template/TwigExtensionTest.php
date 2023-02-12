@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\Core\Template;
 
+// cspell:ignore mila
+
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\GeneratedLink;
 use Drupal\Core\Render\RenderableInterface;
@@ -34,7 +36,7 @@ class TwigExtensionTest extends UnitTestCase {
   protected $renderer;
 
   /**
-   * The url generator.
+   * The URL generator.
    *
    * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
@@ -64,14 +66,14 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * The file URL generator mock.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->renderer = $this->createMock('\Drupal\Core\Render\RendererInterface');
@@ -307,12 +309,11 @@ class TwigExtensionTest extends UnitTestCase {
   public function testEscapeWithGeneratedLink() {
     $loader = new FilesystemLoader();
     $twig = new Environment($loader, [
-        'debug' => TRUE,
-        'cache' => FALSE,
-        'autoescape' => 'html',
-        'optimizations' => 0,
-      ]
-    );
+      'debug' => TRUE,
+      'cache' => FALSE,
+      'autoescape' => 'html',
+      'optimizations' => 0,
+    ]);
 
     $twig->addExtension($this->systemUnderTest);
     $link = new GeneratedLink();
@@ -423,6 +424,122 @@ class TwigExtensionTest extends UnitTestCase {
     $build = $this->systemUnderTest->getLink('test', $url, ['class' => ['bar']]);
 
     $this->assertEquals(['foo', 'bar'], $build['#url']->getOption('attributes')['class']);
+  }
+
+  /**
+   * Tests Twig 'add_suggestion' filter.
+   *
+   * @covers ::suggestThemeHook
+   * @dataProvider providerTestTwigAddSuggestionFilter
+   */
+  public function testTwigAddSuggestionFilter($original_render_array, $suggestion, $expected_render_array) {
+    $processed_render_array = $this->systemUnderTest->suggestThemeHook($original_render_array, $suggestion);
+    $this->assertEquals($expected_render_array, $processed_render_array);
+  }
+
+  /**
+   * A data provider for ::testTwigAddSuggestionFilter().
+   *
+   * @return \Iterator
+   */
+  public function providerTestTwigAddSuggestionFilter(): \Iterator {
+    yield 'suggestion should be added' => [
+      [
+        '#theme' => 'kitten',
+        '#name' => 'Mila',
+      ],
+      'cute',
+      [
+        '#theme' => [
+          'kitten__cute',
+          'kitten',
+        ],
+        '#name' => 'Mila',
+      ],
+    ];
+
+    yield 'suggestion should extend existing suggestions' => [
+      [
+        '#theme' => 'kitten__stripy',
+        '#name' => 'Mila',
+      ],
+      'cute',
+      [
+        '#theme' => [
+          'kitten__stripy__cute',
+          'kitten__stripy',
+        ],
+        '#name' => 'Mila',
+      ],
+    ];
+
+    yield 'suggestion should have highest priority' => [
+      [
+        '#theme' => [
+          'kitten__stripy',
+          'kitten',
+        ],
+        '#name' => 'Mila',
+      ],
+      'cute',
+      [
+        '#theme' => [
+          'kitten__stripy__cute',
+          'kitten__cute',
+          'kitten__stripy',
+          'kitten',
+        ],
+        '#name' => 'Mila',
+      ],
+    ];
+
+    yield '#printed should be removed after suggestion was added' => [
+      [
+        '#theme' => 'kitten',
+        '#name' => 'Mila',
+        '#printed' => TRUE,
+      ],
+      'cute',
+      [
+        '#theme' => [
+          'kitten__cute',
+          'kitten',
+        ],
+        '#name' => 'Mila',
+      ],
+    ];
+
+    yield 'cache key should be added' => [
+      [
+        '#theme' => 'kitten',
+        '#name' => 'Mila',
+        '#cache' => [
+          'keys' => [
+            'kitten',
+          ],
+        ],
+      ],
+      'cute',
+      [
+        '#theme' => [
+          'kitten__cute',
+          'kitten',
+        ],
+        '#name' => 'Mila',
+        '#cache' => [
+          'keys' => [
+            'kitten',
+            'cute',
+          ],
+        ],
+      ],
+    ];
+
+    yield 'null/missing content should be ignored' => [
+      NULL,
+      'cute',
+      NULL,
+    ];
   }
 
 }

@@ -21,7 +21,10 @@ abstract class FileManagedUnitTestBase extends KernelTestBase {
    */
   protected static $modules = ['file_test', 'file', 'system', 'field', 'user'];
 
-  protected function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
     // Clear out any hook calls.
     file_test_reset();

@@ -77,7 +77,7 @@ function update_process_project_info(&$projects) {
  * @param array $available
  *   Data about available project releases.
  *
- * @return
+ * @return array
  *   An array of installed projects with current update status information.
  *
  * @see update_get_available()
@@ -413,6 +413,11 @@ function update_calculate_project_update_status(&$project_data, $available) {
             $release->isUnsupported() ||
             $release->isInsecure()
     ) {
+      continue;
+    }
+    // Ignore dev releases with no date. These are either broken releases or
+    // stub releases to allow them to be selected on drupal.org project issues.
+    elseif ($release->getDate() === NULL && $release_module_version->getVersionExtra() === 'dev') {
       continue;
     }
 

@@ -26,6 +26,11 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
   protected $unroutedUrlAssembler;
 
   /**
+   * The request context.
+   */
+  protected RequestContext $requestContext;
+
+  /**
    * Constructs a RedirectResponseSubscriber object.
    *
    * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
@@ -134,7 +139,7 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
    * @return array
    *   An array of event listener definitions.
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::RESPONSE][] = ['checkRedirectUrl'];
     return $events;
   }

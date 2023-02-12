@@ -119,10 +119,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       'items' => $items,
       'default' => $this->isDefaultValueWidget($form_state),
     ];
-    \Drupal::moduleHandler()->alterDeprecated('Deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. Use hook_field_widget_complete_form_alter or hook_field_widget_complete_WIDGET_TYPE_form_alter instead. See https://www.drupal.org/node/3180429.', [
-      'field_widget_multivalue_form',
-      'field_widget_multivalue_' . $this->getPluginId() . '_form',
-    ], $elements, $form_state, $context);
 
     // Populate the 'array_parents' information in $form_state->get('field')
     // after the form is built, so that we catch changes in the form structure
@@ -361,7 +357,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         'delta' => $delta,
         'default' => $this->isDefaultValueWidget($form_state),
       ];
-      \Drupal::moduleHandler()->alterDeprecated('Deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. Use hook_field_widget_single_element_form_alter or hook_field_widget_single_element_WIDGET_TYPE_form_alter instead. See https://www.drupal.org/node/3180429.', ['field_widget_form', 'field_widget_' . $this->getPluginId() . '_form'], $element, $form_state, $context);
       \Drupal::moduleHandler()->alter(['field_widget_single_element_form', 'field_widget_single_element_' . $this->getPluginId() . '_form'], $element, $form_state, $context);
     }
 
@@ -444,6 +439,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
         $violations_by_delta = $item_list_violations = [];
         foreach ($violations as $violation) {
+          $violation = new InternalViolation($violation);
           // Separate violations by delta.
           $property_path = explode('.', $violation->getPropertyPath());
           $delta = array_shift($property_path);
@@ -454,6 +450,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           else {
             $item_list_violations[] = $violation;
           }
+          // @todo Remove BC layer https://www.drupal.org/i/3307859 on PHP 8.2.
           $violation->arrayPropertyPath = $property_path;
         }
 
@@ -470,7 +467,6 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
             $delta_element = $element[$original_delta];
           }
           foreach ($delta_violations as $violation) {
-            // @todo: Pass $violation->arrayPropertyPath as property path.
             $error_element = $this->errorElement($delta_element, $violation, $form, $form_state);
             if ($error_element !== FALSE) {
               $form_state->setError($error_element, $violation->getMessage());

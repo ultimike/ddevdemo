@@ -63,8 +63,10 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   protected $activeFieldStorageDefinitions;
 
   /**
-   * An array keyed by entity type. Each value is an array whose keys are
-   * field names and whose value is an array with two entries:
+   * An array of lightweight maps of fields, keyed by entity type.
+   *
+   * Each value is an array whose keys are field names and whose value is an
+   * array with two entries:
    *   - type: The field type.
    *   - bundles: The bundles in which the field appears.
    *
@@ -73,10 +75,11 @@ class EntityFieldManager implements EntityFieldManagerInterface {
   protected $fieldMap = [];
 
   /**
-   * An array keyed by field type. Each value is an array whose key are entity
-   * types including arrays in the same form that $fieldMap.
+   * An array of lightweight maps of fields, keyed by field type.
    *
-   * It helps access the mapping between types and fields by the field type.
+   * Each value is an array whose key are entity types including arrays in the
+   * same form as $fieldMap. It helps access the mapping between types and
+   * fields by the field type.
    *
    * @var array
    */
@@ -160,7 +163,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, TypedDataManagerInterface $typed_data_manager, LanguageManagerInterface $language_manager, KeyValueFactoryInterface $key_value_factory, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository = NULL) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, TypedDataManagerInterface $typed_data_manager, LanguageManagerInterface $language_manager, KeyValueFactoryInterface $key_value_factory, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityDisplayRepository = $entity_display_repository;
@@ -170,10 +173,6 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $this->keyValueFactory = $key_value_factory;
     $this->moduleHandler = $module_handler;
     $this->cacheBackend = $cache_backend;
-    if (!$entity_last_installed_schema_repository) {
-      @trigger_error('The entity.last_installed_schema.repository service must be passed to EntityFieldManager::__construct(), it is required before drupal:10.0.0.', E_USER_DEPRECATED);
-      $entity_last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
-    }
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
   }
 
@@ -377,7 +376,9 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    */
   protected function buildBundleFieldDefinitions($entity_type_id, $bundle, array $base_field_definitions) {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    $class = $entity_type->getClass();
+
+    // Use a bundle specific class if one is defined.
+    $class = $this->entityTypeManager->getStorage($entity_type_id)->getEntityClass($bundle);
 
     // Allow the entity class to provide bundle fields and bundle-specific
     // overrides of base fields.

@@ -25,7 +25,7 @@ class ReadOnlyConfigTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['config', 'config_readonly'];
+  protected static $modules = ['config', 'config_readonly'];
 
   /**
    * Read-only message.
@@ -42,7 +42,7 @@ class ReadOnlyConfigTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->adminUser = $this->createUser([], NULL, TRUE);
     $this->drupalLogin($this->adminUser);
@@ -92,7 +92,8 @@ class ReadOnlyConfigTest extends BrowserTestBase {
     $edit = [
       'modules[search][enable]' => TRUE,
     ];
-    $this->drupalPostForm($module_url, $edit, 'Install');
+    $this->drupalGet($module_url);
+    $this->submitForm($edit, 'Install');
     $this->assertSession()->pageTextNotContains($this->message);
 
     // Switch forms to read-only.

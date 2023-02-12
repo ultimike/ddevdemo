@@ -30,7 +30,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "minimum_depth" = 1,
  *     "maximum_depth" = 4,
  *     "kill" = FALSE,
- *   }
+ *   },
+ *   dependencies = {
+ *     "taxonomy",
+ *   },
  * )
  */
 class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPluginInterface {
@@ -287,7 +290,7 @@ class TermDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
       // Initialise the nested array for this vocabulary.
       $all_parents[$vid] = ['top_level' => [], 'lower_levels' => []];
       for ($depth = 1; $depth < $max_depth; $depth++) {
-        $query = \Drupal::entityQuery('taxonomy_term')->condition('vid', $vid);
+        $query = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->condition('vid', $vid);
         if ($depth == 1) {
           // For the top level the parent id must be zero.
           $query->condition('parent', 0);

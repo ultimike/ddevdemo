@@ -17,12 +17,13 @@ use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewEntityInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Stores UI related temporary settings.
  */
+#[\AllowDynamicProperties]
 class ViewUI implements ViewEntityInterface {
 
   /**
@@ -121,8 +122,9 @@ class ViewUI implements ViewEntityInterface {
   ];
 
   /**
-   * Whether the config is being created, updated or deleted through the
-   * import process.
+   * Whether the config is being synced through the import process.
+   *
+   * This is the case with create, update or delete.
    *
    * @var bool
    */
@@ -134,6 +136,11 @@ class ViewUI implements ViewEntityInterface {
    * @var bool
    */
   private $isUninstalling = FALSE;
+
+  /**
+   * The entity type.
+   */
+  protected string $entityType;
 
   /**
    * Constructs a View UI object.
@@ -536,7 +543,6 @@ class ViewUI implements ViewEntityInterface {
     $errors = $executable->validate();
     $executable->destroy();
     if (empty($errors)) {
-      $this->ajax = TRUE;
       $executable->live_preview = TRUE;
 
       // AJAX happens via HTTP POST but everything expects exposed data to
@@ -574,7 +580,7 @@ class ViewUI implements ViewEntityInterface {
       $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, \Drupal::service('router.route_provider')->getRouteByName('entity.view.preview_form'));
       $request->attributes->set('view', $this->storage);
       $request->attributes->set('display_id', $display_id);
-      $raw_parameters = new ParameterBag();
+      $raw_parameters = new InputBag();
       $raw_parameters->set('view', $this->id());
       $raw_parameters->set('display_id', $display_id);
       $request->attributes->set('_raw_variables', $raw_parameters);
@@ -673,9 +679,9 @@ class ViewUI implements ViewEntityInterface {
                 [
                   'data' => [
                     '#prefix' => '<pre>',
-                     'queries' => $queries,
-                     '#suffix' => '</pre>',
-                    ],
+                    'queries' => $queries,
+                    '#suffix' => '</pre>',
+                  ],
                 ],
               ];
             }
@@ -830,7 +836,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * Get the user's current progress through the form stack.
    *
-   * @return
+   * @return array|bool
    *   FALSE if the user is not currently in a multiple-form stack. Otherwise,
    *   an associative array with the following keys:
    *   - current: The number of the current form on the stack.

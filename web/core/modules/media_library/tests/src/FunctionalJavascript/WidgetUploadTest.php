@@ -18,6 +18,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
   use TestFileCreationTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Tests that uploads in the Media library's widget works as expected.
    */
   public function testWidgetUpload() {
@@ -136,8 +141,10 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->waitForText($png_image->filename);
 
     // Remove the item.
+    $assert_session->elementTextContains('css', '.field--name-field-twin-media', $png_image->filename);
     $assert_session->elementExists('css', '.field--name-field-twin-media')->pressButton('Remove');
-    $this->waitForNoText($png_image->filename);
+    $this->waitForElementTextContains('#drupal-live-announce', $png_image->filename . ' has been removed');
+    $assert_session->elementTextNotContains('css', '.field--name-field-twin-media', $png_image->filename);
 
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Three');
@@ -203,7 +210,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4), FALSE);
+    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');
@@ -473,8 +480,10 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->waitForText($png_image->filename);
 
     // Remove the item.
+    $assert_session->elementTextContains('css', '.field--name-field-twin-media', $png_image->filename);
     $assert_session->elementExists('css', '.field--name-field-twin-media')->pressButton('Remove');
-    $this->waitForNoText($png_image->filename);
+    $this->waitForElementTextContains('#drupal-live-announce', $png_image->filename . ' has been removed');
+    $assert_session->elementTextNotContains('css', '.field--name-field-twin-media', $png_image->filename);
 
     $this->openMediaLibraryForField('field_twin_media');
     $this->switchToMediaType('Three');
@@ -544,7 +553,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert media type four should only allow jpg files by trying a png file
     // first.
     $png_uri_4 = $file_system->copy($png_image->uri, 'public://');
-    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4), FALSE);
+    $this->addMediaFileToField('Add file', $file_system->realpath($png_uri_4));
     $this->waitForText('Only files with the following extensions are allowed');
     // Assert that jpg files are accepted by type four.
     $jpg_uri_2 = $file_system->copy($jpg_image->uri, 'public://');

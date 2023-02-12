@@ -198,7 +198,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
     $exception = new BrokenPostRequestException(32 * 1e6);
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
 
-    $event = new ExceptionEvent($this->httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+    $event = new ExceptionEvent($this->httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
     $this->subscriber->onException($event);
     $this->assertTrue($event->isAllowingCustomResponseCode());
     $actual_response = $event->getResponse();
@@ -221,8 +221,8 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   public function testOnExceptionNestedException() {
     $form = ['#type' => 'form', '#build_id' => 'the_build_id'];
     $expected_form = $form + [
-        '#build_id_old' => 'the_build_id',
-      ];
+      '#build_id_old' => 'the_build_id',
+    ];
     $form_state = new FormState();
     $form_exception = new FormAjaxException($form, $form_state);
     $exception = new \Exception('', 0, $form_exception);
@@ -266,7 +266,7 @@ class FormAjaxSubscriberTest extends UnitTestCase {
    * @internal
    */
   protected function assertResponseFromException(Request $request, \Exception $exception, ?Response $expected_response): void {
-    $this->event = new ExceptionEvent($this->httpKernel, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+    $this->event = new ExceptionEvent($this->httpKernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
     $this->subscriber->onException($this->event);
 
     $this->assertSame($expected_response, $this->event->getResponse());

@@ -12,7 +12,7 @@ class ReadOnlyConfigWhitelistTest extends ReadOnlyConfigTest {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'config',
     'config_readonly',
     'node',

@@ -1,5 +1,18 @@
 # Changelog
 
+### 4.0.0 2022-10-13
+
+* Create 4.x branch for breaking changes introduced in 3.1.6 so that they may be backed out on the 3.x branch.
+* Drop support for older versions of PHP and Symfony.
+
+### 3.1.6 2022-10-11
+
+* Remove allow-plugins config; it is unused except in CI scripts
+* Allow older versions of symfony/filesystem for ancient PHP binaries
+* Explicitly allow ocramius/package-versions script
+* Run composer update to fix composer.lock sync issues, eliminate Guzzle CVEs
+* Replace Webmozart/PathUtil with Symfony/Filesystem
+
 ### 3.1.5 2022-2-23
 
 * BUGFIX: Prevent runtime error with null on PHP 8.1 (#53)

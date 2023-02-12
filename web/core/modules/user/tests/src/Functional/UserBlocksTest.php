@@ -32,13 +32,16 @@ class UserBlocksTest extends BrowserTestBase {
    */
   protected $adminUser;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
     $this->adminUser = $this->drupalCreateUser(['administer blocks']);
     $this->drupalLogin($this->adminUser);
     $this->drupalPlaceBlock('user_login_block', ['id' => 'user_blocks_test_user_login_block']);
-    $this->drupalLogout($this->adminUser);
+    $this->drupalLogout();
   }
 
   /**

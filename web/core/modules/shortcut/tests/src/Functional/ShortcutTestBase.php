@@ -47,7 +47,10 @@ abstract class ShortcutTestBase extends BrowserTestBase {
    */
   protected $set;
 
-  protected function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
 
     if ($this->profile != 'standard') {

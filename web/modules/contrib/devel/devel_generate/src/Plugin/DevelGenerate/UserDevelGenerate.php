@@ -150,6 +150,7 @@ class UserDevelGenerate extends DevelGenerateBase implements ContainerFactoryPlu
     if ($kill) {
       $uids = $this->userStorage->getQuery()
         ->condition('uid', 1, '>')
+        ->accessCheck(FALSE)
         ->execute();
       $users = $this->userStorage->loadMultiple($uids);
       $this->userStorage->delete($users);

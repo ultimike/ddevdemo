@@ -5,6 +5,7 @@ namespace Drupal\Tests\Core\Routing;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\AccessAwareRouter;
 use Drupal\Core\Routing\AccessAwareRouterInterface;
+use Drupal\Core\Routing\Router;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,7 @@ class AccessAwareRouterTest extends UnitTestCase {
   /**
    * @var \Drupal\Core\Routing\Router
    */
-  protected $router;
+  protected Router $router;
 
   /**
    * @var \Symfony\Component\Routing\Route
@@ -66,7 +67,7 @@ class AccessAwareRouterTest extends UnitTestCase {
       ->getMock();
     $this->router->expects($this->once())
       ->method('matchRequest')
-      ->will($this->returnValue([RouteObjectInterface::ROUTE_OBJECT => $this->route]));
+      ->willReturn([RouteObjectInterface::ROUTE_OBJECT => $this->route]);
     $this->accessAwareRouter = new AccessAwareRouter($this->router, $this->accessManager, $this->currentUser);
   }
 

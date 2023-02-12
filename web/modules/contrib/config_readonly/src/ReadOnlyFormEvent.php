@@ -3,7 +3,7 @@
 namespace Drupal\config_readonly;
 
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Readonly form event.

@@ -75,7 +75,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '9.4.5';
+  const VERSION = '10.0.3';
 
   /**
    * Core API compatibility.
@@ -86,16 +86,6 @@ class Drupal {
    * Core minimum schema version.
    */
   const CORE_MINIMUM_SCHEMA_VERSION = 8000;
-
-  /**
-   * Minimum supported version of PHP.
-   *
-   * @deprecated in drupal:9.4.0 and is removed from drupal:10.0.0. Use
-   *   \Drupal\Core\Utility\PhpRequirements::getMinimumSupportedPhp() instead.
-   *
-   * @see https://www.drupal.org/node/3261451
-   */
-  const MINIMUM_SUPPORTED_PHP = '7.4.0';
 
   /**
    * Minimum allowed version of PHP for Drupal to be bootstrapped.
@@ -113,7 +103,7 @@ class Drupal {
    * - Once in the error message printed to the user immediately after.
    * Remember to update both whenever this constant is updated.
    */
-  const MINIMUM_PHP = '7.3.0';
+  const MINIMUM_PHP = '8.1.0';
 
   /**
    * Minimum recommended value of PHP memory_limit.
@@ -131,12 +121,12 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.0';
+  const RECOMMENDED_PHP = '8.1.6';
 
   /**
    * The currently active container object, or NULL if not initialized yet.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|null
+   * @var \Drupal\Component\DependencyInjection\ContainerInterface|null
    */
   protected static $container;
 
@@ -160,7 +150,7 @@ class Drupal {
   /**
    * Returns the currently active global container.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return \Drupal\Component\DependencyInjection\ContainerInterface
    *
    * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
    */
@@ -565,10 +555,10 @@ class Drupal {
   }
 
   /**
-   * Returns the url generator service.
+   * Returns the URL generator service.
    *
    * @return \Drupal\Core\Routing\UrlGeneratorInterface
-   *   The url generator service.
+   *   The URL generator service.
    */
   public static function urlGenerator() {
     return static::getContainer()->get('url_generator');

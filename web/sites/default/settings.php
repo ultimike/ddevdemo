@@ -809,7 +809,7 @@ include __DIR__ . "/settings.pantheon.php";
 
 if (isset($_ENV['PANTHEON_ENVIRONMENT'])) {
   $settings['config_readonly'] = TRUE;
-} 
+}
 else {
   $config['config_split.config_split.local_development']['status'] = TRUE;
 }
@@ -825,8 +825,6 @@ else {
  * Keep this code block at the end of this file to take full effect.
  */
 #
-
-$settings['install_profile'] = 'standard';
 
 // Automatically generated include for settings managed by ddev.
 if (file_exists($app_root . '/' . $site_path . '/settings.ddev.php')) {

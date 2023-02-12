@@ -28,18 +28,21 @@ class NestedFormTest extends FieldTestBase {
   /**
    * @var array
    */
-  protected $fieldStorageSingle;
+  protected array $fieldStorageSingle;
 
   /**
    * @var array
    */
-  protected $fieldStorageUnlimited;
+  protected array $fieldStorageUnlimited;
 
   /**
    * @var array
    */
-  protected $field;
+  protected array $field;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 

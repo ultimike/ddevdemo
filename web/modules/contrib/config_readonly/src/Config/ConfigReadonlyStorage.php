@@ -12,7 +12,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\config_readonly\ConfigReadonlyWhitelistTrait;
 
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

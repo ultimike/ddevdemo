@@ -145,7 +145,7 @@ abstract class FormTestBase extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Add functions to the global namespace for testing.
@@ -193,7 +193,7 @@ abstract class FormTestBase extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     Html::resetSeenIds();
     (new FormState())->clearErrors();
   }
@@ -217,12 +217,12 @@ abstract class FormTestBase extends UnitTestCase {
     $form = $this->createMock('Drupal\Core\Form\FormInterface');
     $form->expects($this->once())
       ->method('getFormId')
-      ->will($this->returnValue($form_id));
+      ->willReturn($form_id);
 
     if ($expected_form) {
       $form->expects($this->exactly($count))
         ->method('buildForm')
-        ->will($this->returnValue($expected_form));
+        ->willReturn($expected_form);
     }
     return $form;
   }

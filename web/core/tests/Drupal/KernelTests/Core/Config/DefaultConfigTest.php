@@ -40,27 +40,7 @@ class DefaultConfigTest extends KernelTestBase {
     'config_schema_test.someschema.somemodule.section_two.subsection',
     'config_schema_test.someschema.with_parents',
     'config_schema_test.someschema',
-    // Skip tour-test-legacy files as they intentionally have deprecated
-    // properties.
-    'tour.tour.tour-test-legacy',
-    'tour.tour.tour-test-legacy-location',
   ];
-
-  /**
-   * Themes which provide default configuration and need enabling.
-   *
-   * If a theme provides default configuration but does not have a schema
-   * because it can rely on schemas added by system_config_schema_info_alter()
-   * then this test needs to enable it.
-   *
-   * @var array
-   */
-  protected $themes = ['seven'];
-
-  protected function setUp(): void {
-    parent::setUp();
-    \Drupal::service('theme_installer')->install($this->themes);
-  }
 
   /**
    * {@inheritdoc}

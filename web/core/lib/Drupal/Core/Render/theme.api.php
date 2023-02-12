@@ -45,7 +45,7 @@
  * implementing hook_theme(), which specifies the name of the hook, the input
  * "variables" used to provide data and options, and other information. Modules
  * implementing hook_theme() also need to provide a default implementation for
- * each of their theme hooks in a Twig template file, and they may also provide
+ * each of their theme hooks in a Twig file, and they may also provide
  * preprocessing functions. For example, the core Search module defines a theme
  * hook for a search result item in search_theme():
  * @code
@@ -79,16 +79,15 @@
  * copy the default implementation template, and then modifying it as desired.
  *
  * @section sec_preprocess_templates Preprocessing for Template Files
- * If the theme implementation is a template file, several functions are called
- * before the template file is invoked to modify the variables that are passed
- * to the template. These make up the "preprocessing" phase, and are executed
- * (if they exist), in the following order (note that in the following list,
- * HOOK indicates the hook being called or a less specific hook. For example, if
- * '#theme' => 'node__article' is called, hook is node__article and node. MODULE
- * indicates a module name, THEME indicates a theme name, and ENGINE indicates a
- * theme engine name). Modules, themes, and theme engines can provide these
- * functions to modify how the data is preprocessed, before it is passed to the
- * theme template:
+ * Several functions are called before the template file is invoked to modify
+ * the variables that are passed to the template. These make up the
+ * "preprocessing" phase, and are executed (if they exist), in the following
+ * order (note that in the following list, HOOK indicates the hook being called
+ * or a less specific hook. For example, if '#theme' => 'node__article' is
+ * called, hook is node__article and node. MODULE indicates a module name,
+ * THEME indicates a theme name, and ENGINE indicates a theme engine name).
+ * Modules, themes, and theme engines can provide these functions to modify how
+ * the data is preprocessed, before it is passed to the theme template:
  * - template_preprocess(&$variables, $hook): Creates a default set of variables
  *   for all theme hooks with template implementations. Provided by Drupal Core.
  * - template_preprocess_HOOK(&$variables): Should be implemented by the module
@@ -251,7 +250,7 @@
  *   hook_theme() implementation specifies variable 'foo', then in a render
  *   array, you would provide this data using property '#foo'. Modules
  *   implementing hook_theme() also need to provide a default implementation for
- *   each of their theme hooks in a Twig template file. For more information
+ *   each of their theme hooks, normally in a Twig file. For more information
  *   and to discover available theme hooks, see the documentation of
  *   hook_theme() and the
  *   @link themeable Default theme implementations topic. @endlink
@@ -527,8 +526,8 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
  * Preprocess theme variables for templates.
  *
  * This hook allows modules to preprocess theme variables for theme templates.
- * It is called for all theme hooks. hook_preprocess_HOOK() can be used to
- * preprocess variables for a specific theme hook.
+ * hook_preprocess_HOOK() can be used to preprocess variables for a specific
+ * theme hook.
  *
  * For more detailed information, see the
  * @link themeable Theme system overview topic @endlink.
@@ -551,7 +550,7 @@ function hook_preprocess(&$variables, $hook) {
     $hooks = theme_get_registry();
   }
 
-  // Determine the primary theme hook argument.
+  // Determine the primary theme function argument.
   if (isset($hooks[$hook]['variables'])) {
     $keys = array_keys($hooks[$hook]['variables']);
     $key = $keys[0];
@@ -586,15 +585,20 @@ function hook_preprocess(&$variables, $hook) {
  *   The variables array (modify in place).
  */
 function hook_preprocess_HOOK(&$variables) {
-  // This example is from rdf_preprocess_image(). It adds an RDF attribute
-  // to the image hook's variables.
-  $variables['attributes']['typeof'] = ['foaf:Image'];
+  // This example is from node_preprocess_html(). It adds the node type to
+  // the body classes, when on an individual node page or node preview page.
+  if (($node = \Drupal::routeMatch()->getParameter('node')) || ($node = \Drupal::routeMatch()->getParameter('node_preview'))) {
+    if ($node instanceof NodeInterface) {
+      $variables['node_type'] = $node->getType();
+    }
+  }
 }
 
 /**
  * Provides alternate named suggestions for a specific theme hook.
  *
- * This hook allows modules to provide alternative template name suggestions.
+ * This hook allows modules to provide alternative theme template name
+ * suggestions.
  *
  * HOOK is the least-specific version of the hook being called. For example, if
  * '#theme' => 'node__article' is called, then hook_theme_suggestions_node()
@@ -963,24 +967,24 @@ function hook_js_settings_alter(array &$settings, \Drupal\Core\Asset\AttachedAss
  * @see \Drupal\Core\Asset\LibraryDiscoveryParser::parseLibraryInfo()
  */
 function hook_library_info_alter(&$libraries, $extension) {
-  // Update Farbtastic to version 2.0.
-  if ($extension == 'core' && isset($libraries['jquery.farbtastic'])) {
+  // Update imaginary library 'foo' to version 2.0.
+  if ($extension === 'core' && isset($libraries['foo'])) {
     // Verify existing version is older than the one we are updating to.
-    if (version_compare($libraries['jquery.farbtastic']['version'], '2.0', '<')) {
-      // Update the existing Farbtastic to version 2.0.
-      $libraries['jquery.farbtastic']['version'] = '2.0';
+    if (version_compare($libraries['foo']['version'], '2.0', '<')) {
+      // Update the existing 'foo' to version 2.0.
+      $libraries['foo']['version'] = '2.0';
       // To accurately replace library files, the order of files and the options
       // of each file have to be retained; e.g., like this:
-      $old_path = 'assets/vendor/farbtastic';
+      $old_path = 'assets/vendor/foo';
       // Since the replaced library files are no longer located in a directory
       // relative to the original extension, specify an absolute path (relative
       // to DRUPAL_ROOT / base_path()) to the new location.
-      $new_path = '/' . \Drupal::service('extension.list.module')->getPath('farbtastic_update') . '/js';
+      $new_path = '/' . \Drupal::service('extension.list.module')->getPath('foo_update') . '/js';
       $new_js = [];
       $replacements = [
-        $old_path . '/farbtastic.js' => $new_path . '/farbtastic-2.0.js',
+        $old_path . '/foo.js' => $new_path . '/foo-2.0.js',
       ];
-      foreach ($libraries['jquery.farbtastic']['js'] as $source => $options) {
+      foreach ($libraries['foo']['js'] as $source => $options) {
         if (isset($replacements[$source])) {
           $new_js[$replacements[$source]] = $options;
         }
@@ -988,7 +992,7 @@ function hook_library_info_alter(&$libraries, $extension) {
           $new_js[$source] = $options;
         }
       }
-      $libraries['jquery.farbtastic']['js'] = $new_js;
+      $libraries['foo']['js'] = $new_js;
     }
   }
 }
@@ -1124,25 +1128,26 @@ function hook_page_bottom(array &$page_bottom) {
  *     where the array keys are the names of the variables, and the array
  *     values are the default values if they are not given in the render array.
  *     Template implementations receive each array key as a variable in the
- *     template file (so they must be legal PHP/Twig variable names).
+ *     template file (so they must be legal PHP/Twig variable names). If you
+ *     are using these variables in a render array, prefix the variable names
+ *     defined here with a #.
  *   - render element: Used for render element items only: the name of the
- *     renderable element or element tree to pass to the template. This
- *     name is used as the name of the variable that holds the renderable
- *     element or tree in preprocess and process functions.
- *   - file: The file the implementation resides in. This file will be included
- *     prior to the theme being rendered, to make sure that the preprocess
- *     functions in this file are actually loaded.
- *   - path: Override the path of the file to be used. Ordinarily the module or
- *     theme path will be used, but if the file will not be in the default
- *     path, include it here. This path should be relative to the Drupal root
- *     directory.
- *   - template: If specified, this is the template name. Do not add 'html.twig'
- *     on the end of the template name. The extension will be added
- *     automatically by the default rendering engine (which is Twig.) If 'path'
- *     is specified, 'template' should also be specified. If 'template' is not
- *     specified, a default template name will be assumed. For example, if a
- *     module registers the 'search_result' theme hook, 'search-result' will be
- *     assigned as its template name.
+ *     renderable element or element tree to pass to the template. This name is
+ *     used as the name of the variable that holds the renderable element or
+ *     tree in preprocess and process functions.
+ *   - file: The file that any preprocess implementations reside in. This file
+ *     will be included prior to the template being rendered, to make sure that
+ *     the preprocess function (as needed) is actually loaded.
+ *   - path: If specified, overrides the path to the directory that contains the
+ *     file to be used. This path should be relative to the Drupal root
+ *     directory. If not provided, the path will be set to the module or theme's
+ *     templates directory.
+ *   - template: The template name, without 'html.twig' on the end. The
+ *     extension will be added automatically by the default rendering engine
+ *     (which is Twig.) If 'path' is specified, 'template' should also be
+ *     specified. If not specified, a default template name will be assumed.
+ *     For example, if a module registers the 'search_result' theme hook,
+ *     'search-result' will be assigned as its template name.
  *   - base hook: Used for theme suggestions only: the base theme hook name.
  *     Instead of this suggestion's implementation being used directly, the base
  *     hook will be invoked with this implementation as its first suggestion.
@@ -1180,8 +1185,8 @@ function hook_page_bottom(array &$page_bottom) {
  *     variables are set.
  *   - type: (automatically derived) Where the theme hook is defined:
  *     'module', 'theme_engine', or 'theme'.
- *   - theme path: (automatically derived) The directory path of the theme or
- *     module, so that it doesn't need to be looked up.
+ *   - theme path: The directory path of the theme or module. If not defined,
+ *     it is determined during the registry process.
  *
  * @see themeable
  * @see hook_theme_registry_alter()
@@ -1208,7 +1213,7 @@ function hook_theme($existing, $type, $theme, $path) {
  * Alter the theme registry information returned from hook_theme().
  *
  * The theme registry stores information about all available theme hooks,
- * including which callback functions those hooks will call when triggered,
+ * including which preprocess functions those hooks will call when triggered,
  * what template files are exposed by these hooks, and so on.
  *
  * Note that this hook is only executed as the theme cache is re-built.
@@ -1222,9 +1227,9 @@ function hook_theme($existing, $type, $theme, $path) {
  * @code
  * $theme_registry['block_content_add_list'] = array (
  *   'template' => 'block-content-add-list',
- *   'path' => 'core/themes/seven/templates',
+ *   'path' => 'core/themes/claro/templates',
  *   'type' => 'theme_engine',
- *   'theme path' => 'core/themes/seven',
+ *   'theme path' => 'core/themes/claro',
  *   'includes' => array (
  *     0 => 'core/modules/block_content/block_content.pages.inc',
  *   ),
@@ -1235,7 +1240,7 @@ function hook_theme($existing, $type, $theme, $path) {
  *     0 => 'template_preprocess',
  *     1 => 'template_preprocess_block_content_add_list',
  *     2 => 'contextual_preprocess',
- *     3 => 'seven_preprocess_block_content_add_list',
+ *     3 => 'claro_preprocess_block_content_add_list',
  *   ),
  * );
  * @endcode

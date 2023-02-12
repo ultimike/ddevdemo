@@ -242,7 +242,7 @@ class CommentForm extends ContentEntityForm {
       '#access' => $is_admin,
     ];
 
-    return parent::form($form, $form_state, $comment);
+    return parent::form($form, $form_state);
   }
 
   /**
@@ -382,9 +382,9 @@ class CommentForm extends ContentEntityForm {
 
       // Add a log entry.
       $logger->notice('Comment posted: %subject.', [
-          '%subject' => $comment->getSubject(),
-          'link' => Link::fromTextAndUrl(t('View'), $comment->toUrl()->setOption('fragment', 'comment-' . $comment->id()))->toString(),
-        ]);
+        '%subject' => $comment->getSubject(),
+        'link' => Link::fromTextAndUrl(t('View'), $comment->toUrl()->setOption('fragment', 'comment-' . $comment->id()))->toString(),
+      ]);
 
       // Explain the approval queue if necessary.
       if (!$comment->isPublished()) {

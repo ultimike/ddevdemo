@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Tests\Traits\PhpUnitWarnings;
 use Drupal\TestTools\TestVarDumper;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
@@ -27,6 +28,7 @@ abstract class UnitTestCase extends TestCase {
 
   use PhpUnitWarnings;
   use PhpUnitCompatibilityTrait;
+  use ProphecyTrait;
   use ExpectDeprecationTrait;
 
   /**
@@ -46,7 +48,7 @@ abstract class UnitTestCase extends TestCase {
   /**
    * {@inheritdoc}
    */
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     VarDumper::setHandler(TestVarDumper::class . '::cliHandler');
   }
@@ -54,7 +56,7 @@ abstract class UnitTestCase extends TestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     // Ensure that an instantiated container in the global state of \Drupal from
     // a previous test does not leak into this test.
@@ -95,28 +97,6 @@ abstract class UnitTestCase extends TestCase {
       $this->randomGenerator = new Random();
     }
     return $this->randomGenerator;
-  }
-
-  /**
-   * Asserts if two arrays are equal by sorting them first.
-   *
-   * @param array $expected
-   *   An expected results array.
-   * @param array $actual
-   *   The actual array value.
-   * @param string $message
-   *   An optional error message.
-   *
-   * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use
-   *   ::assertEquals, ::assertEqualsCanonicalizing, or ::assertSame instead.
-   *
-   * @see https://www.drupal.org/node/3136304
-   */
-  protected function assertArrayEquals(array $expected, array $actual, $message = NULL) {
-    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use ::assertEquals(), ::assertEqualsCanonicalizing(), or ::assertSame() instead. See https://www.drupal.org/node/3136304", E_USER_DEPRECATED);
-    ksort($expected);
-    ksort($actual);
-    $this->assertEquals($expected, $actual, !empty($message) ? $message : '');
   }
 
   /**
@@ -200,13 +180,13 @@ abstract class UnitTestCase extends TestCase {
     $config_storage = $this->createMock('Drupal\Core\Config\NullStorage');
     $config_storage->expects($this->any())
       ->method('listAll')
-      ->will($this->returnValue(array_keys($configs)));
+      ->willReturn(array_keys($configs));
 
     foreach ($configs as $name => $config) {
       $config_storage->expects($this->any())
         ->method('read')
         ->with($this->equalTo($name))
-        ->will($this->returnValue($config));
+        ->willReturn($config);
     }
     return $config_storage;
   }
@@ -252,7 +232,7 @@ abstract class UnitTestCase extends TestCase {
     $container->expects($this->any())
       ->method('get')
       ->with('cache_tags.invalidator')
-      ->will($this->returnValue($cache_tags_validator));
+      ->willReturn($cache_tags_validator);
 
     \Drupal::setContainer($container);
     return $container;

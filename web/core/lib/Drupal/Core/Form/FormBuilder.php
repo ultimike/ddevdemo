@@ -193,8 +193,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $form_arg = $this->classResolver->getInstanceFromDefinition($form_arg);
     }
 
-    if (!is_object($form_arg) || !($form_arg instanceof FormInterface)) {
-      throw new \InvalidArgumentException("The form argument $form_arg is not a valid form.");
+    if (!is_object($form_arg)) {
+      throw new \InvalidArgumentException(("The form class $form_arg could not be found or loaded."));
+    }
+    elseif (!($form_arg instanceof FormInterface)) {
+      throw new \InvalidArgumentException('The form argument ' . $form_arg::class . ' must be an instance of \Drupal\Core\Form\FormInterface.');
     }
 
     // Add the $form_arg as the callback object and determine the form ID.
@@ -1171,7 +1174,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $name = array_shift($element['#parents']);
       $element['#name'] = $name;
       if ($element['#type'] == 'file') {
-        // To make it easier to handle files in file.inc, we place all
+        // To make it easier to handle files, we place all
         // file fields in the 'files' array. Also, we do not support
         // nested file names.
         // @todo Remove this files prefix now?

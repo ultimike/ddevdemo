@@ -22,7 +22,7 @@ class TestSiteUserLoginCommand extends Command {
   /**
    * The class loader to use for installation and initialization of setup.
    *
-   * @var \Symfony\Component\Classloader\Classloader
+   * @var \Composer\Autoload\ClassLoader
    */
   protected $classLoader;
 
@@ -41,7 +41,7 @@ class TestSiteUserLoginCommand extends Command {
    *
    * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
    */
-  protected function execute(InputInterface $input, OutputInterface $output) {
+  protected function execute(InputInterface $input, OutputInterface $output): int {
     $root = dirname(__DIR__, 5);
     chdir($root);
 

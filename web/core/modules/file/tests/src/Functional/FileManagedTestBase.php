@@ -20,7 +20,10 @@ abstract class FileManagedTestBase extends BrowserTestBase {
    */
   protected static $modules = ['file_test', 'file'];
 
-  protected function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
     // Clear out any hook calls.
     file_test_reset();

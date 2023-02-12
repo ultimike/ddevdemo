@@ -28,7 +28,7 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('entity_test_no_uuid');
@@ -156,16 +156,16 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
     // Set up a non-admin user that is allowed to view test entities.
     \Drupal::currentUser()->setAccount($this->createUser(['uid' => 2], ['view test entity']));
     $entity = EntityTest::create([
-        'name' => 'forbid_access',
-      ]);
+      'name' => 'forbid_access',
+    ]);
 
     // The user is denied access to the entity.
     $this->assertEntityAccess([
-        'create' => FALSE,
-        'update' => FALSE,
-        'delete' => FALSE,
-        'view' => FALSE,
-      ], $entity);
+      'create' => FALSE,
+      'update' => FALSE,
+      'delete' => FALSE,
+      'view' => FALSE,
+    ], $entity);
   }
 
   /**

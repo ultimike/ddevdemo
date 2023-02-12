@@ -92,7 +92,6 @@ trait BookTestTrait {
     // since it uniquely identifies each call to checkBookNode().
     static $number = 0;
     $this->drupalGet('node/' . $node->id());
-
     // Check outline structure.
     if ($nodes !== NULL) {
       $this->assertSession()->responseMatches($this->generateOutlinePattern($nodes));
@@ -130,7 +129,7 @@ trait BookTestTrait {
     }
 
     // Fetch links in the current breadcrumb.
-    $links = $this->xpath('//nav[@class="breadcrumb"]/ol/li/a');
+    $links = $this->xpath('//nav[@aria-labelledby="system-breadcrumb"]/ol/li/a');
     $got_breadcrumb = [];
     foreach ($links as $link) {
       $got_breadcrumb[] = $link->getAttribute('href');
@@ -161,8 +160,7 @@ trait BookTestTrait {
     foreach ($nodes as $node) {
       $outline .= '(node\/' . $node->id() . ')(.*?)(' . $node->label() . ')(.*?)';
     }
-
-    return '/<nav id="book-navigation-' . $this->book->id() . '"(.*?)<ul(.*?)' . $outline . '<\/ul>/s';
+    return '/<nav role="navigation" aria-labelledby="book-label-' . $this->book->id() . '"(.*?)<ul(.*?)' . $outline . '<\/ul>/s';
   }
 
   /**
@@ -186,8 +184,8 @@ trait BookTestTrait {
     // Used to ensure that when sorted nodes stay in same order.
     static $number = 0;
 
-    $edit['title[0][value]'] = str_pad($number, 2, '0', STR_PAD_LEFT) . ' - SimpleTest test node ' . $this->randomMachineName(10);
-    $edit['body[0][value]'] = 'SimpleTest test body ' . $this->randomMachineName(32) . ' ' . $this->randomMachineName(32);
+    $edit['title[0][value]'] = str_pad($number, 2, '0', STR_PAD_LEFT) . ' - test node ' . $this->randomMachineName(10);
+    $edit['body[0][value]'] = 'test body ' . $this->randomMachineName(32) . ' ' . $this->randomMachineName(32);
     $edit['book[bid]'] = $book_nid;
 
     if ($parent !== NULL) {

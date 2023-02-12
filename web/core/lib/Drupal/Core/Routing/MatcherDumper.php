@@ -88,15 +88,15 @@ class MatcherDumper implements MatcherDumperInterface {
    *   Thrown if the table could not be created or the database connection
    *   failed.
    */
-  public function dump(array $options = []) {
+  public function dump(array $options = []): string {
     // Convert all of the routes into database records.
     // Accumulate the menu masks on top of any we found before.
     $masks = array_flip($this->state->get('routing.menu_masks.' . $this->tableName, []));
     // Delete any old records first, then insert the new ones. That avoids
     // stale data. The transaction makes it atomic to avoid unstable router
     // states due to random failures.
-    $transaction = $this->connection->startTransaction();
     try {
+      $transaction = $this->connection->startTransaction();
       // We don't use truncate, because it is not guaranteed to be transaction
       // safe.
       try {
@@ -149,7 +149,9 @@ class MatcherDumper implements MatcherDumperInterface {
 
     }
     catch (\Exception $e) {
-      $transaction->rollBack();
+      if (isset($transaction)) {
+        $transaction->rollBack();
+      }
       watchdog_exception('Routing', $e);
       throw $e;
     }
@@ -159,6 +161,8 @@ class MatcherDumper implements MatcherDumperInterface {
     $this->state->set('routing.menu_masks.' . $this->tableName, $masks);
 
     $this->routes = NULL;
+
+    return '';
   }
 
   /**
@@ -168,7 +172,7 @@ class MatcherDumper implements MatcherDumperInterface {
    *   A RouteCollection instance representing all routes currently in the
    *   dumper.
    */
-  public function getRoutes() {
+  public function getRoutes(): RouteCollection {
     return $this->routes;
   }
 
