@@ -1,0 +1,10 @@
+name: Select2
+type: module
+description: Convert select fields to select2.
+core_version_requirement: ^9 || ^10
+php: 8.0
+
+# Information added by Drupal.org packaging script on 2023-02-03
+version: '8.x-1.2'
+project: 'select2_all'
+datestamp: 1675388594

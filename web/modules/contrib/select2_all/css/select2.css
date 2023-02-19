@@ -1,0 +1,5 @@
+.select2-container--open {
+  /** Dialogs in CKEditor will have a z-index of 10001 */
+  /* @see CKEDITOR.config.baseFloatZIndex */
+  z-index: 10002;
+}
