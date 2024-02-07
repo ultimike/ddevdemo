@@ -12,12 +12,12 @@ use Drupal\search_api_autocomplete\SearchInterface;
 use Drupal\search_api_autocomplete\Suggester\SuggesterPluginBase;
 use Drupal\search_api_autocomplete\Suggestion\SuggestionFactory;
 use Drupal\search_api_solr\Solarium\Autocomplete\Query as AutocompleteQuery;
+use Drupal\search_api_solr\Solarium\Autocomplete\Result;
 use Drupal\search_api_solr\SolrAutocompleteBackendTrait;
 use Drupal\search_api_solr\SolrBackendInterface;
 use Drupal\search_api_solr\Utility\Utility;
 use Drupal\search_api_solr_autocomplete\Event\PreSuggesterQueryEvent;
 use Solarium\Component\ComponentAwareQueryInterface;
-use Solarium\Core\Query\Result\ResultInterface;
 
 /**
  * Provides a suggester plugin that retrieves suggestions from the server.
@@ -176,7 +176,6 @@ class Suggester extends SuggesterPluginBase implements PluginFormInterface {
         $suggestion_factory = new SuggestionFactory($user_input);
         $this->setAutocompleteSuggesterQuery($query, $solarium_query, $user_input, $options);
         // Allow modules to alter the solarium autocomplete query.
-        \Drupal::moduleHandler()->alterDeprecated('hook_search_api_solr_suggester_autocomplete_query_alter is deprecated will be removed in Search API Solr 4.3.0. Handle the PreSpellcheckQueryEvent instead.', 'search_api_solr_suggester_autocomplete_query', $solarium_query, $query);
         $event = new PreSuggesterQueryEvent($query, $solarium_query);
         $backend->dispatch($event);
         $result = $backend->getSolrConnector()->autocomplete($solarium_query, $backend->getCollectionEndpoint($query->getIndex()));
@@ -185,7 +184,7 @@ class Suggester extends SuggesterPluginBase implements PluginFormInterface {
         $this->filterDuplicateAutocompleteSuggestions($suggestions);
       }
       catch (SearchApiException $e) {
-        watchdog_exception('search_api_solr', $e);
+        $this->logException($e);
       }
     }
 
@@ -259,7 +258,7 @@ class Suggester extends SuggesterPluginBase implements PluginFormInterface {
   /**
    * Get the term suggestions from the autocomplete query result.
    *
-   * @param \Solarium\Core\Query\Result\ResultInterface $result
+   * @param \Drupal\search_api_solr\Solarium\Autocomplete\Result $result
    *   An autocomplete query result.
    * @param \Drupal\search_api_autocomplete\Suggestion\SuggestionFactory $suggestion_factory
    *   The suggestion factory.
@@ -267,13 +266,12 @@ class Suggester extends SuggesterPluginBase implements PluginFormInterface {
    * @return \Drupal\search_api_autocomplete\Suggestion\SuggestionInterface[]
    *   An array of suggestions.
    */
-  protected function getAutocompleteSuggesterSuggestions(ResultInterface $result, SuggestionFactory $suggestion_factory) {
+  protected function getAutocompleteSuggesterSuggestions(Result $result, SuggestionFactory $suggestion_factory) {
     $suggestions = [];
     if ($phrases_result = $result->getComponent(ComponentAwareQueryInterface::COMPONENT_SUGGESTER)) {
       /** @var \Solarium\Component\Result\Suggester\Result $phrases_result */
       $dictionaries = array_keys($phrases_result->getResults());
       foreach ($phrases_result->getAll() as $dictionary_index => $phrases) {
-        /** @var \Solarium\QueryType\Suggester\Result\Term $phrases */
         foreach ($phrases->getSuggestions() as $phrase) {
           $suggestion = $suggestion_factory->createFromSuggestedKeys($phrase['term']);
           if (method_exists($suggestion, 'setDictionary')) {

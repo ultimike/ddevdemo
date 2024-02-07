@@ -33,7 +33,6 @@ class IndividualExportImportTest extends KernelTestBase {
     'config',
     'config_test',
     'config_split',
-    'config_filter',
   ];
 
   /**
@@ -197,7 +196,9 @@ class IndividualExportImportTest extends KernelTestBase {
     static::assertEquals($data, $this->getActiveStorage()->read('config_test.system'));
 
     static::assertCount(2, $this->io->calls);
+    // @phpstan-ignore-next-line
     static::assertEquals(['confirm'], array_keys($this->io->calls[0]));
+    // @phpstan-ignore-next-line
     static::assertEquals(['success' => ['Configuration successfully imported.']], $this->io->calls[1]);
   }
 

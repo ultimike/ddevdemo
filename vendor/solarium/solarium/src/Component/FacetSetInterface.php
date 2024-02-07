@@ -75,7 +75,7 @@ interface FacetSetInterface
      *
      * @throws InvalidArgumentException
      *
-     * @return \Solarium\Component\FacetSet
+     * @return self Provides fluent interface
      */
     public function addFacet($facet): self;
 
@@ -84,7 +84,7 @@ interface FacetSetInterface
      *
      * @param array $facets
      *
-     * @return \Solarium\Component\FacetSet
+     * @return self Provides fluent interface
      */
     public function addFacets(array $facets): self;
 
@@ -111,14 +111,14 @@ interface FacetSetInterface
      *
      * @param string|FacetInterface $facet
      *
-     * @return \Solarium\Component\FacetSet
+     * @return self Provides fluent interface
      */
     public function removeFacet($facet): self;
 
     /**
      * Remove all facets.
      *
-     * @return \Solarium\Component\FacetSet
+     * @return self Provides fluent interface
      */
     public function clearFacets(): self;
 
@@ -129,7 +129,7 @@ interface FacetSetInterface
      *
      * @param FacetInterface[] $facets
      *
-     * @return \Solarium\Component\FacetSet
+     * @return self Provides fluent interface
      */
     public function setFacets(array $facets): self;
 

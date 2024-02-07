@@ -28,6 +28,7 @@ class Uuid extends Constraint
     public const INVALID_CHARACTERS_ERROR = '51120b12-a2bc-41bf-aa53-cd73daf330d0';
     public const INVALID_HYPHEN_PLACEMENT_ERROR = '98469c83-0309-4f5d-bf95-a496dcaa869c';
     public const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
+    public const INVALID_TIME_BASED_VERSION_ERROR = '484081ca-6fbd-11ed-ade8-a3bdfd0fcf2f';
     public const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
     protected const ERROR_NAMES = [
@@ -65,6 +66,12 @@ class Uuid extends Constraint
         self::V8_CUSTOM,
     ];
 
+    public const TIME_BASED_VERSIONS = [
+        self::V1_MAC,
+        self::V6_SORTABLE,
+        self::V7_MONOTONIC,
+    ];
+
     /**
      * Message to display when validation fails.
      *
@@ -90,24 +97,25 @@ class Uuid extends Constraint
      */
     public $versions = self::ALL_VERSIONS;
 
+    /** @var callable|null */
     public $normalizer;
 
     /**
-     * @param int[]|null $versions
+     * @param int[]|int|null $versions
      */
     public function __construct(
-        array $options = null,
-        string $message = null,
-        array $versions = null,
-        bool $strict = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        array|int|null $versions = null,
+        ?bool $strict = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->versions = $versions ?? $this->versions;
+        $this->versions = (array) ($versions ?? $this->versions);
         $this->strict = $strict ?? $this->strict;
         $this->normalizer = $normalizer ?? $this->normalizer;
 

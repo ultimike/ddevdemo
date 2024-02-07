@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class IniFileLoader extends FileLoader
 {
-    public function load(mixed $resource, string $type = null): mixed
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         $path = $this->locator->locate($resource);
 
@@ -55,7 +55,7 @@ class IniFileLoader extends FileLoader
         return null;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         if (!\is_string($resource)) {
             return false;
@@ -89,8 +89,8 @@ class IniFileLoader extends FileLoader
             'off' === $lowercaseValue,
             'none' === $lowercaseValue => false,
             isset($value[1]) && (
-                ("'" === $value[0] && "'" === $value[\strlen($value) - 1]) ||
-                ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
+                ("'" === $value[0] && "'" === $value[\strlen($value) - 1])
+                || ('"' === $value[0] && '"' === $value[\strlen($value) - 1])
             ) => substr($value, 1, -1), // quoted string
             default => XmlUtils::phpize($value),
         };

@@ -90,6 +90,18 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     }
 
     /**
+     * Configures the DOMDocument::saveXml options bitmask.
+     *
+     * @see https://www.php.net/manual/en/libxml.constants.php
+     *
+     * @param positive-int|null $saveOptions
+     */
+    public function withSaveOptions(?int $saveOptions): static
+    {
+        return $this->with(XmlEncoder::SAVE_OPTIONS, $saveOptions);
+    }
+
+    /**
      * Configures whether to keep empty nodes.
      */
     public function withRemoveEmptyTags(?bool $removeEmptyTags): static
@@ -131,5 +143,13 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     public function withVersion(?string $version): static
     {
         return $this->with(XmlEncoder::VERSION, $version);
+    }
+
+    /**
+     * Configures whether to wrap strings within CDATA sections.
+     */
+    public function withCdataWrapping(?bool $cdataWrapping): static
+    {
+        return $this->with(XmlEncoder::CDATA_WRAPPING, $cdataWrapping);
     }
 }

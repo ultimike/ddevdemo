@@ -10,9 +10,9 @@ use Twig\Cache\CacheInterface;
 /**
  * Provides an alternate cache storage for Twig using PhpStorage.
  *
- * This class is designed to work on setups with multiple webheads using a local
- * filesystem for the twig cache. When generating the cache key, a hash value
- * depending on the enabled extensions is included. This prevents stale
+ * This class is designed to work on setups with multiple web heads using a
+ * local filesystem for the twig cache. When generating the cache key, a hash
+ * value depending on the enabled extensions is included. This prevents stale
  * templates from being reused when twig extensions are enabled or disabled.
  *
  * @see \Drupal\Core\DependencyInjection\Compiler\TwigExtensionPass
@@ -74,7 +74,7 @@ class TwigPhpStorageCache implements CacheInterface {
    * {@inheritdoc}
    */
   public function generateKey(string $name, string $className): string {
-    if (strpos($name, '{# inline_template_start #}') === 0) {
+    if (str_starts_with($name, '{# inline_template_start #}')) {
       // $name is an inline template, and can have characters that are not valid
       // for a filename. $suffix is unique for each inline template so we just
       // use the generic name 'inline-template' here.

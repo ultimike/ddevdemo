@@ -43,9 +43,20 @@
          *   The link to add the block.
          */
         const toggleBlockEntry = (index, link) => {
+          const $link = $(link);
           const textMatch =
             link.textContent.toLowerCase().indexOf(query) !== -1;
-          $(link).toggle(textMatch);
+          // Checks if a category is currently hidden.
+          // Toggles the category on if so.
+          if (
+            Drupal.elementIsHidden(
+              $link.closest('.js-layout-builder-category')[0],
+            )
+          ) {
+            $link.closest('.js-layout-builder-category').show();
+          }
+          // Toggle the li tag of the matching link.
+          $link.parent().toggle(textMatch);
         };
 
         // Filter if the length of the query is at least 2 characters.
@@ -82,15 +93,17 @@
             .find('.js-layout-builder-category[remember-closed]')
             .removeAttr('open')
             .removeAttr('remember-closed');
+          // Show all categories since filter is turned off.
           $categories.find('.js-layout-builder-category').show();
-          $filterLinks.show();
+          // Show all li tags since filter is turned off.
+          $filterLinks.parent().show();
           announce(Drupal.t('All available blocks are listed.'));
         }
       };
 
       $(
         once('block-filter-text', 'input.js-layout-builder-filter', context),
-      ).on('keyup', debounce(filterBlockList, 200));
+      ).on('input', debounce(filterBlockList, 200));
     },
   };
 
@@ -396,7 +409,7 @@
       };
 
       $('#layout-builder-content-preview', context).on('change', (event) => {
-        const isChecked = $(event.currentTarget).is(':checked');
+        const isChecked = event.currentTarget.checked;
 
         localStorage.setItem(contentPreviewId, JSON.stringify(isChecked));
 
@@ -443,4 +456,13 @@
 
     return `<div class="layout-builder-block__content-preview-placeholder-label js-layout-builder-content-preview-placeholder-label">${contentPreviewPlaceholderText}</div>`;
   };
+
+  // Remove all contextual links outside the layout.
+  $(window).on('drupalContextualLinkAdded', (event, data) => {
+    const element = data.$el;
+    const contextualId = element.attr('data-contextual-id');
+    if (contextualId && !contextualId.startsWith('layout_builder_block:')) {
+      element.remove();
+    }
+  });
 })(jQuery, Drupal, Sortable);

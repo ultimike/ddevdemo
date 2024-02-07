@@ -191,7 +191,7 @@ class FieldsProcessorPluginBaseTest extends UnitTestCase {
   public function testProcessFieldValueOverride() {
     $override = function (&$value, &$type) {
       // Check whether the passed $type matches the one included in the value.
-      if (strpos($value, "{$type}_field") !== FALSE) {
+      if (str_contains($value, "{$type}_field")) {
         $value = "&$value";
       }
       else {
@@ -540,12 +540,11 @@ class FieldsProcessorPluginBaseTest extends UnitTestCase {
     $query = \Drupal::getContainer()
       ->get('search_api.query_helper')
       ->createQuery($this->index);
-    $conditions = $query->createConditionGroup();
+    $conditions = $query->createAndAddConditionGroup();
     $conditions->addCondition('text_field', 'foo');
     $conditions->addCondition('text_field', ['foo', 'bar'], 'IN');
     $conditions->addCondition('string_field', NULL, '<>');
     $conditions->addCondition('integer_field', 'bar');
-    $query->addConditionGroup($conditions);
     $query2 = clone $query;
 
     $this->processor->preprocessSearchQuery($query);

@@ -49,7 +49,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                            caused the violation
      * @param mixed              $cause           The cause of the violation
      */
-    public function __construct(string|\Stringable $message, ?string $messageTemplate, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, mixed $cause = null)
+    public function __construct(string|\Stringable $message, ?string $messageTemplate, array $parameters, mixed $root, ?string $propertyPath, mixed $invalidValue, ?int $plural = null, ?string $code = null, ?Constraint $constraint = null, mixed $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
@@ -66,7 +66,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     public function __toString(): string
     {
         if (\is_object($this->root)) {
-            $class = 'Object('.\get_class($this->root).')';
+            $class = 'Object('.$this->root::class.')';
         } elseif (\is_array($this->root)) {
             $class = 'Array';
         } else {

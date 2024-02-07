@@ -10,28 +10,23 @@
  * RSS feed.
  */
 
-/*
- * Media query breakpoints.
- * Processed by postcss/postcss-custom-media.
- */
-
-/* Navigation related breakpoints */
-
-/* Grid related breakpoints */
-
-/* Grid shifts from 6 to 14 columns. */
-
-/* Width of the entire grid maxes out. */
-
 .feed-icon {
   display: flex;
   align-items: center;
+  -webkit-text-decoration: none;
   text-decoration: none;
   color: var(--color-text-neutral-soft);
 }
 
 .feed-icon:hover {
   color: var(--color--primary-50);
+}
+
+@media (max-width: 75rem) {
+  .feed-icon {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
 }
 
 .feed-icon__label {
@@ -50,10 +45,17 @@
   height: var(--sp1-5);
   margin-inline-start: var(--sp0-5);
   color: var(--color--white);
+  border-radius: 2px;
   background-color: var(--color--primary-50);
 }
 
 .feed-icon__icon svg {
   vertical-align: top;
   fill: currentColor;
+}
+
+@media (max-width: 75rem) {
+  .feed-icon__icon {
+    margin-inline: 0 var(--sp0-5);
+  }
 }

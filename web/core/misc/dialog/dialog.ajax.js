@@ -3,7 +3,7 @@
  * Extends the Drupal AJAX functionality to integrate the dialog API.
  */
 
-(function ($, Drupal) {
+(function ($, Drupal, { focusable }) {
   /**
    * Initialize dialogs for Ajax purposes.
    *
@@ -38,14 +38,46 @@
           $dialog.trigger('dialogButtonsChange');
         }
 
-        // Force focus on the modal when the behavior is run.
-        $dialog.dialog('widget').trigger('focus');
+        setTimeout(function () {
+          // Account for pre-existing focus handling that may have already moved
+          // the focus inside the dialog.
+          if (!$dialog[0].contains(document.activeElement)) {
+            // Move focus to the first focusable element in the next event loop
+            // to allow dialog buttons to be changed first.
+            $dialog.dialog('instance')._focusedElement = null;
+            $dialog.dialog('instance')._focusTabbable();
+          }
+        }, 0);
       }
 
       const originalClose = settings.dialog.close;
       // Overwrite the close method to remove the dialog on closing.
       settings.dialog.close = function (event, ...args) {
         originalClose.apply(settings.dialog, [event, ...args]);
+        // Check if the opener element is inside an AJAX container.
+        const $element = $(event.target);
+        const ajaxContainer = $element.data('uiDialog')
+          ? $element
+              .data('uiDialog')
+              .opener.closest('[data-drupal-ajax-container]')
+          : [];
+
+        // If the opener element was in an ajax container, and focus is on the
+        // body element, we can assume focus was lost. To recover, focus is
+        // moved to the first focusable element in the container.
+        if (
+          ajaxContainer.length &&
+          (document.activeElement === document.body ||
+            $(document.activeElement).not(':visible'))
+        ) {
+          const focusableChildren = focusable(ajaxContainer[0]);
+          if (focusableChildren.length > 0) {
+            setTimeout(() => {
+              focusableChildren[0].focus();
+            }, 0);
+          }
+        }
+
         $(event.target).remove();
       };
     },
@@ -62,25 +94,27 @@
     prepareDialogButtons($dialog) {
       const buttons = [];
       const $buttons = $dialog.find(
-        '.form-actions input[type=submit], .form-actions a.button',
+        '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link',
       );
       $buttons.each(function () {
-        const $originalButton = $(this).css({ display: 'none' });
+        const $originalButton = $(this);
+        this.style.display = 'none';
         buttons.push({
           text: $originalButton.html() || $originalButton.attr('value'),
           class: $originalButton.attr('class'),
+          'data-once': $originalButton.data('once'),
           click(e) {
             // If the original button is an anchor tag, triggering the "click"
             // event will not simulate a click. Use the click method instead.
-            if ($originalButton.is('a')) {
+            if ($originalButton[0].tagName === 'A') {
               $originalButton[0].click();
             } else {
               $originalButton
                 .trigger('mousedown')
                 .trigger('mouseup')
                 .trigger('click');
-              e.preventDefault();
             }
+            e.preventDefault();
           },
         });
       });
@@ -246,4 +280,4 @@
   $(window).on('dialog:beforeclose', (e, dialog, $element) => {
     $element.off('.dialog');
   });
-})(jQuery, Drupal);
+})(jQuery, Drupal, window.tabbable);

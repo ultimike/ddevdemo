@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal\Traits;
 
 /**
@@ -163,7 +165,7 @@ trait CreateTestContentEntitiesTrait {
     if ($entity_type_manager->hasDefinition('menu_link_content')) {
       $menu_link = $entity_type_manager->getStorage('menu_link_content')->create([
         'title' => 'post upgrade menu link',
-        'link' => ['uri' => 'http://www.drupal.org'],
+        'link' => ['uri' => 'http://www.example.com'],
         'menu_name' => 'tools',
       ]);
       $menu_link->save();

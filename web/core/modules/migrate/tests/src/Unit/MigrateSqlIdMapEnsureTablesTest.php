@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -65,6 +67,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'not null' => TRUE,
       'default' => 0,
       'description' => 'UNIX timestamp of the last time this row was imported',
+      'size' => 'big',
     ];
     $fields['hash'] = [
       'type' => 'varchar',

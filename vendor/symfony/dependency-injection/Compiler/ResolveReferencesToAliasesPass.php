@@ -22,6 +22,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {
+    protected bool $skipScalars = true;
+
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         parent::process($container);

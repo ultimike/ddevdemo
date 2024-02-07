@@ -84,12 +84,8 @@
           toolbarTabOuterHeight + toolbarTrayHorizontalOuterHeight,
         );
 
-        $('body').css({
-          'padding-top': this.model.get('height'),
-        });
-        $('html').css({
-          'scroll-padding-top': this.model.get('height'),
-        });
+        $('body')[0].style.paddingTop = `${this.model.get('height')}px`;
+        $('html')[0].style.scrollPaddingTop = `${this.model.get('height')}px`;
 
         this.triggerDisplace();
       },
@@ -114,6 +110,16 @@
         this.updateTrayOrientation();
         this.updateBarAttributes();
 
+        $('[data-toolbar-anti-flicker-loading]').remove();
+        $('html').removeClass([
+          'toolbar-loading',
+          'toolbar-horizontal',
+          'toolbar-vertical',
+          'toolbar-tray-open',
+          'toolbar-fixed',
+          'toolbar-oriented',
+          'toolbar-anti-flicker',
+        ]);
         $('body').removeClass('toolbar-loading');
 
         // Load the subtrees if the orientation of the toolbar is changed to
@@ -208,6 +214,9 @@
         // Deactivate the previous tray.
         $(this.model.previous('activeTray')).removeClass('is-active');
 
+        // The stored active tab is removed as updateTabs() can be called when
+        // a tray is explicitly closed, thus not replaced with a new active tab.
+        localStorage.removeItem('Drupal.toolbar.activeTabID');
         // Activate the selected tab.
         if ($tab.length > 0) {
           $tab

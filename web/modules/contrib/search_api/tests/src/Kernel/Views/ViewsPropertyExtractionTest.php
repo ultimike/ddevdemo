@@ -53,7 +53,7 @@ class ViewsPropertyExtractionTest extends KernelTestBase {
    *
    * @dataProvider propertyExtractionDataProvider
    */
-  public function testPropertyExtraction($property_path, $expected, $pre_set = FALSE, $return_fields = TRUE, $set_highlighting = FALSE, $processor_property_value = NULL) {
+  public function testPropertyExtraction(string $property_path, string|array $expected, bool $pre_set = FALSE, bool $return_fields = TRUE, bool $set_highlighting = FALSE, string|array|null $processor_property_value = NULL) {
     $datasource_id = 'entity:user';
 
     /** @var \Drupal\search_api\IndexInterface|\PHPUnit\Framework\MockObject\MockObject $index */
@@ -195,13 +195,12 @@ class ViewsPropertyExtractionTest extends KernelTestBase {
 
     $field->preRender($values);
 
-    $this->assertObjectHasAttribute($property_path, $row);
+    $this->assertArrayHasKey($property_path, (array) $row);
     $this->assertEquals((array) $expected, $row->$property_path);
 
     // Check that $field->propertyReplacements was set correctly (if
     // applicable).
     $property_replacements = new \ReflectionProperty($field, 'propertyReplacements');
-    $property_replacements->setAccessible(TRUE);
     $property_replacements = $property_replacements->getValue($field);
     if (isset($original_property_path)) {
       $this->assertArrayHasKey($original_property_path, $property_replacements);
@@ -220,7 +219,7 @@ class ViewsPropertyExtractionTest extends KernelTestBase {
    *
    * @see \Drupal\Tests\search_api\Kernel\Views\ViewsPropertyExtractionTest::testPropertyExtraction()
    */
-  public function propertyExtractionDataProvider() {
+  public function propertyExtractionDataProvider(): array {
     return [
       'extract normal property' => [
         'entity:user/name',

@@ -1,6 +1,36 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `is_valid` function to the `Expression` constraint, its behavior is the same as `ValidatorInterface::validate`
+ * Allow single integer for the `versions` option of the `Uuid` constraint
+ * Allow single constraint to be passed to the `constraints` option of the `When` constraint
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Deprecate `ValidatorBuilder::setDoctrineAnnotationReader()`
+ * Deprecate `ValidatorBuilder::addDefaultDoctrineAnnotationReader()`
+ * Add `number`, `finite-number` and `finite-float` types to `Type` constraint
+ * Add the `withSeconds` option to the `Time` constraint that allows to pass time without seconds
+ * Deprecate `ValidatorBuilder::enableAnnotationMapping()`, use `ValidatorBuilder::enableAttributeMapping()` instead
+ * Deprecate `ValidatorBuilder::disableAnnotationMapping()`, use `ValidatorBuilder::disableAttributeMapping()` instead
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add `GroupProviderInterface` to implement validation group providers outside the underlying class
+
+6.3
+---
+
+ * Add method `getConstraint()` to `ConstraintViolationInterface`
+ * Add `Uuid::TIME_BASED_VERSIONS` to match that a UUID being validated embeds a timestamp
+ * Add the `pattern` parameter in violations of the `Regex` constraint
+ * Add a `NoSuspiciousCharacters` constraint to validate a string is not a spoofing attempt
+ * Add a `PasswordStrength` constraint to check the strength of a password
+ * Add the `countUnit` option to the `Length` constraint to allow counting the string length either by code points (like before, now the default setting `Length::COUNT_CODEPOINTS`), bytes (`Length::COUNT_BYTES`) or graphemes (`Length::COUNT_GRAPHEMES`)
+ * Add the `filenameMaxLength` option to the `File` constraint
+ * Add the `exclude` option to the `Cascade` constraint
+ * Add the `value_length` parameter to `Length` constraint
+ * Allow to disable the translation domain for `ConstraintViolationInterface` messages
+
 6.2
 ---
 

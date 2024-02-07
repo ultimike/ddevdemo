@@ -9,7 +9,7 @@ use Psr\Log\LogLevel;
 /**
  * The Chosen plugin URI.
  */
-define('CHOSEN_DOWNLOAD_URI', 'https://github.com/harvesthq/chosen/releases/download/v1.8.7/chosen_v1.8.7.zip');
+define('CHOSEN_DOWNLOAD_URI', 'https://github.com/JJJ/chosen/archive/refs/tags/2.2.1.zip');
 
 /**
  * A Drush commandfile.
@@ -57,9 +57,8 @@ class ChosenLibCommands extends DrushCommands {
       $dirname = basename($filepath, '.zip');
 
       // Remove any existing Chosen plugin directory.
-      if (is_dir($dirname) || is_dir('chosen')) {
+      if (is_dir('chosen')) {
         $fileservice = \Drupal::service('file_system');
-        $fileservice->deleteRecursive($dirname);
         $fileservice->deleteRecursive('chosen');
 
         $this->drush_log(dt('A existing Chosen plugin was deleted from @path', ['@path' => $path]), 'notice');
@@ -70,7 +69,14 @@ class ChosenLibCommands extends DrushCommands {
 
       // Change the directory name to "chosen" if needed.
       if ('chosen' !== $dirname) {
-        $this->drush_move_dir($dirname, 'chosen');
+        $subdirname = $dirname . '/chosen-' . $dirname;
+        if (is_dir($subdirname)) {
+          $this->drush_move_dir($subdirname, 'chosen');
+          $fileservice = \Drupal::service('file_system');
+          $fileservice->deleteRecursive($dirname);
+        } else {
+          $this->drush_move_dir($dirname, 'chosen');
+        }
         $dirname = 'chosen';
       }
 

@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Render\RendererTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Render;
 
@@ -11,6 +8,7 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
@@ -501,7 +499,7 @@ class RendererTest extends RendererTestBase {
         '#markup' => $first,
       ],
     ];
-    $output = $this->renderer->renderRoot($elements);
+    $output = (string) $this->renderer->renderRoot($elements);
 
     // The lowest weight element should appear last in $output.
     $this->assertGreaterThan(strpos($output, $first), strpos($output, $second));
@@ -537,7 +535,7 @@ class RendererTest extends RendererTestBase {
       ],
       '#sorted' => TRUE,
     ];
-    $output = $this->renderer->renderRoot($elements);
+    $output = (string) $this->renderer->renderRoot($elements);
 
     // The elements should appear in output in the same order as the array.
     $this->assertLessThan(strpos($output, $first), strpos($output, $second));
@@ -791,13 +789,46 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Provides a list of access conditions and expected cache metadata.
+   *
+   * @return array
+   */
+  public function providerRenderCache() {
+    return [
+      'full access' => [
+        NULL,
+        [
+          'render_cache_tag',
+          'render_cache_tag_child:1',
+          'render_cache_tag_child:2',
+        ],
+      ],
+      'no child access' => [
+        AccessResult::forbidden()
+          ->addCacheTags([
+            'render_cache_tag_child_access:1',
+            'render_cache_tag_child_access:2',
+          ]),
+        [
+          'render_cache_tag',
+          'render_cache_tag_child:1',
+          'render_cache_tag_child:2',
+          'render_cache_tag_child_access:1',
+          'render_cache_tag_child_access:2',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * @covers ::render
    * @covers ::doRender
    * @covers \Drupal\Core\Render\RenderCache::get
    * @covers \Drupal\Core\Render\RenderCache::set
-   * @covers \Drupal\Core\Render\RenderCache::createCacheID
+   *
+   * @dataProvider providerRenderCache
    */
-  public function testRenderCache() {
+  public function testRenderCache($child_access, $expected_tags) {
     $this->setUpRequest();
     $this->setupMemoryCache();
 
@@ -809,6 +840,7 @@ class RendererTest extends RendererTestBase {
       ],
       '#markup' => '',
       'child' => [
+        '#access' => $child_access,
         '#cache' => [
           'keys' => ['render_cache_test_child'],
           'tags' => ['render_cache_tag_child:1', 'render_cache_tag_child:2'],
@@ -831,15 +863,10 @@ class RendererTest extends RendererTestBase {
 
     // Test that cache tags are correctly collected from the render element,
     // including the ones from its subchild.
-    $expected_tags = [
-      'render_cache_tag',
-      'render_cache_tag_child:1',
-      'render_cache_tag_child:2',
-    ];
     $this->assertEquals($expected_tags, $element['#cache']['tags'], 'Cache tags were collected from the element and its subchild.');
 
     // The cache item also has a 'rendered' cache tag.
-    $cache_item = $this->cacheFactory->get('render')->get('render_cache_test:en:stark');
+    $cache_item = $this->cacheFactory->get('render')->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element));
     $this->assertSame(Cache::mergeTags($expected_tags, ['rendered']), $cache_item->tags);
   }
 
@@ -848,7 +875,6 @@ class RendererTest extends RendererTestBase {
    * @covers ::doRender
    * @covers \Drupal\Core\Render\RenderCache::get
    * @covers \Drupal\Core\Render\RenderCache::set
-   * @covers \Drupal\Core\Render\RenderCache::createCacheID
    *
    * @dataProvider providerTestRenderCacheMaxAge
    */
@@ -865,7 +891,7 @@ class RendererTest extends RendererTestBase {
     ];
     $this->renderer->renderRoot($element);
 
-    $cache_item = $this->cacheFactory->get('render')->get('render_cache_test:en:stark');
+    $cache_item = $this->cacheFactory->get('render')->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element));
     if (!$is_render_cached) {
       $this->assertFalse($cache_item);
     }
@@ -893,7 +919,6 @@ class RendererTest extends RendererTestBase {
    * @covers ::doRender
    * @covers \Drupal\Core\Render\RenderCache::get
    * @covers \Drupal\Core\Render\RenderCache::set
-   * @covers \Drupal\Core\Render\RenderCache::createCacheID
    * @covers \Drupal\Core\Render\RenderCache::getCacheableRenderArray
    *
    * @dataProvider providerTestRenderCacheProperties
@@ -918,7 +943,7 @@ class RendererTest extends RendererTestBase {
     $this->renderer->renderRoot($element);
 
     $cache = $this->cacheFactory->get('render');
-    $data = $cache->get('render_cache_test:en:stark')->data;
+    $data = $cache->get(['render_cache_test'], CacheableMetadata::createFromRenderArray($element))->data;
 
     // Check that parent markup is ignored when caching children's markup.
     $this->assertEquals($data['#markup'] === '', (bool) Element::children($data));

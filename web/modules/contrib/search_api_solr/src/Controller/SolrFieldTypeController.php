@@ -30,15 +30,20 @@ class SolrFieldTypeController extends AbstractSolrEntityController {
    */
   public function getConfigZip(ServerInterface $search_api_server) {
     try {
-      $archive_options = new Archive();
-      $archive_options->setSendHttpHeaders(TRUE);
-
+      $archive_options = NULL;
+      if (class_exists('\ZipStream\Option\Archive')) {
+        // Version 2.x. Version 3.x uses named parameters instead of options.
+        $archive_options = new Archive();
+        $archive_options->setSendHttpHeaders(TRUE);
+      }
       @ob_clean();
       // If you are using nginx as a webserver, it will try to buffer the
       // response. We have to disable this with a custom header.
       // @see https://github.com/maennchen/ZipStream-PHP/wiki/nginx
       header('X-Accel-Buffering: no');
-      $zip = $this->getListBuilder($search_api_server)->getConfigZip($archive_options);
+      /** @var SolrConfigSetController $solrConfigSetController */
+      $solrConfigSetController = $this->getListBuilder($search_api_server);
+      $zip = $solrConfigSetController->getConfigZip($archive_options);
       $zip->finish();
       @ob_end_flush();
 
@@ -75,8 +80,8 @@ class SolrFieldTypeController extends AbstractSolrEntityController {
    *
    * @param \Drupal\search_api\ServerInterface $search_api_server
    *   Search API server.
-   * @param \Drupal\search_api_solr\SolrConfigInterface $solr_field_type
-   *   Solr entity.
+   * @param \Drupal\search_api_solr\SolrFieldTypeInterface $solr_field_type
+   *   Solr field type.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   Redirect response.

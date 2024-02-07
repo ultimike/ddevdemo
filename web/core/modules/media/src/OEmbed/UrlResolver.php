@@ -9,6 +9,8 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\TransferException;
 
+// cspell:ignore omitscript
+
 /**
  * Converts oEmbed media URLs into endpoint-specific resource URLs.
  */
@@ -191,7 +193,7 @@ class UrlResolver implements UrlResolverInterface {
    *   The oEmbed provider for the asset.
    *
    * @return string
-   *   The resource url.
+   *   The resource URL.
    */
   protected function getEndpointMatchingUrl($url, Provider $provider) {
     $endpoints = $provider->getEndpoints();

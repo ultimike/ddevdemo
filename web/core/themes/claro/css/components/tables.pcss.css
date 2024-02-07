@@ -168,8 +168,18 @@ td.is-active {
  * This ignores the filter format select of the textarea editor.
  */
 td > .form-item > .form-element,
-td > .ajax-new-content > .form-item > .form-element {
+td > .ajax-new-content > .form-item > .form-element,
+td > .form-item > .claro-autocomplete,
+td > .form-item > .claro-autocomplete > .form-element,
+td > .ajax-new-content > .form-item > .claro-autocomplete,
+td > .ajax-new-content > .form-item > .claro-autocomplete > .form-element {
   width: 100%;
+}
+
+td > .form-item > .form-element--type-select,
+td > .ajax-new-content > .form-item > .form-element--type-select {
+  width: max-content;
+  min-width: 100%;
 }
 
 /* Win over table-file-multiple-widget. */

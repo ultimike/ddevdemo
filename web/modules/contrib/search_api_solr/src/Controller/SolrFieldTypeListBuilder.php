@@ -31,17 +31,17 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function buildRow(EntityInterface $solr_field_type) {
-    /** @var \Drupal\search_api_solr\SolrFieldTypeInterface $solr_field_type */
-    $domains = $solr_field_type->getDomains();
+  public function buildRow(EntityInterface $_field_type) {
+    /** @var \Drupal\search_api_solr\SolrFieldTypeInterface $_field_type */
+    $domains = $_field_type->getDomains();
     if (empty($domains)) {
       $domains = ['generic'];
     }
 
-    $enabled_label = $solr_field_type->disabledOnServer ? $this->t('Disabled') : $this->t('Enabled');
+    $enabled_label = $_field_type->isDisabledOnServer() ? $this->t('Disabled') : $this->t('Enabled');
     $enabled_icon = [
       '#theme' => 'image',
-      '#uri' => !$solr_field_type->disabledOnServer ? 'core/misc/icons/73b355/check.svg' : 'core/misc/icons/e32700/error.svg',
+      '#uri' => !$_field_type->isDisabledOnServer() ? 'core/misc/icons/73b355/check.svg' : 'core/misc/icons/e32700/error.svg',
       '#width' => 18,
       '#height' => 18,
       '#alt' => $enabled_label,
@@ -49,21 +49,21 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
     ];
 
     $row = [
-      'label' => $solr_field_type->label(),
-      'minimum_solr_version' => $solr_field_type->getMinimumSolrVersion(),
+      'label' => $_field_type->label(),
+      'minimum_solr_version' => $_field_type->getMinimumSolrVersion(),
       // @todo format
-      'managed_schema' => $solr_field_type->requiresManagedSchema(),
+      'managed_schema' => $_field_type->requiresManagedSchema(),
       // @todo format
-      'langcode' => $solr_field_type->getFieldTypeLanguageCode(),
+      'langcode' => $_field_type->getFieldTypeLanguageCode(),
       // @todo format
       'domains' => implode(', ', $domains),
-      'id' => $solr_field_type->id(),
+      'id' => $_field_type->id(),
       'enabled' => [
         'data' => $enabled_icon,
         'class' => ['checkbox'],
       ],
     ];
-    return $row + parent::buildRow($solr_field_type);
+    return $row + parent::buildRow($_field_type);
   }
 
   /**
@@ -71,7 +71,7 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
    *
    * @throws \Drupal\search_api\SearchApiException
    */
-  public function load() {
+  public function load(): array {
     static $entities;
 
     $active_languages = array_keys(\Drupal::languageManager()->getLanguages());
@@ -79,7 +79,7 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
     // returns as we provide language fallbacks. For example, 'de' should be
     // used for 'de-at' if there's no dedicated 'de-at' field type.
     array_walk($active_languages, function (&$value) {
-      list($value,) = explode('-', $value);
+      [$value] = explode('-', $value);
     });
     $active_languages[] = LanguageInterface::LANGCODE_NOT_SPECIFIED;
 
@@ -110,7 +110,7 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
       $entity_ids = $this->getEntityIds();
       /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
       $storage = $this->getStorage();
-      /** @var \Drupal\search_api_solr\Entity\SolrFieldType[] $entities */
+      /** @var \Drupal\search_api_solr\SolrFieldTypeInterface[] $entities */
       $entities = $storage->loadMultipleOverrideFree($entity_ids);
 
       // We filter those field types that are relevant for the current server.
@@ -118,11 +118,10 @@ class SolrFieldTypeListBuilder extends AbstractSolrEntityListBuilder {
       // different values for minimum_solr_version and domains.
       $selection = [];
       foreach ($entities as $key => $solr_field_type) {
-        $entities[$key]->disabledOnServer = in_array($solr_field_type->id(), $disabled_field_types);
-        /** @var \Drupal\search_api_solr\SolrFieldTypeInterface $solr_field_type */
+        $entities[$key]->setDisabledOnServer(in_array($solr_field_type->id(), $disabled_field_types));
         $version = $solr_field_type->getMinimumSolrVersion();
         $domains = $solr_field_type->getDomains();
-        list($language,) = explode('-', $solr_field_type->getFieldTypeLanguageCode());
+        [$language] = explode('-', $solr_field_type->getFieldTypeLanguageCode());
         if (
           $solr_field_type->requiresManagedSchema() != $this->getBackend()->isManagedSchema() ||
           version_compare($version, $solr_version, '>') ||

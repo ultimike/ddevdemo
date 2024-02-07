@@ -29,7 +29,7 @@ class Email extends Constraint
     public const VALIDATION_MODE_HTML5 = 'html5';
     public const VALIDATION_MODE_STRICT = 'strict';
     /**
-     * @deprecated since Symfony 6.2
+     * @deprecated since Symfony 6.2, use VALIDATION_MODE_HTML5 instead
      */
     public const VALIDATION_MODE_LOOSE = 'loose';
 
@@ -43,7 +43,7 @@ class Email extends Constraint
     ];
 
     protected const ERROR_NAMES = [
-        self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
+        self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
     /**
@@ -53,14 +53,15 @@ class Email extends Constraint
 
     public $message = 'This value is not a valid email address.';
     public $mode;
+    /** @var callable|null */
     public $normalizer;
 
     public function __construct(
-        array $options = null,
-        string $message = null,
-        string $mode = null,
-        callable $normalizer = null,
-        array $groups = null,
+        ?array $options = null,
+        ?string $message = null,
+        ?string $mode = null,
+        ?callable $normalizer = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
@@ -74,11 +75,11 @@ class Email extends Constraint
         $this->normalizer = $normalizer ?? $this->normalizer;
 
         if (self::VALIDATION_MODE_LOOSE === $this->mode) {
-            trigger_deprecation('symfony/validator', '6.2', 'The "%s" mode is deprecated. The default mode will be changed to "%s" in 7.0.', self::VALIDATION_MODE_LOOSE, self::VALIDATION_MODE_HTML5);
+            trigger_deprecation('symfony/validator', '6.2', 'The "%s" mode is deprecated. It will be removed in 7.0 and the default mode will be changed to "%s".', self::VALIDATION_MODE_LOOSE, self::VALIDATION_MODE_HTML5);
         }
 
         if (self::VALIDATION_MODE_STRICT === $this->mode && !class_exists(StrictEmailValidator::class)) {
-            throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode.', __CLASS__));
+            throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode. Try running "composer require egulias/email-validator".', __CLASS__));
         }
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {

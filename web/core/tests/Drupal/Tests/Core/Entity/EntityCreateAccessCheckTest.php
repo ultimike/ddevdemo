@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Access\AccessResult;
@@ -82,7 +84,7 @@ class EntityCreateAccessCheckTest extends UnitTestCase {
 
     // Don't expect a call to the access control handler when we have a bundle
     // argument requirement but no bundle is provided.
-    if ($entity_bundle || strpos($requirement, '{') === FALSE) {
+    if ($entity_bundle || !str_contains($requirement, '{')) {
       $access_control_handler = $this->createMock('Drupal\Core\Entity\EntityAccessControlHandlerInterface');
       $access_control_handler->expects($this->once())
         ->method('createAccess')

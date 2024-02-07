@@ -8,6 +8,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestSetupTrait;
@@ -126,9 +127,11 @@ abstract class BrowserTestBase extends TestCase {
   protected $defaultTheme;
 
   /**
-   * An array of custom translations suitable for drupal_rewrite_settings().
+   * An array of custom translations suitable for SettingsEditor::rewrite().
    *
    * @var array
+   *
+   * @see \Drupal\Core\Site\SettingsEditor::rewrite()
    */
   protected $customTranslations;
 
@@ -281,7 +284,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Gets an instance of the default Mink driver.
    *
-   * @return Behat\Mink\Driver\DriverInterface
+   * @return \Behat\Mink\Driver\DriverInterface
    *   Instance of default Mink driver.
    *
    * @throws \InvalidArgumentException
@@ -318,9 +321,11 @@ abstract class BrowserTestBase extends TestCase {
   }
 
   /**
-   * Get the Mink driver args from an environment variable, if it is set. Can
-   * be overridden in a derived class so it is possible to use a different
-   * value for a subset of tests, e.g. the JavaScript tests.
+   * Gets the Mink driver args from an environment variable.
+   *
+   * The environment variable can be overridden in a derived class so it is
+   * possible to use a different value for a subset of tests, e.g. the
+   * JavaScript tests.
    *
    * @return string|false
    *   The JSON-encoded argument string. False if it is not set.
@@ -371,6 +376,17 @@ abstract class BrowserTestBase extends TestCase {
     // PHPUnit 6 tests that only make assertions using $this->assertSession()
     // can be marked as risky.
     $this->addToAssertionCount(1);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __get(string $name) {
+    if ($name === 'randomGenerator') {
+      @trigger_error('Accessing the randomGenerator property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use getRandomGenerator() instead. See https://www.drupal.org/node/3358445', E_USER_DEPRECATED);
+
+      return $this->getRandomGenerator();
+    }
   }
 
   /**
@@ -546,7 +562,7 @@ abstract class BrowserTestBase extends TestCase {
     // as expected.
     $this->container->get('cache_tags.invalidator')->resetChecksums();
 
-    // Generate a route to prime the url generator with the correct base url.
+    // Generate a route to prime the URL generator with the correct base URL.
     // @todo Remove in https://www.drupal.org/project/drupal/issues/3207896.
     Url::fromRoute('<front>')->setAbsolute()->toString();
 
@@ -617,7 +633,11 @@ abstract class BrowserTestBase extends TestCase {
   protected function getDrupalSettings() {
     $html = $this->getSession()->getPage()->getContent();
     if (preg_match('@<script type="application/json" data-drupal-selector="drupal-settings-json">([^<]*)</script>@', $html, $matches)) {
-      return Json::decode($matches[1]);
+      $settings = Json::decode($matches[1]);
+      if (isset($settings['ajaxPageState']['libraries'])) {
+        $settings['ajaxPageState']['libraries'] = UrlHelper::uncompressQueryParameter($settings['ajaxPageState']['libraries']);
+      }
+      return $settings;
     }
     return [];
   }

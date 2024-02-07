@@ -54,17 +54,17 @@ class Range extends Constraint
     public $maxPropertyPath;
 
     public function __construct(
-        array $options = null,
-        string $notInRangeMessage = null,
-        string $minMessage = null,
-        string $maxMessage = null,
-        string $invalidMessage = null,
-        string $invalidDateTimeMessage = null,
+        ?array $options = null,
+        ?string $notInRangeMessage = null,
+        ?string $minMessage = null,
+        ?string $maxMessage = null,
+        ?string $invalidMessage = null,
+        ?string $invalidDateTimeMessage = null,
         mixed $min = null,
-        string $minPropertyPath = null,
+        ?string $minPropertyPath = null,
         mixed $max = null,
-        string $maxPropertyPath = null,
-        array $groups = null,
+        ?string $maxPropertyPath = null,
+        ?array $groups = null,
         mixed $payload = null
     ) {
         parent::__construct($options, $groups, $payload);
@@ -92,7 +92,7 @@ class Range extends Constraint
         }
 
         if ((null !== $this->minPropertyPath || null !== $this->maxPropertyPath) && !class_exists(PropertyAccess::class)) {
-            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option.', static::class));
+            throw new LogicException(sprintf('The "%s" constraint requires the Symfony PropertyAccess component to use the "minPropertyPath" or "maxPropertyPath" option. Try running "composer require symfony/property-access".', static::class));
         }
 
         if (null !== $this->min && null !== $this->max && ($minMessage || $maxMessage)) {

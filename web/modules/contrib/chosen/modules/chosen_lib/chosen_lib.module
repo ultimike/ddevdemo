@@ -3,8 +3,6 @@
 /**
  * @file
  * General functions and hook implementations.
- *
- * @see https://harvesthq.github.com/chosen/
  */
 
 use Drupal\Core\DrupalKernel;
@@ -45,23 +43,19 @@ function _chosen_lib_get_chosen_path() {
   // Similar to 'modules' and 'themes' directories inside an installation
   // profile, installation profiles may want to place libraries into a
   // 'libraries' directory.
-  $searchdir[] = 'profiles/' . \Drupal::installProfile() . '/libraries';
+  $searchdir[] = 'profiles/' . \Drupal::installProfile() . '/libraries/';
 
   // Always search libraries.
-  $searchdir[] = 'libraries';
+  $searchdir[] = 'libraries/';
 
   // Also search sites/<domain>/*.
-  $searchdir[] = DrupalKernel::findSitePath(\Drupal::request()) . '/libraries';
+  $searchdir[] = DrupalKernel::findSitePath(\Drupal::request()) . '/libraries/';
 
   foreach ($searchdir as $dir) {
-    if (file_exists($dir . '/chosen/chosen.jquery.min.js') || file_exists($dir . '/chosen/chosen.jquery.js')) {
-      return $dir . '/chosen';
-    }
-    if (file_exists($dir . '/chosen-js/chosen.jquery.min.js') || file_exists($dir . '/chosen-js/chosen.jquery.js')) {
-      return $dir . '/chosen-js';
-    }
-    if (file_exists($dir . '/jquery.chosen/chosen.jquery.min.js') || file_exists($dir . '/jquery.chosen/chosen.jquery.js')) {
-      return $dir . '/jquery.chosen';
+    foreach (['chosen', 'chosen/docs', 'chosen-js', 'jquery.chosen'] as $sub) {
+      if (file_exists($dir . $sub . '/chosen.jquery.min.js') || file_exists($dir . $sub . '/chosen.jquery.js')) {
+        return $dir . $sub;
+      }
     }
   }
 

@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *   <dt>Faster instantiation of the event dispatcher service</dt>
  *   <dd>
  *     Instead of calling <code>addSubscriberService</code> once for each
- *     subscriber, a precompiled array of listener definitions is passed
+ *     subscriber, a pre-compiled array of listener definitions is passed
  *     directly to the constructor. This is faster by roughly an order of
  *     magnitude. The listeners are collected and prepared using a compiler
  *     pass.
@@ -210,6 +210,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function addListener($event_name, $listener, $priority = 0) {
     $this->listeners[$event_name][$priority][] = ['callable' => $listener];
@@ -218,6 +221,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function removeListener($event_name, $listener) {
     if (!isset($this->listeners[$event_name])) {
@@ -255,6 +261,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function addSubscriber(EventSubscriberInterface $subscriber) {
     foreach ($subscriber->getSubscribedEvents() as $event_name => $params) {
@@ -274,6 +283,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function removeSubscriber(EventSubscriberInterface $subscriber) {
     foreach ($subscriber->getSubscribedEvents() as $event_name => $params) {

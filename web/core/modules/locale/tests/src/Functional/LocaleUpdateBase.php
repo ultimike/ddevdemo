@@ -9,6 +9,8 @@ use Drupal\file\Entity\File;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Component\Render\FormattableMarkup;
 
+// cspell:ignore februar januar juni marz
+
 /**
  * Base class for testing updates to string translations.
  */
@@ -133,10 +135,11 @@ EOF;
     }
 
     \Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
+    $fileUri = $path . '/' . $filename;
     $file = File::create([
       'uid' => 1,
       'filename' => $filename,
-      'uri' => $path . '/' . $filename,
+      'uri' => $fileUri,
       'filemime' => 'text/x-gettext-translation',
       'timestamp' => $timestamp,
     ]);
@@ -144,6 +147,9 @@ EOF;
     file_put_contents($file->getFileUri(), $po_header . $text);
     touch(\Drupal::service('file_system')->realpath($file->getFileUri()), $timestamp);
     $file->save();
+
+    $this->assertTrue(file_exists($fileUri));
+    $this->assertEquals($timestamp, filemtime($fileUri));
   }
 
   /**
@@ -209,8 +215,7 @@ EOF;
   }
 
   /**
-   * Setup existing translations in the database and set up the status of
-   * existing translations.
+   * Sets up existing translations and their statuses in the database.
    */
   protected function setCurrentTranslations() {
     // Add non customized translations to the database.

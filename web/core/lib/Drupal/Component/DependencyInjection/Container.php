@@ -304,6 +304,9 @@ class Container implements ContainerInterface, ResetInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function set($id, $service) {
     $this->services[$id] = $service;
@@ -320,7 +323,7 @@ class Container implements ContainerInterface, ResetInterface {
    * {@inheritdoc}
    */
   public function getParameter($name): array|bool|string|int|float|NULL {
-    if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
+    if (!\array_key_exists($name, $this->parameters)) {
       if (!$name) {
         throw new ParameterNotFoundException('');
       }
@@ -335,11 +338,14 @@ class Container implements ContainerInterface, ResetInterface {
    * {@inheritdoc}
    */
   public function hasParameter($name): bool {
-    return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+    return \array_key_exists($name, $this->parameters);
   }
 
   /**
    * {@inheritdoc}
+   *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.VoidReturn
+   * @return void
    */
   public function setParameter($name, $value) {
     if ($this->frozen) {
@@ -357,7 +363,7 @@ class Container implements ContainerInterface, ResetInterface {
       $id = $this->aliases[$id];
     }
 
-    return isset($this->services[$id]) || array_key_exists($id, $this->services);
+    return \array_key_exists($id, $this->services);
   }
 
   /**
@@ -453,6 +459,13 @@ class Container implements ContainerInterface, ResetInterface {
 
           continue;
         }
+        elseif ($type == 'service_closure') {
+          $arguments[$key] = function () use ($argument) {
+            return $this->get($argument->id, $argument->invalidBehavior);
+          };
+
+          continue;
+        }
         // Check for collection.
         elseif ($type == 'collection') {
           $value = $argument->value;
@@ -497,7 +510,7 @@ class Container implements ContainerInterface, ResetInterface {
     $alternatives = [];
     foreach ($keys as $key) {
       $lev = levenshtein($search_key, $key);
-      if ($lev <= strlen($search_key) / 3 || strpos($key, $search_key) !== FALSE) {
+      if ($lev <= strlen($search_key) / 3 || str_contains($key, $search_key)) {
         $alternatives[] = $key;
       }
     }

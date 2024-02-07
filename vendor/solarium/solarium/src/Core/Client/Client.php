@@ -36,6 +36,7 @@ use Solarium\Plugin\BufferedDelete\BufferedDeleteLite;
 use Solarium\Plugin\CustomizeRequest\CustomizeRequest;
 use Solarium\Plugin\Loadbalancer\Loadbalancer;
 use Solarium\Plugin\MinimumScoreFilter\MinimumScoreFilter;
+use Solarium\Plugin\NoWaitForResponseRequest;
 use Solarium\Plugin\ParallelExecution\ParallelExecution;
 use Solarium\Plugin\PostBigExtractRequest;
 use Solarium\Plugin\PostBigRequest;
@@ -45,6 +46,8 @@ use Solarium\QueryType\Analysis\Query\Field as AnalysisQueryField;
 use Solarium\QueryType\Extract\Query as ExtractQuery;
 use Solarium\QueryType\Extract\Result as ExtractResult;
 use Solarium\QueryType\Graph\Query as GraphQuery;
+use Solarium\QueryType\Luke\Query as LukeQuery;
+use Solarium\QueryType\Luke\Result\Result as LukeResult;
 use Solarium\QueryType\ManagedResources\Query\Resources as ManagedResourcesQuery;
 use Solarium\QueryType\ManagedResources\Query\Stopwords as ManagedStopwordsQuery;
 use Solarium\QueryType\ManagedResources\Query\Synonyms as ManagedSynonymsQuery;
@@ -155,6 +158,11 @@ class Client extends Configurable implements ClientInterface
     const QUERY_REALTIME_GET = 'get';
 
     /**
+     * Querytype luke.
+     */
+    const QUERY_LUKE = 'luke';
+
+    /**
      * Querytype cores.
      */
     const QUERY_CORE_ADMIN = 'cores';
@@ -219,6 +227,7 @@ class Client extends Configurable implements ClientInterface
         self::QUERY_GRAPH => GraphQuery::class,
         self::QUERY_EXTRACT => ExtractQuery::class,
         self::QUERY_REALTIME_GET => RealtimeGetQuery::class,
+        self::QUERY_LUKE => LukeQuery::class,
         self::QUERY_CORE_ADMIN => CoreAdminQuery::class,
         self::QUERY_COLLECTIONS => CollectionsQuery::class,
         self::QUERY_CONFIGSETS => ConfigsetsQuery::class,
@@ -235,6 +244,7 @@ class Client extends Configurable implements ClientInterface
      */
     protected $pluginTypes = [
         'loadbalancer' => Loadbalancer::class,
+        'nowaitforresponserequest' => NoWaitForResponseRequest::class,
         'postbigrequest' => PostBigRequest::class,
         'postbigextractrequest' => PostBigExtractRequest::class,
         'customizerequest' => CustomizeRequest::class,
@@ -344,7 +354,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function addEndpoint($endpoint): ClientInterface
+    public function addEndpoint($endpoint): self
     {
         if (\is_array($endpoint)) {
             $endpoint = new Endpoint($endpoint);
@@ -378,7 +388,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function addEndpoints(array $endpoints): ClientInterface
+    public function addEndpoints(array $endpoints): self
     {
         foreach ($endpoints as $key => $endpoint) {
             // in case of a config array: add key to config
@@ -433,7 +443,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function removeEndpoint($endpoint): ClientInterface
+    public function removeEndpoint($endpoint): self
     {
         if (\is_object($endpoint)) {
             $endpoint = $endpoint->getKey();
@@ -451,7 +461,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function clearEndpoints(): ClientInterface
+    public function clearEndpoints(): self
     {
         $this->endpoints = [];
         $this->defaultEndpoint = null;
@@ -468,7 +478,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function setEndpoints(array $endpoints): ClientInterface
+    public function setEndpoints(array $endpoints): self
     {
         $this->clearEndpoints();
         $this->addEndpoints($endpoints);
@@ -487,7 +497,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function setDefaultEndpoint($endpoint): ClientInterface
+    public function setDefaultEndpoint($endpoint): self
     {
         if (\is_object($endpoint)) {
             $endpoint = $endpoint->getKey();
@@ -509,7 +519,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function setAdapter(AdapterInterface $adapter): ClientInterface
+    public function setAdapter(AdapterInterface $adapter): self
     {
         $this->adapter = $adapter;
 
@@ -538,7 +548,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function registerQueryType(string $type, string $queryClass): ClientInterface
+    public function registerQueryType(string $type, string $queryClass): self
     {
         $this->queryTypes[$type] = $queryClass;
 
@@ -552,7 +562,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function registerQueryTypes(array $queryTypes): ClientInterface
+    public function registerQueryTypes(array $queryTypes): self
     {
         foreach ($queryTypes as $type => $class) {
             // support both "key=>value" and "(no-key) => array(key=>x,query=>y)" formats
@@ -596,7 +606,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): ClientInterface
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
     {
         $this->eventDispatcher = $eventDispatcher;
 
@@ -618,7 +628,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function registerPlugin(string $key, $plugin, array $options = []): ClientInterface
+    public function registerPlugin(string $key, $plugin, array $options = []): self
     {
         if (\is_string($plugin)) {
             $plugin = class_exists($plugin) ? $plugin : $plugin.strrchr($plugin, '\\');
@@ -643,7 +653,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function registerPlugins(array $plugins): ClientInterface
+    public function registerPlugins(array $plugins): self
     {
         foreach ($plugins as $key => $plugin) {
             if (!isset($plugin['key'])) {
@@ -708,7 +718,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return self Provides fluent interface
      */
-    public function removePlugin($plugin): ClientInterface
+    public function removePlugin($plugin): self
     {
         if (\is_object($plugin)) {
             foreach ($this->pluginInstances as $key => $instance) {
@@ -1034,6 +1044,22 @@ class Client extends Configurable implements ClientInterface
     }
 
     /**
+     * Execute a Luke query.
+     *
+     * This is a convenience method that forwards the query to the
+     * execute method, thus allowing for an easy to use and clean API.
+     *
+     * @param QueryInterface|\Solarium\QueryType\Luke\Query $query
+     * @param Endpoint|string|null                          $endpoint
+     *
+     * @return ResultInterface|\Solarium\QueryType\Luke\Result\Result
+     */
+    public function luke(QueryInterface $query, $endpoint = null): LukeResult
+    {
+        return $this->execute($query, $endpoint);
+    }
+
+    /**
      * Execute a CoreAdmin query.
      *
      * This is a convenience method that forwards the query to the
@@ -1280,6 +1306,18 @@ class Client extends Configurable implements ClientInterface
     public function createRealtimeGet(array $options = null): RealtimeGetQuery
     {
         return $this->createQuery(self::QUERY_REALTIME_GET, $options);
+    }
+
+    /**
+     * Create a Luke query instance.
+     *
+     * @param mixed $options
+     *
+     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\Luke\Query
+     */
+    public function createLuke(array $options = null): LukeQuery
+    {
+        return $this->createQuery(self::QUERY_LUKE, $options);
     }
 
     /**

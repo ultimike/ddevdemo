@@ -32,6 +32,7 @@ internal.drupal.ckeditor5:
     - core/jquery
     - core/once
     - core/drupal
+    - core/drupal.ajax
     - core/drupal.debounce
     - core/ckeditor5.editorClassic
     - core/ckeditor5.editorDecoupled
@@ -99,6 +100,13 @@ internal.drupal.ckeditor5.filter.admin:
     - core/drupal.ajax
     - core/drupalSettings
 
+internal.drupal.ckeditor5.table:
+  css:
+    theme:
+      css/table.css: { }
+  dependencies:
+    - core/ckeditor5.table
+
 internal.admin:
   js:
     js/ckeditor5.admin.js: { }
@@ -110,6 +118,7 @@ internal.admin:
     - filter/drupal.filter.admin
     - core/jquery
     - core/once
+    - core/drupal.announce
 
 internal.admin.specialCharacters:
   css:
@@ -178,6 +187,11 @@ internal.admin.drupalmedia:
     theme:
       css/drupalmedia.admin.css: { }
 
+internal.admin.showBlocks:
+  css:
+    theme:
+      css/show-blocks.admin.css: { }
+
 internal.admin.sourceEditing:
   css:
     theme:
@@ -208,3 +222,8 @@ internal.admin.image:
   css:
     theme:
       css/image.admin.css: { }
+  js:
+    js/ckeditor5.image.admin.js: { }
+  dependencies:
+    - core/jquery
+    - core/drupal

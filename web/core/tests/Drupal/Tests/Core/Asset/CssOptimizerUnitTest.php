@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\CssOptimizer;
@@ -222,6 +224,18 @@ class CssOptimizerUnitTest extends UnitTestCase {
         ],
         file_get_contents($absolute_path . 'quotes.css.optimized.css'),
       ],
+      [
+        [
+          'group' => -100,
+          'type' => 'file',
+          'weight' => 0.013,
+          'media' => 'all',
+          'preprocess' => TRUE,
+          'data' => $path . 'import3.css',
+          'basename' => 'import3.css',
+        ],
+        file_get_contents($absolute_path . 'import3.css.optimized.css'),
+      ],
     ];
   }
 
@@ -234,11 +248,6 @@ class CssOptimizerUnitTest extends UnitTestCase {
     global $base_path;
     $original_base_path = $base_path;
     $base_path = '/';
-
-    // \Drupal\Core\Asset\CssOptimizer::loadFile() relies on the current working
-    // directory being the one that is used when index.php is the entry point.
-    // Note: PHPUnit automatically restores the original working directory.
-    chdir(realpath(__DIR__ . '/../../../../../../'));
 
     $this->assertEquals($expected, $this->optimizer->optimize($css_asset), 'Group of file CSS assets optimized correctly.');
 

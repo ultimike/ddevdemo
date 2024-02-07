@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Logger;
 
 use Drupal\Core\Logger\LogMessageParser;
@@ -67,8 +69,8 @@ class LogMessageParserTest extends UnitTestCase {
       // Test removal of unexpected placeholders like ! while allowed
       // placeholders beginning with @, % and : are preserved.
       [
-        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://drupal.org', '!bang' => 'foo bar']],
-        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://drupal.org']],
+        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://example.com', '!bang' => 'foo bar']],
+        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://example.com']],
       ],
     ];
   }

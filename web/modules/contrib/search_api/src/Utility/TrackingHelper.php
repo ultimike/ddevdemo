@@ -88,17 +88,17 @@ class TrackingHelper implements TrackingHelperInterface {
    * {@inheritdoc}
    */
   public function trackReferencedEntityUpdate(EntityInterface $entity, bool $deleted = FALSE) {
+    if (!empty($entity->search_api_skip_tracking)) {
+      return;
+    }
+
     /** @var \Drupal\search_api\IndexInterface[] $indexes */
     $indexes = [];
     try {
       $indexes = $this->entityTypeManager->getStorage('search_api_index')
         ->loadMultiple();
     }
-    // @todo Replace with multi-catch once we depend on PHP 7.1+.
-    catch (InvalidPluginDefinitionException $e) {
-      // Can't really happen, but play it safe to appease static code analysis.
-    }
-    catch (PluginNotFoundException $e) {
+    catch (InvalidPluginDefinitionException | PluginNotFoundException) {
       // Can't really happen, but play it safe to appease static code analysis.
     }
 
@@ -176,7 +176,7 @@ class TrackingHelper implements TrackingHelperInterface {
       try {
         $datasource = $field->getDatasource();
       }
-      catch (SearchApiException $e) {
+      catch (SearchApiException) {
         continue;
       }
       if (!$datasource) {

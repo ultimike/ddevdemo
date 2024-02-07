@@ -30,11 +30,6 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
   ];
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = DateTimeInterface::class;
-
-  /**
    * The system's date configuration.
    *
    * @var \Drupal\Core\Config\ImmutableConfig
@@ -74,7 +69,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
    * @see ::normalize
    * @see \Drupal\Core\Datetime\DrupalDateTime::prepareTimezone()
    *
-   * @returns \DateTimeZone
+   * @return \DateTimeZone
    *   The timezone to use.
    */
   protected function getNormalizationTimezone() {
@@ -119,7 +114,18 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
    * {@inheritdoc}
    */
   public function hasCacheableSupportsMethod(): bool {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use getSupportedTypes() instead. See https://www.drupal.org/node/3359695', E_USER_DEPRECATED);
+
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSupportedTypes(?string $format): array {
+    return [
+      DateTimeInterface::class => TRUE,
+    ];
   }
 
 }

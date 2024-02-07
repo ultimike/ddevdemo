@@ -25,8 +25,9 @@ class EntityFormDisplayTest extends KernelTestBase {
     'field',
     'entity_test',
     'field_test',
-    'user',
+    'system',
     'text',
+    'user',
   ];
 
   /**
@@ -34,6 +35,8 @@ class EntityFormDisplayTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('action');
+    $this->installConfig('user');
     $this->installEntitySchema('entity_test');
   }
 
@@ -206,7 +209,11 @@ class EntityFormDisplayTest extends KernelTestBase {
     $field->save();
 
     // Create default and compact entity display.
-    EntityFormMode::create(['id' => 'entity_test.compact', 'targetEntityType' => 'entity_test'])->save();
+    EntityFormMode::create([
+      'id' => 'entity_test.compact',
+      'label' => 'Compact',
+      'targetEntityType' => 'entity_test',
+    ])->save();
     EntityFormDisplay::create([
       'targetEntityType' => 'entity_test',
       'bundle' => 'entity_test',
@@ -280,6 +287,25 @@ class EntityFormDisplayTest extends KernelTestBase {
     \Drupal::service('config.manager')->uninstall('module', 'text');
     $display = $display_repository->getFormDisplay('entity_test', 'entity_test');
     $this->assertNull($display->getComponent($field_name));
+  }
+
+  /**
+   * Tests the serialization and unserialization of the class.
+   */
+  public function testSerialization() {
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    $display_repository = \Drupal::service('entity_display.repository');
+
+    $form_display = $display_repository->getFormDisplay('entity_test', 'entity_test');
+    // Make sure the langcode base field is visible in the original form
+    // display.
+    $this->assertNotEmpty($form_display->getComponent('langcode'));
+    // Remove the langcode.
+    $form_display->removeComponent('langcode');
+
+    $unserialized = unserialize(serialize($form_display));
+    // Verify that components are retained upon unserialization.
+    $this->assertEquals($form_display->getComponents(), $unserialized->getComponents());
   }
 
 }

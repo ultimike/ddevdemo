@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\editor\Unit\EditorXssFilter;
 
 use Drupal\editor\EditorXssFilter\Standard;
@@ -27,6 +29,7 @@ class StandardTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
 
     // Mock text format configuration entity object.
     $this->format = $this->getMockBuilder('\Drupal\filter\Entity\FilterFormat')
@@ -107,7 +110,7 @@ class StandardTest extends UnitTestCase {
 
     // Default SRC tag by leaving it empty.
     // @see https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Default_SRC_tag_by_leaving_it_empty
-    $data[] = ['<IMG SRC= onmouseover="alert(\'xxs\')">', '<IMG nmouseover="alert(&#039;xxs&#039;)">'];
+    $data[] = ['<IMG SRC= onmouseover="alert(\'xxs\')">', '<IMG>'];
 
     // Default SRC tag by leaving it out entirely.
     // @see https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Default_SRC_tag_by_leaving_it_out_entirely
@@ -516,12 +519,12 @@ xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
     // @see \Drupal\editor\EditorXssFilter::filterXssDataAttributes()
 
     // The following two test cases verify that XSS attack vectors are filtered.
-    $data[] = ['<img src="butterfly.jpg" data-caption="&lt;script&gt;alert();&lt;/script&gt;" />', '<img src="butterfly.jpg" data-caption="alert();" />'];
-    $data[] = ['<img src="butterfly.jpg" data-caption="&lt;EMBED SRC=&quot;http://ha.ckers.org/xss.swf&quot; AllowScriptAccess=&quot;always&quot;&gt;&lt;/EMBED&gt;" />', '<img src="butterfly.jpg" data-caption="" />'];
+    $data[] = ['<img src="butterfly.jpg" data-caption="&lt;script&gt;alert();&lt;/script&gt;" />', '<img src="butterfly.jpg" data-caption="alert();">'];
+    $data[] = ['<img src="butterfly.jpg" data-caption="&lt;EMBED SRC=&quot;http://ha.ckers.org/xss.swf&quot; AllowScriptAccess=&quot;always&quot;&gt;&lt;/EMBED&gt;" />', '<img src="butterfly.jpg" data-caption>'];
 
     // When including HTML-tags as visible content, they are double-escaped.
     // This test case ensures that we leave that content unchanged.
-    $data[] = ['<img src="butterfly.jpg" data-caption="&amp;lt;script&amp;gt;alert();&amp;lt;/script&amp;gt;" />', '<img src="butterfly.jpg" data-caption="&amp;lt;script&amp;gt;alert();&amp;lt;/script&amp;gt;" />'];
+    $data[] = ['<img src="butterfly.jpg" data-caption="&amp;lt;script&amp;gt;alert();&amp;lt;/script&amp;gt;" />', '<img src="butterfly.jpg" data-caption="&amp;lt;script&amp;gt;alert();&amp;lt;/script&amp;gt;">'];
 
     return $data;
   }

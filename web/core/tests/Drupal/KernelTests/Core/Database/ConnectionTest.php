@@ -97,8 +97,6 @@ class ConnectionTest extends DatabaseTestBase {
     // Set up identical replica and confirm connection options are identical.
     Database::addConnectionInfo('default', 'replica', $connection_info['default']);
     $db2 = Database::getConnection('replica', 'default');
-    // Getting a driver class ensures the namespace option is set.
-    $this->assertEquals($db->getDriverClass('Select'), $db2->getDriverClass('Select'));
     $connectionOptions2 = $db2->getConnectionOptions();
 
     // Get a fresh copy of the default connection options.
@@ -189,6 +187,16 @@ class ConnectionTest extends DatabaseTestBase {
    */
   public function testHasJson() {
     $this->assertTrue($this->connection->hasJson());
+  }
+
+  /**
+   * Tests deprecation of ::tablePrefix().
+   *
+   * @group legacy
+   */
+  public function testDeprecatedTablePrefix(): void {
+    $this->expectDeprecation('Drupal\Core\Database\Connection::tablePrefix() is deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Instead, you should just use Connection::getPrefix(). See https://www.drupal.org/node/3260849');
+    $this->assertIsString($this->connection->tablePrefix());
   }
 
 }

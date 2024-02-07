@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\UrlHelper;
@@ -54,6 +56,7 @@ class UrlHelperTest extends TestCase {
       'example.com',
       'www.example.com',
       'ex-ample.com',
+      // cspell:disable-next-line
       '3xampl3.com',
       'example.com/parenthesis',
       'example.com/index.html#pagetop',
@@ -104,6 +107,30 @@ class UrlHelperTest extends TestCase {
       'ex%ample.com',
     ];
     return $this->dataEnhanceWithScheme($data);
+  }
+
+  /**
+   * Tests that we get the same thing out that we put in.
+   */
+  public function testCompressUncompress() {
+    $data = [];
+    while (count($data) < 30) {
+      $data[] = 'drupal/drupal' . count($data);
+    }
+    $data = implode(',', $data);
+    $compressed = UrlHelper::compressQueryParameter($data);
+    $uncompressed = UrlHelper::uncompressQueryParameter($compressed);
+    $this->assertEquals($data, $uncompressed);
+    $this->assertLessThan(strlen($uncompressed), strlen($compressed));
+  }
+
+  /**
+   * Tests passing an invalid string as a compressed query parameter.
+   */
+  public function testUncompressInvalidString() {
+    // Pass an invalid string to ::uncompressQueryParameter() and ensure it
+    // doesn't result in a PHP warning.
+    $this->assertFalse(UrlHelper::uncompressQueryParameter('llama'));
   }
 
   /**
@@ -164,6 +191,7 @@ class UrlHelperTest extends TestCase {
    */
   public function providerTestInvalidRelativeData() {
     $data = [
+      // cspell:disable-next-line
       'ex^mple',
       'example<>',
       'ex%ample',
@@ -406,14 +434,14 @@ class UrlHelperTest extends TestCase {
       ['https://example.com/external/path', TRUE],
       ['javascript://fake-external-path', FALSE],
       // External URL without an explicit protocol.
-      ['//www.drupal.org/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
+      ['//www.example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
       // Internal URL starting with a slash.
-      ['/www.drupal.org', FALSE],
+      ['/www.example.com', FALSE],
       // Simple external URLs.
       ['http://example.com', TRUE],
       ['https://example.com', TRUE],
-      ['http://drupal.org/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
-      ['//drupal.org', TRUE],
+      ['http://example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
+      ['//example.com', TRUE],
       // Some browsers ignore or strip leading control characters.
       ["\x00//www.example.com", TRUE],
       ["\x08//www.example.com", TRUE],
@@ -431,7 +459,7 @@ class UrlHelperTest extends TestCase {
       ['/system/ajax', FALSE],
       ['?q=foo:bar', FALSE],
       ['node/edit:me', FALSE],
-      ['/drupal.org', FALSE],
+      ['/example.com', FALSE],
       ['<front>', FALSE],
     ];
   }
@@ -517,10 +545,10 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Enhances test urls with schemes.
+   * Enhances test URLs with schemes.
    *
    * @param array $urls
-   *   The list of urls.
+   *   The list of URLs.
    *
    * @return array
    *   A list of provider data with schemes.
@@ -537,10 +565,10 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Enhances test urls with prefixes.
+   * Enhances test URLs with prefixes.
    *
    * @param array $urls
-   *   The list of urls.
+   *   The list of URLs.
    *
    * @return array
    *   A list of provider data with prefixes.
@@ -557,7 +585,7 @@ class UrlHelperTest extends TestCase {
   }
 
   /**
-   * Tests detecting external urls that point to local resources.
+   * Tests detecting external URLs that point to local resources.
    *
    * @param string $url
    *   The external URL to test.
@@ -637,7 +665,7 @@ class UrlHelperTest extends TestCase {
       ['http://example.com/foo', ''],
       ['http://example.com/foo', 'bar'],
       ['http://example.com/foo', 'http://'],
-      // Invalid destination urls.
+      // Invalid destination URLs.
       ['', 'http://example.com/foo'],
       ['bar', 'http://example.com/foo'],
       ['/bar', 'http://example.com/foo'],

@@ -77,10 +77,10 @@ function hook_file_validate(\Drupal\file\FileInterface $file) {
   $errors = [];
 
   if (!$file->getFilename()) {
-    $errors[] = t("The file's name is empty. Please give a name to the file.");
+    $errors[] = t("The file's name is empty. Give a name to the file.");
   }
   if (strlen($file->getFilename()) > 255) {
-    $errors[] = t("The file's name exceeds the 255 characters limit. Please rename the file and try again.");
+    $errors[] = t("The file's name exceeds the 255 characters limit. Rename the file and try again.");
   }
 
   return $errors;
@@ -98,7 +98,7 @@ function hook_file_validate(\Drupal\file\FileInterface $file) {
  */
 function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
+  if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
@@ -118,7 +118,7 @@ function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInter
  */
 function hook_file_move(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
+  if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 

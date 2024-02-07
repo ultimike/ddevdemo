@@ -96,6 +96,16 @@ class SearchApiQuery extends QueryPluginBase {
   protected $where = [];
 
   /**
+   * Not actually used.
+   *
+   * Copied over from \Drupal\views\Plugin\views\query\Sql::$orderby since
+   * ExposedFormPluginBase depends on it.
+   *
+   * @var array
+   */
+  public $orderby = [];
+
+  /**
    * The conjunction with which multiple filter groups are combined.
    *
    * @var string
@@ -161,7 +171,7 @@ class SearchApiQuery extends QueryPluginBase {
     // @todo Instead use Views::viewsData() – injected, too – to load the base
     //   table definition and use the "index" (or maybe rename to
     //   "search_api_index") field from there.
-    if (substr($table, 0, 17) == 'search_api_index_') {
+    if (str_starts_with($table, 'search_api_index_')) {
       $index_id = substr($table, 17);
       if ($entity_type_manager) {
         return $entity_type_manager->getStorage('search_api_index')
@@ -190,7 +200,7 @@ class SearchApiQuery extends QueryPluginBase {
       try {
         $object = $row->_object ?: $row->_item->getOriginalObject();
       }
-      catch (SearchApiException $e) {
+      catch (SearchApiException) {
         return NULL;
       }
       $entity = $object->getValue();
@@ -291,8 +301,8 @@ class SearchApiQuery extends QueryPluginBase {
    *
    * @return $this
    *
-   * @deprecated in search_api:8.x-1.11 and is removed from search_api:2.0.0. Use
-   *   addRetrievedFieldValue() instead.
+   * @deprecated in search_api:8.x-1.11 and is removed from search_api:2.0.0.
+   *   Use addRetrievedFieldValue() instead.
    *
    * @see https://www.drupal.org/node/3011060
    */
@@ -343,14 +353,7 @@ class SearchApiQuery extends QueryPluginBase {
    */
   public function addField($table, $field, $alias = '', array $params = []) {
     // Ignore calls for built-in fields which don't need to be retrieved.
-    $built_in = [
-      'search_api_id' => TRUE,
-      'search_api_datasource' => TRUE,
-      'search_api_language' => TRUE,
-      'search_api_relevance' => TRUE,
-      'search_api_excerpt' => TRUE,
-    ];
-    if (isset($built_in[$field])) {
+    if (isset(ResultRow::LAZY_LOAD_PROPERTIES[$field])) {
       return $field;
     }
 
@@ -461,7 +464,7 @@ class SearchApiQuery extends QueryPluginBase {
    * @see https://www.drupal.org/node/2899682
    */
   public function getEntityTypes($return_bool = FALSE) {
-    @trigger_error('\Drupal\search_api\Plugin\views\query\SearchApiQuery::getEntityTypes() is deprecated in Search API 8.x-1.5. Use \Drupal\search_api\IndexInterface::getEntityTypes() instead. See https://www.drupal.org/node/2899682', E_USER_DEPRECATED);
+    @trigger_error('\Drupal\search_api\Plugin\views\query\SearchApiQuery::getEntityTypes() is deprecated in search_api:8.x-1.5 and is removed from search_api:2.0.0. Use \Drupal\search_api\IndexInterface::getEntityTypes() instead. See https://www.drupal.org/node/2899682', E_USER_DEPRECATED);
     $types = $this->index->getEntityTypes();
     return $return_bool ? (bool) $types : $types;
   }
@@ -513,8 +516,7 @@ class SearchApiQuery extends QueryPluginBase {
       // add a new OR filter to the query to which the filters for the groups
       // will be added.
       if ($this->groupOperator === 'OR') {
-        $base = $this->query->createConditionGroup('OR');
-        $this->query->addConditionGroup($base);
+        $base = $this->query->createAndAddConditionGroup('OR');
       }
       else {
         $base = $this->query;
@@ -523,10 +525,16 @@ class SearchApiQuery extends QueryPluginBase {
       foreach ($this->where as $group_id => $group) {
         if (!empty($group['conditions']) || !empty($group['condition_groups'])) {
           $group += ['type' => 'AND'];
-          // Filters in the default group (used by arguments) should always be
-          // added directly to the query.
-          $default_group = $group_id == 0;
-          $conditions = $default_group ? $this->query : $this->query->createConditionGroup($group['type']);
+          // Filters in the default group 0 (used by arguments) should not take
+          // $this->groupOperator into account, but use a separate conditions
+          // group just for them, placed directly on the query.
+          $conditions = $this->query->createConditionGroup($group['type']);
+          if ($group_id == 0) {
+            $this->query->addConditionGroup($conditions);
+          }
+          else {
+            $base->addConditionGroup($conditions);
+          }
           if (!empty($group['conditions'])) {
             foreach ($group['conditions'] as $condition) {
               [$field, $value, $operator] = $condition;
@@ -537,10 +545,6 @@ class SearchApiQuery extends QueryPluginBase {
             foreach ($group['condition_groups'] as $nested_conditions) {
               $conditions->addConditionGroup($nested_conditions);
             }
-          }
-          // For the default group, the filters were already set on the query.
-          if (!$default_group) {
-            $base->addConditionGroup($conditions);
           }
         }
       }
@@ -701,7 +705,7 @@ class SearchApiQuery extends QueryPluginBase {
       }
     }
 
-    foreach ($results as $item_id => $result) {
+    foreach ($results as $result) {
       $values = [];
       $values['_item'] = $result;
       try {
@@ -714,13 +718,17 @@ class SearchApiQuery extends QueryPluginBase {
           }
         }
       }
-      catch (SearchApiException $e) {
+      catch (SearchApiException) {
         // Can't actually be thrown here, but catch for the static analyzer's
         // sake.
       }
 
       // Gather any properties from the search results.
       foreach ($result->getFields(FALSE) as $field_id => $field) {
+        // Ignore calls for built-in fields which don't need to be retrieved.
+        if (isset(ResultRow::LAZY_LOAD_PROPERTIES[$field_id])) {
+          continue;
+        }
         $path = $field->getCombinedPropertyPath();
         try {
           $property = $field->getDataDefinition();
@@ -733,7 +741,7 @@ class SearchApiQuery extends QueryPluginBase {
             $path .= '|' . $field_id;
           }
         }
-        catch (SearchApiException $e) {
+        catch (SearchApiException) {
           // If we're not able to retrieve the data definition at this point,
           // it doesn't really matter.
         }
@@ -769,6 +777,9 @@ class SearchApiQuery extends QueryPluginBase {
 
     $query = $this->getSearchApiQuery();
     if ($query instanceof CacheableDependencyInterface) {
+      // Add the list cache tag of the search index, so that the view will be
+      // invalidated if any items on the index are indexed or deleted.
+      $tags[] = 'search_api_list:' . $this->getIndex()->id();
       $tags = Cache::mergeTags($query->getCacheTags(), $tags);
     }
 
@@ -859,12 +870,13 @@ class SearchApiQuery extends QueryPluginBase {
   /**
    * Retrieves the Search API result set returned for this query.
    *
-   * @return \Drupal\search_api\Query\ResultSetInterface
-   *   The result set of this query. Might not contain the actual results yet if
-   *   the query hasn't been executed yet.
+   * @return \Drupal\search_api\Query\ResultSetInterface|null
+   *   The result set of this query, or NULL if no search query has been
+   *   created for this view. If a result set is returned, it might not contain
+   *   the actual results yet if the query hasn't been executed yet.
    */
   public function getSearchApiResults() {
-    return $this->query->getResults();
+    return $this->query?->getResults();
   }
 
   /**
@@ -962,6 +974,24 @@ class SearchApiQuery extends QueryPluginBase {
   public function createConditionGroup($conjunction = 'AND', array $tags = []) {
     if (!$this->shouldAbort()) {
       return $this->query->createConditionGroup($conjunction, $tags);
+    }
+    return new ConditionGroup($conjunction, $tags);
+  }
+
+  /**
+   * Creates a new condition group and adds it to this query object.
+   *
+   * @param string $conjunction
+   *   The conjunction to use for the condition group – either 'AND' or 'OR'.
+   * @param string[] $tags
+   *   (optional) Tags to set on the condition group.
+   *
+   * @return \Drupal\search_api\Query\ConditionGroupInterface
+   *   The newly added condition group object.
+   */
+  public function createAndAddConditionGroup(string $conjunction = 'AND', array $tags = []): ConditionGroupInterface {
+    if (!$this->shouldAbort()) {
+      return $this->query->createAndAddConditionGroup($conjunction, $tags);
     }
     return new ConditionGroup($conjunction, $tags);
   }

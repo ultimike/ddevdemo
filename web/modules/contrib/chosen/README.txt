@@ -7,7 +7,7 @@
 -- INSTALLATION --
 
   1. Download the Chosen jQuery plugin
-     (https://harvesthq.github.io/chosen/ version 1.5 or higher is recommended)
+     (https://github.com/JJJ/chosen)
      and extract the file under "libraries".
   2. Download and enable the module.
   3. Configure at Administer > Configuration > User interface > Chosen
@@ -17,42 +17,34 @@
   It is assumed you are installing Drupal through Composer using the Drupal
   Composer facade. See https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies#drupal-packagist
 
-  Before you add the module using composer, you should add an installer path
-  so that the Chosen JavaScript library is installed in the correct location.
-  You might have an entry similar to below in your composer.json already if
-  you had used [drupal-composer/drupal-project](https://github.com/drupal-composer/drupal-project)
-  to create your project.
+  The Chosen Drupal module is shipped with a "composer.libraries.json" file
+  contains information about the chosen library, required by the module itself.
+
+  This file should be merged with the project's main composer.json by the aid
+  of the Composer Merge Plugin plugin available on GitHub. To make use of
+  from the project directory, open a terminal and run:
+
 ```
-    "extra": {
-        "installer-paths": {
-            "web/libraries/{$name}": ["type:drupal-library"]
-        }
-    }
-```
-  where `web/libraries/` is the path to the libraries directory relative to your
-  _project_ root. Modify the entry above to add `harvesthq/chosen` in that array.
-```
-    "extra": {
-        "installer-paths": {
-            "web/libraries/{$name}": [
-              "type:drupal-library",
-              "harvesthq/chosen"
-            ]
-        }
-    }
+composer require wikimedia/composer-merge-plugin
 ```
 
-  Next, you need to add a custom installer-type so that composer installer
-  extended plugin can pick it up. Find the `installer-types` entry in extra
-  section and add `library` to it. Your entry should look something like the
-  following:
+  Then, edit the "composer.json" file of your website and under the "extra"
+  section add:
+
 ```
-    "extra": {
-        "installer-types": [
-            "library"
-        ]
-    }
+"merge-plugin": {
+    "include": [
+        "web/modules/contrib/chosen/composer.libraries.json"
+    ]
+}
 ```
+
+  (*) note: the `web` represents the folder where drupal lives like: ex.
+  `docroot`.
+
+  From now on, every time the "composer.json" file is updated, it will also
+  read the content of "composer.libraries.json" file located at
+  web/modules/contrib/chosen/ and update accordingly.
 
   Remember, you may have other entries in there already. For this to work, you
   need to have the 'oomphinc/composer-installers-extender' installer. If you
@@ -68,8 +60,7 @@ composer require drupal/chosen
 ```
 
   This command will add the Chosen Drupal module and JavaScript library to your
-  project. The library will be downloaded to the `drupal-library` installer path
-  you set in the first step.
+  project.
 
 -- INSTALLATION VIA DRUSH --
 
@@ -83,11 +74,6 @@ composer require drupal/chosen
 
   If you are using Composer to manage your site's dependencies,
   then the Chosen plugin will automatically be downloaded to `libraries/chosen`.
-
--- ACCESSIBILITY CONCERN --
-
-  There are accessibility problems with the main library as identified here:
-        https://github.com/harvesthq/chosen/issues/264
 
 -- TROUBLE SHOOTING --
 

@@ -241,11 +241,7 @@ class ContentEntityTrackingManager {
       $indexes = $this->entityTypeManager->getStorage('search_api_index')
         ->loadMultiple();
     }
-    // @todo Replace with multi-catch once we depend on PHP 7.1+.
-    catch (InvalidPluginDefinitionException $e) {
-      // Can't really happen, but play it safe to appease static code analysis.
-    }
-    catch (PluginNotFoundException $e) {
+    catch (InvalidPluginDefinitionException | PluginNotFoundException) {
       // Can't really happen, but play it safe to appease static code analysis.
     }
 
@@ -260,7 +256,7 @@ class ContentEntityTrackingManager {
         try {
           $config = $index->getDatasource($datasource_id)->getConfiguration();
         }
-        catch (SearchApiException $e) {
+        catch (SearchApiException) {
           // Can't really happen, but play it safe to appease static code
           // analysis.
           unset($indexes[$index_id]);
@@ -400,7 +396,7 @@ class ContentEntityTrackingManager {
     try {
       $config = $index->getDatasource($datasource_id)->getConfiguration();
     }
-    catch (SearchApiException $e) {
+    catch (SearchApiException) {
       // Can't really happen, but play it safe to appease static code analysis.
       return $item_ids;
     }

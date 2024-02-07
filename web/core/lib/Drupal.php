@@ -75,10 +75,20 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '10.0.3';
+  const VERSION = '10.2.2';
 
   /**
    * Core API compatibility.
+   *
+   * This constant is set to '8.x' to provide legacy compatibility with
+   * extensions that use the '8.x-' prefix to denote Drupal core major version
+   * compatibility, for example '8.x-1.0'. These extensions can specify
+   * compatibility with multiple major versions of Drupal core by setting the
+   * version constraint in 'core_version_requirement'. Drupal does not support
+   * using this core major version number prefix with versions greater than 8.
+   * For example '9.x-' prefixed extensions are not supported.
+   *
+   * @todo Remove or rename this constant in https://www.drupal.org/i/3085662
    */
   const CORE_COMPATIBILITY = '8.x';
 
@@ -121,7 +131,7 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.1.6';
+  const RECOMMENDED_PHP = '8.2.0';
 
   /**
    * The currently active container object, or NULL if not initialized yet.

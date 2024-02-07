@@ -3,8 +3,6 @@
 /**
  * @file
  * General functions and hook implementations.
- *
- * @see https://harvesthq.github.com/chosen/
  */
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -18,7 +16,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 /**
  * Define chosen library url.
  */
-define('CHOSEN_WEBSITE_URL', 'https://harvesthq.github.io/chosen');
+define('CHOSEN_WEBSITE_URL', 'https://github.com/JJJ/chosen');
 define('CHOSEN_INCLUDE_ADMIN', 0);
 define('CHOSEN_INCLUDE_NO_ADMIN', 1);
 define('CHOSEN_INCLUDE_EVERYWHERE', 2);

@@ -154,7 +154,7 @@ class UserCancelTest extends BrowserTestBase {
     // Attempt bogus account cancellation request confirmation.
     $bogus_timestamp = $timestamp + 60;
     $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account, $bogus_timestamp));
-    $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.');
+    $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Request a new one using the form below.');
     $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isActive(), 'User account was not canceled.');
@@ -162,7 +162,7 @@ class UserCancelTest extends BrowserTestBase {
     // Attempt expired account cancellation request confirmation.
     $bogus_timestamp = $timestamp - 86400 - 60;
     $this->drupalGet("user/" . $account->id() . "/cancel/confirm/$bogus_timestamp/" . user_pass_rehash($account, $bogus_timestamp));
-    $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Please request a new one using the form below.');
+    $this->assertSession()->pageTextContains('You have tried to use an account cancellation link that has expired. Request a new one using the form below.');
     $user_storage->resetCache([$account->id()]);
     $account = $user_storage->load($account->id());
     $this->assertTrue($account->isActive(), 'User account was not canceled.');
@@ -626,7 +626,7 @@ class UserCancelTest extends BrowserTestBase {
     $this->submitForm([], 'Confirm');
     $status = TRUE;
     foreach ($users as $account) {
-      $status = $status && (strpos($this->getTextContent(), "Account {$account->getAccountName()} has been deleted.") !== FALSE);
+      $status = $status && (str_contains($this->getTextContent(), "Account {$account->getAccountName()} has been deleted."));
       $user_storage->resetCache([$account->id()]);
       $status = $status && !$user_storage->load($account->id());
     }

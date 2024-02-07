@@ -1,6 +1,41 @@
 CHANGELOG
 =========
 
+6.4
+---
+
+ * Add `TranslatableNormalizer`
+ * Allow `Context` attribute to target classes
+ * Deprecate Doctrine annotations support in favor of native attributes
+ * Allow the `Groups` attribute/annotation on classes
+ * JsonDecode: Add `json_decode_detailed_errors` option
+ * Make `ProblemNormalizer` give details about Messenger's `ValidationFailedException`
+ * Add `XmlEncoder::CDATA_WRAPPING` context option
+ * Deprecate `AnnotationLoader`, use `AttributeLoader` instead
+ * Add aliases for all classes in the `Annotation` namespace to `Attribute`
+
+6.3
+---
+
+ * Add `AbstractNormalizer::REQUIRE_ALL_PROPERTIES` context flag to require all properties to be listed in the input instead of falling back to null for nullable ones
+ * Add `XmlEncoder::SAVE_OPTIONS` context option
+ * Add `BackedEnumNormalizer::ALLOW_INVALID_VALUES` context option
+ * Add `UnsupportedFormatException` which is thrown when there is no decoder for a given format
+ * Add method `getSupportedTypes(?string $format)` to `NormalizerInterface` and `DenormalizerInterface`
+ * Make `ProblemNormalizer` give details about `ValidationFailedException` and `PartialDenormalizationException`
+ * Deprecate `CacheableSupportsMethodInterface` in favor of the new `getSupportedTypes(?string $format)` methods
+ * The following Normalizer classes will become final in 7.0:
+   * `ConstraintViolationListNormalizer`
+   * `CustomNormalizer`
+   * `DataUriNormalizer`
+   * `DateIntervalNormalizer`
+   * `DateTimeNormalizer`
+   * `DateTimeZoneNormalizer`
+   * `GetSetMethodNormalizer`
+   * `JsonSerializableNormalizer`
+   * `ObjectNormalizer`
+   * `PropertyNormalizer`
+
 6.2
 ---
 

@@ -3,6 +3,7 @@
 namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Database\Database;
 use GuzzleHttp\Exception\GuzzleException;
 use Drupal\Tests\StreamCapturer;
@@ -202,8 +203,8 @@ class KernelTestBaseTest extends KernelTestBase {
     $output = \Drupal::service('renderer')->renderRoot($build);
     $this->assertEquals('core', \Drupal::theme()->getActiveTheme()->getName());
 
-    $this->assertEquals($expected, $build['#markup']);
-    $this->assertEquals($expected, $output);
+    $this->assertSame($expected, (string) $build['#markup']);
+    $this->assertSame($expected, (string) $output);
   }
 
   /**
@@ -254,6 +255,7 @@ class KernelTestBaseTest extends KernelTestBase {
   public function testMethodRequiresModule() {
     require __DIR__ . '/../../fixtures/KernelMissingDependentModuleMethodTest.php';
 
+    // @phpstan-ignore-next-line
     $stub_test = new KernelMissingDependentModuleMethodTest();
     // We have to setName() to the method name we're concerned with.
     $stub_test->setName('testRequiresModule');
@@ -281,6 +283,7 @@ class KernelTestBaseTest extends KernelTestBase {
   public function testRequiresModule() {
     require __DIR__ . '/../../fixtures/KernelMissingDependentModuleTest.php';
 
+    // @phpstan-ignore-next-line
     $stub_test = new KernelMissingDependentModuleTest();
     // We have to setName() to the method name we're concerned with.
     $stub_test->setName('testRequiresModule');
@@ -361,6 +364,19 @@ class KernelTestBaseTest extends KernelTestBase {
 
     // Test that the module that is providing the database driver is enabled.
     $this->assertSame(1, \Drupal::service('extension.list.module')->get($module)->status);
+  }
+
+  /**
+   * Tests the deprecation of accessing the randomGenerator property directly.
+   *
+   * @group legacy
+   */
+  public function testGetRandomGeneratorPropertyDeprecation() {
+    $this->expectDeprecation('Accessing the randomGenerator property is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use getRandomGenerator() instead. See https://www.drupal.org/node/3358445');
+    // We purposely test accessing an undefined property here. We need to tell
+    // PHPStan to ignore that.
+    // @phpstan-ignore-next-line
+    $this->assertInstanceOf(Random::class, $this->randomGenerator);
   }
 
 }
