@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\Number;
 
 use Drupal\field\Entity\FieldConfig;
@@ -11,7 +13,6 @@ use Drupal\Tests\BrowserTestBase;
  * Tests the creation of numeric fields.
  *
  * @group field
- * @group #slow
  */
 class NumberFieldTest extends BrowserTestBase {
 
@@ -46,7 +47,7 @@ class NumberFieldTest extends BrowserTestBase {
   /**
    * Tests decimal field.
    */
-  public function testNumberDecimalField() {
+  public function testNumberDecimalField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([
@@ -134,7 +135,7 @@ class NumberFieldTest extends BrowserTestBase {
   /**
    * Tests integer field.
    */
-  public function testNumberIntegerField() {
+  public function testNumberIntegerField(): void {
     $minimum = rand(-4000, -2000);
     $maximum = rand(2000, 4000);
 
@@ -300,7 +301,7 @@ class NumberFieldTest extends BrowserTestBase {
   /**
    * Tests float field.
    */
-  public function testNumberFloatField() {
+  public function testNumberFloatField(): void {
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([
@@ -339,7 +340,7 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->responseContains('placeholder="0.00"');
 
     // Submit a signed decimal value within the allowed precision and scale.
-    $value = '-1234.5678';
+    $value = -1234.5678;
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
@@ -391,9 +392,9 @@ class NumberFieldTest extends BrowserTestBase {
   }
 
   /**
-   * Tests setting the minimum value of a float field through the interface.
+   * Tests setting minimum values through the interface.
    */
-  public function testCreateNumberFloatField() {
+  public function testMinimumValues(): void {
     // Create a float field.
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([
@@ -413,12 +414,7 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSetMinimumValue($field, 0.0001);
     // Set the minimum value to an integer value.
     $this->assertSetMinimumValue($field, 1);
-  }
 
-  /**
-   * Tests setting the minimum value of a decimal field through the interface.
-   */
-  public function testCreateNumberDecimalField() {
     // Create a decimal field.
     $field_name = $this->randomMachineName();
     FieldStorageConfig::create([

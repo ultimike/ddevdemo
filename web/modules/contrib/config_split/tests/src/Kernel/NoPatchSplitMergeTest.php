@@ -13,7 +13,7 @@ use Drupal\Tests\config_filter\Kernel\ConfigStorageTestTrait;
 /**
  * Test the splitting and merging.
  *
- * These are the integration tests to assert that the module has the behaviour
+ * These are the integration tests to assert that the module has the behavior
  * on import and export that we expect. This is supposed to not go into internal
  * details of how config split achieves this.
  *
@@ -28,7 +28,7 @@ class NoPatchSplitMergeTest extends KernelTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var string[]
    */
   protected static $modules = [
     'system',
@@ -101,7 +101,7 @@ class NoPatchSplitMergeTest extends KernelTestBase {
           unset($data['module']['config_test']);
         }
 
-        if (strpos($name, 'config_test') !== FALSE || in_array($name, ['system.menu.exclude_test', 'system.menu.indirect_exclude_test'])) {
+        if (strpos($name, 'config_test') !== FALSE || in_array($name, ['system.menu.exclude-test', 'system.menu.indirect-exclude-test'])) {
           // Expect config that depends on config_test directly and indirectly
           // to be split off.
           $expectedSplit->write($name, $data);
@@ -271,7 +271,7 @@ class NoPatchSplitMergeTest extends KernelTestBase {
             $expectedExport->write($name, $data);
           }
         }
-        elseif (strpos($name, 'config_test') !== FALSE || in_array($name, ['system.menu.exclude_test', 'system.menu.indirect_exclude_test'])) {
+        elseif (strpos($name, 'config_test') !== FALSE || in_array($name, ['system.menu.exclude-test', 'system.menu.indirect-exclude-test'])) {
           // Expect config that depends on config_test directly and indirectly
           // to be split off.
           $expectedSplit->write($name, $data);
@@ -304,8 +304,8 @@ class NoPatchSplitMergeTest extends KernelTestBase {
   public function testIncludeDependency($storage) {
     $config = $this->createSplitConfig('test_split', [
       'storage' => $storage,
-      'complete_list' => ['system.menu.exclude_test'],
-      'partial_list' => ['system.menu.indirect_exclude_test'],
+      'complete_list' => ['system.menu.exclude-test'],
+      'partial_list' => ['system.menu.indirect-exclude-test'],
       'no_patching' => TRUE,
     ]);
 
@@ -314,8 +314,8 @@ class NoPatchSplitMergeTest extends KernelTestBase {
     $this->copyConfig($active, $this->getSyncFileStorage());
 
     // Change only the indirectly dependent config.
-    $originalSystem = $this->config('system.menu.indirect_exclude_test')->getRawData();
-    $this->config('system.menu.indirect_exclude_test')->set('label', 'Split Test')->save();
+    $originalSystem = $this->config('system.menu.indirect-exclude-test')->getRawData();
+    $this->config('system.menu.indirect-exclude-test')->set('label', 'Split Test')->save();
 
     $expectedExport = new MemoryStorage();
     $expectedSplit = new MemoryStorage();
@@ -328,11 +328,11 @@ class NoPatchSplitMergeTest extends KernelTestBase {
       foreach ($active->listAll() as $name) {
         $data = $active->read($name);
 
-        if ($name === 'system.menu.exclude_test') {
+        if ($name === 'system.menu.exclude-test') {
           // The option "skip equal" is false, write to export only.
           $expectedSplit->write($name, $data);
         }
-        elseif ($name === 'system.menu.indirect_exclude_test') {
+        elseif ($name === 'system.menu.indirect-exclude-test') {
           // We only changed the config in the default collection.
           if ($collection === StorageInterface::DEFAULT_COLLECTION) {
             // The unchanged value is in export, the changed value is split.

@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Wizard;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -20,7 +21,7 @@ class MenuTest extends WizardTestBase {
   /**
    * Tests the menu functionality.
    */
-  public function testMenus() {
+  public function testMenus(): void {
     $this->drupalPlaceBlock('system_menu_block:main');
 
     // Create a view with a page display and a menu link in the Main Menu.
@@ -50,7 +51,7 @@ class MenuTest extends WizardTestBase {
     /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
     $link = $menu_link_manager->createInstance('views_view:views.' . $view['id'] . '.page_1');
     $url = $link->getUrlObject();
-    $this->assertEquals('view.' . $view['id'] . '.page_1', $url->getRouteName(), new FormattableMarkup('Found a link to %path in the main menu', ['%path' => $view['page[path]']]));
+    $this->assertEquals('view.' . $view['id'] . '.page_1', $url->getRouteName(), "Found a link to {$view['page[path]']} in the main menu");
     $metadata = $link->getMetaData();
     $this->assertEquals(['view_id' => $view['id'], 'display_id' => 'page_1'], $metadata);
   }

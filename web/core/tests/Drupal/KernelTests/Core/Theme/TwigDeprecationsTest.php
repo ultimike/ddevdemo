@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -12,6 +14,7 @@ use Drupal\KernelTests\KernelTestBase;
  * @see \Drupal\Core\Template\TwigNodeCheckDeprecations
  * @group Twig
  * @group legacy
+ * @group #slow
  */
 class TwigDeprecationsTest extends KernelTestBase {
 

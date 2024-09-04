@@ -186,15 +186,17 @@ class ConfigSplitCliService {
    *   The translation function akin to t().
    * @param bool $confirmed
    *   Whether the import is already confirmed by the console input.
+   * @param bool $override
+   *   Allows the deactivation via override.
    */
-  public function ioDeactivate(string $split, $io, callable $t, $confirmed = FALSE): bool {
+  public function ioDeactivate(string $split, $io, callable $t, $confirmed = FALSE, $override = FALSE): bool {
     $config = $this->getSplitFromArgument($split, $io, $t);
     if ($config === NULL) {
       return FALSE;
     }
 
     $message = $t('Deactivate the split config configuration?');
-    $storage = $this->manager->singleDeactivate($config, FALSE);
+    $storage = $this->manager->singleDeactivate($config, FALSE, $override);
 
     if ($confirmed || $io->confirm($message)) {
       return $this->tryImport($storage, $io, $t);

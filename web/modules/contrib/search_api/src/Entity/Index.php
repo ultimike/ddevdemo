@@ -746,6 +746,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
    */
   public function setFields(array $fields) {
     $this->fieldInstances = $fields;
+    return $this;
   }
 
   /**
@@ -866,7 +867,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
     // determine whether all items were loaded successfully.
     $items_by_datasource = [];
     foreach ($item_ids as $item_id) {
-      list($datasource_id, $raw_id) = Utility::splitCombinedId($item_id);
+      [$datasource_id, $raw_id] = Utility::splitCombinedId($item_id);
       $items_by_datasource[$datasource_id][$raw_id] = $item_id;
     }
 
@@ -917,21 +918,31 @@ class Index extends ConfigEntityBase implements IndexInterface {
    */
   public function indexItems($limit = '-1', $datasource_id = NULL) {
     if ($this->hasValidTracker() && !$this->isReadOnly()) {
-      $tracker = $this->getTrackerInstance();
-      $next_set = $tracker->getRemainingItems($limit, $datasource_id);
-      if (!$next_set) {
-        return 0;
-      }
-      $items = $this->loadItemsMultiple($next_set);
-      if (!$items) {
+      if (!\Drupal::lock()->acquire($this->getLockId(), 60)) {
         return 0;
       }
       try {
-        return count($this->indexSpecificItems($items));
+        $tracker = $this->getTrackerInstance();
+        $next_set = $tracker->getRemainingItems($limit, $datasource_id);
+        if (!$next_set) {
+          return 0;
+        }
+        $items = $this->loadItemsMultiple($next_set);
+        if (!$items) {
+          return 0;
+        }
+        try {
+          return count($this->indexSpecificItems($items));
+        }
+        catch (SearchApiException $e) {
+          $variables['%index'] = $this->label();
+          $this->logException($e,
+            '%type while trying to index items on index %index: @message in %function (line %line of %file)',
+            $variables);
+        }
       }
-      catch (SearchApiException $e) {
-        $variables['%index'] = $this->label();
-        $this->logException($e, '%type while trying to index items on index %index: @message in %function (line %line of %file)', $variables);
+      finally {
+        \Drupal::lock()->release($this->getLockId());
       }
     }
     return 0;
@@ -964,7 +975,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
 
     // Preprocess the indexed items.
     $this->alterIndexedItems($items);
-    $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Please use the "search_api.indexing_items" event instead. See https://www.drupal.org/node/3059866';
+    $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Use the "search_api.indexing_items" event instead. See https://www.drupal.org/node/3059866';
     \Drupal::moduleHandler()->alterDeprecated($description, 'search_api_index_items', $this, $items);
     $event = new IndexingItemsEvent($this, $items);
     \Drupal::getContainer()->get('event_dispatcher')
@@ -984,43 +995,47 @@ class Index extends ConfigEntityBase implements IndexInterface {
       unset($rejected_ids[$item_id]);
     }
 
-    // Items that are rejected should also be deleted from the server.
-    if ($rejected_ids) {
-      $this->getServerInstance()->deleteItems($this, $rejected_ids);
-    }
-
-    $indexed_ids = [];
-    if ($items) {
-      $indexed_ids = $this->getServerInstance()->indexItems($this, $items);
-    }
-
-    // Return the IDs of all items that were either successfully indexed or
-    // rejected before being handed to the server.
-    $processed_ids = array_merge(array_values($rejected_ids), array_values($indexed_ids));
-
-    if ($processed_ids) {
-      if ($this->hasValidTracker()) {
-        $this->getTrackerInstance()->trackItemsIndexed($processed_ids);
+    try {
+      // Items that are rejected should also be deleted from the server.
+      if ($rejected_ids) {
+        $this->getServerInstance()->deleteItems($this, $rejected_ids);
       }
-      // Since we've indexed items now, triggering reindexing would have some
-      // effect again. Therefore, we reset the flag.
-      $this->setHasReindexed(FALSE);
 
-      $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Please use the "search_api.items_indexed" event instead. See https://www.drupal.org/node/3059866';
-      \Drupal::moduleHandler()->invokeAllDeprecated($description, 'search_api_items_indexed', [$this, $processed_ids]);
+      $indexed_ids = [];
+      if ($items) {
+        $indexed_ids = $this->getServerInstance()->indexItems($this, $items);
+      }
 
-      $dispatcher = \Drupal::getContainer()->get('event_dispatcher');
-      $dispatcher->dispatch(new ItemsIndexedEvent($this, $processed_ids), SearchApiEvents::ITEMS_INDEXED);
+      // Return the IDs of all items that were either successfully indexed or
+      // rejected before being handed to the server.
+      $processed_ids = array_merge(array_values($rejected_ids), array_values($indexed_ids));
 
-      // Clear search api list caches.
-      Cache::invalidateTags(['search_api_list:' . $this->id]);
+      if ($processed_ids) {
+        if ($this->hasValidTracker()) {
+          $this->getTrackerInstance()->trackItemsIndexed($processed_ids);
+        }
+        // Since we've indexed items now, triggering reindexing would have some
+        // effect again. Therefore, we reset the flag.
+        $this->setHasReindexed(FALSE);
+
+        $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Use the "search_api.items_indexed" event instead. See https://www.drupal.org/node/3059866';
+        \Drupal::moduleHandler()
+          ->invokeAllDeprecated($description, 'search_api_items_indexed', [$this, $processed_ids]);
+
+        $dispatcher = \Drupal::getContainer()->get('event_dispatcher');
+        $dispatcher->dispatch(new ItemsIndexedEvent($this, $processed_ids), SearchApiEvents::ITEMS_INDEXED);
+      }
+
+      return $processed_ids;
     }
+    finally {
+      // Clear Search API list caches.
+      Cache::invalidateTags(['search_api_list:' . $this->id]);
 
-    // Clear the static entity cache, to avoid running out of memory when
-    // indexing lots of items in one process (especially via Drush).
-    \Drupal::getContainer()->get('entity.memory_cache')->deleteAll();
-
-    return $processed_ids;
+      // Clear the static entity cache, to avoid running out of memory when
+      // indexing lots of items in one process (especially via Drush).
+      \Drupal::getContainer()->get('entity.memory_cache')->deleteAll();
+    }
   }
 
   /**
@@ -1108,8 +1123,15 @@ class Index extends ConfigEntityBase implements IndexInterface {
     if ($this->hasValidTracker()) {
       $this->getTrackerInstance()->trackItemsDeleted($item_ids);
     }
+    // Delete the items from the search server, and make sure they aren't
+    // indexed again in the same page request due to an already scheduled
+    // indexing operation.
     if (!$this->isReadOnly() && $this->hasValidServer()) {
       $this->getServerInstance()->deleteItems($this, $item_ids);
+      if ($this->getOption('index_directly') && !$this->isBatchTracking()) {
+        \Drupal::getContainer()->get('search_api.post_request_indexing')
+          ->removeFromIndexing($this->id(), $item_ids);
+      }
     }
   }
 
@@ -1120,7 +1142,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
     if ($this->status() && !$this->isReindexing()) {
       $this->setHasReindexed();
       $this->getTrackerInstance()->trackAllItemsUpdated();
-      $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Please use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
+      $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
       \Drupal::moduleHandler()->invokeAllDeprecated($description, 'search_api_index_reindex', [$this, FALSE]);
       /** @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher */
       $dispatcher = \Drupal::getContainer()->get('event_dispatcher');
@@ -1148,7 +1170,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
       $this->getServerInstance()->deleteAllIndexItems($this);
     }
     if ($invoke_hook) {
-      $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Please use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
+      $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
       \Drupal::moduleHandler()->invokeAllDeprecated($description, 'search_api_index_reindex', [$this, !$this->isReadOnly()]);
 
       /** @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher */
@@ -1170,7 +1192,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
     $index_task_manager->stopTracking($this);
     $index_task_manager->startTracking($this);
     $this->setHasReindexed();
-    $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Please use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
+    $description = 'This hook is deprecated in search_api:8.x-1.14 and is removed from search_api:2.0.0. Use the "search_api.reindex_scheduled" event instead. See https://www.drupal.org/node/3059866';
     \Drupal::moduleHandler()
       ->invokeAllDeprecated($description, 'search_api_index_reindex', [$this, FALSE]);
     /** @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher */
@@ -1202,6 +1224,13 @@ class Index extends ConfigEntityBase implements IndexInterface {
       \Drupal::state()->set($key, $has_reindexed);
     }
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLockId(): string {
+    return "search_api:index:{$this->id}";
   }
 
   /**
@@ -1975,7 +2004,7 @@ class Index extends ConfigEntityBase implements IndexInterface {
    *
    * Prevents the instantiated plugins and fields from being serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // First, write our changes to the persistent *_settings properties so they
     // won't be discarded. Make sure we have a container to do this. This is
     // important to correctly display test failures.

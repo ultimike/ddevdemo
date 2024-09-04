@@ -12,7 +12,7 @@ use Drupal\Tests\config_filter\Kernel\ConfigStorageTestTrait;
 /**
  * Test the splitting and merging.
  *
- * These are the integration tests to assert that the module has the behaviour
+ * These are the integration tests to assert that the module has the behavior
  * on import and export that we expect. This is supposed to not go into internal
  * details of how config split achieves this.
  *
@@ -27,7 +27,7 @@ class SplitContentEntityTypeTest extends KernelTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var string[]
    */
   protected static $modules = [
     'system',

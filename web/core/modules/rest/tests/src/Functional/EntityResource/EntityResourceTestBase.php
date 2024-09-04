@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional\EntityResource;
 
 use Drupal\Component\Assertion\Inspector;
@@ -406,7 +408,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Tests a GET request for an entity, plus edge cases to ensure good DX.
    */
-  public function testGet() {
+  public function testGet(): void {
     $this->initAuthentication();
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
@@ -434,6 +436,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
         // @see \Drupal\Core\EventSubscriber\AnonymousUserResponseSubscriber::onRespond()
         ->addCacheTags(['config:user.role.anonymous']);
       $expected_cacheability->addCacheableDependency($this->getExpectedUnauthorizedEntityAccessCacheability(FALSE));
+      // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+      // it gets resolved.
+      $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
       $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'MISS', FALSE);
     }
     else {
@@ -446,19 +451,22 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // response.
     if (static::$auth) {
       $response = $this->request('GET', $url, $request_options);
+      // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+      // it gets resolved.
+      $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
       $this->assertResponseWhenMissingAuthentication('GET', $response);
     }
 
     $request_options[RequestOptions::HEADERS]['REST-test-auth'] = '1';
 
-    // DX: 403 when attempting to use unallowed authentication provider.
+    // DX: 403 when attempting to use disallowed authentication provider.
     $response = $this->request('GET', $url, $request_options);
     $this->assertResourceErrorResponse(403, 'The used authentication method is not allowed on this route.', $response);
 
     unset($request_options[RequestOptions::HEADERS]['REST-test-auth']);
     $request_options[RequestOptions::HEADERS]['REST-test-auth-global'] = '1';
 
-    // DX: 403 when attempting to use unallowed global authentication provider.
+    // DX: 403 when attempting to use disallowed global authentication provider.
     $response = $this->request('GET', $url, $request_options);
     $this->assertResourceErrorResponse(403, 'The used authentication method is not allowed on this route.', $response);
 
@@ -483,6 +491,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
     $response = $this->request('GET', $url, $request_options);
+    // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+    // it gets resolved.
+    $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
     $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
 
     // Then, what we'll use for the remainder of the test: multiple formats.
@@ -503,6 +514,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
     $response = $this->request('GET', $url, $request_options);
+    // Mitigate https://www.drupal.org/project/drupal/issues/3451483 until
+    // it gets resolved.
+    $response = $response->withoutHeader('X-Drupal-Dynamic-Cache');
     $this->assertResourceErrorResponse(403, $this->getExpectedUnauthorizedAccessMessage('GET'), $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
     $this->assertArrayNotHasKey('Link', $response->getHeaders());
 
@@ -682,7 +696,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Tests a POST request for an entity, plus edge cases to ensure good DX.
    */
-  public function testPost() {
+  public function testPost(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('POSTing config entities is not yet supported.');
@@ -692,7 +706,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
     // Try with all of the following request bodies.
-    $unparseable_request_body = '!{>}<';
+    $not_parseable_request_body = '!{>}<';
     $parseable_valid_request_body = $this->serializer->encode($this->getNormalizedPostEntity(), static::$format);
     $parseable_invalid_request_body = $this->serializer->encode($this->makeNormalizationInvalid($this->getNormalizedPostEntity(), 'label'), static::$format);
     $parseable_invalid_request_body_2 = $this->serializer->encode($this->getNormalizedPostEntity() + ['uuid' => [$this->randomMachineName(129)]], static::$format);
@@ -756,9 +770,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'No entity content received.', $response);
 
-    $request_options[RequestOptions::BODY] = $unparseable_request_body;
+    $request_options[RequestOptions::BODY] = $not_parseable_request_body;
 
-    // DX: 400 when unparseable request body.
+    // DX: 400 when un-parseable request body.
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Syntax error', $response);
 
@@ -856,7 +870,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Tests a PATCH request for an entity, plus edge cases to ensure good DX.
    */
-  public function testPatch() {
+  public function testPatch(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('PATCHing config entities is not yet supported.');
@@ -869,7 +883,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
     // Try with all of the following request bodies.
-    $unparseable_request_body         = '!{>}<';
+    $not_parseable_request_body       = '!{>}<';
     $parseable_valid_request_body     = $this->serializer->encode($this->getNormalizedPatchEntity(), static::$format);
     $parseable_invalid_request_body   = $this->serializer->encode($this->makeNormalizationInvalid($this->getNormalizedPatchEntity(), 'label'), static::$format);
     $parseable_invalid_request_body_2 = $this->serializer->encode($this->getNormalizedPatchEntity() + ['field_rest_test' => [['value' => $this->randomString()]]], static::$format);
@@ -948,9 +962,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'No entity content received.', $response);
 
-    $request_options[RequestOptions::BODY] = $unparseable_request_body;
+    $request_options[RequestOptions::BODY] = $not_parseable_request_body;
 
-    // DX: 400 when unparseable request body.
+    // DX: 400 when un-parseable request body.
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceErrorResponse(400, 'Syntax error', $response);
 
@@ -1094,7 +1108,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Tests a DELETE request for an entity, plus edge cases to ensure good DX.
    */
-  public function testDelete() {
+  public function testDelete(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('DELETEing config entities is not yet supported.');

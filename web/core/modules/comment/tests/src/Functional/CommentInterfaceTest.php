@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\Core\Url;
@@ -8,6 +10,7 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\user\RoleInterface;
 use Drupal\filter\Entity\FilterFormat;
 
@@ -43,7 +46,7 @@ class CommentInterfaceTest extends CommentTestBase {
   /**
    * Tests the comment interface.
    */
-  public function testCommentInterface() {
+  public function testCommentInterface(): void {
 
     // Post comment #1 without subject or preview.
     $this->drupalLogin($this->webUser);
@@ -224,7 +227,7 @@ class CommentInterfaceTest extends CommentTestBase {
    * comment body are used for the subject. If this would break within a word,
    * then the break is put at the previous word boundary instead.
    */
-  public function testAutoFilledSubject() {
+  public function testAutoFilledSubject(): void {
     $this->drupalLogin($this->webUser);
     $this->drupalGet('node/' . $this->node->id());
 
@@ -238,6 +241,16 @@ class CommentInterfaceTest extends CommentTestBase {
     $body_text2 = 'AQuickBrownFoxJumpedOverTheLazyDog';
     $comment2 = $this->postComment(NULL, $body_text2, '', TRUE);
     $this->assertEquals('AQuickBrownFoxJumpedOverTheL…', $comment2->getSubject());
+
+    // Make the body field non required.
+    $comment_body_field = FieldConfig::loadByName('comment', 'comment', 'comment_body');
+    $comment_body_field->setRequired(FALSE)->save();
+    // Try to post a comment without any value in body and subject fields.
+    $this->drupalGet('node/' . $this->node->id());
+    // Ensure that there are no PHP errors or warnings when automatically
+    // generating the subject. This occurs when the comment body is empty.
+    $comment2 = $this->postComment(NULL, '', '', TRUE);
+    $this->assertEquals('(No subject)', $comment2->getSubject());
   }
 
   /**
@@ -247,7 +260,7 @@ class CommentInterfaceTest extends CommentTestBase {
    * with the additional check that HTML is stripped appropriately prior to
    * character-counting.
    */
-  public function testAutoFilledHtmlSubject() {
+  public function testAutoFilledHtmlSubject(): void {
     // Set up two default (i.e. filtered HTML) input formats, because then we
     // can select one of them. Then create a user that can use these formats,
     // log the user in, and then GET the node page on which to test the
@@ -296,7 +309,7 @@ class CommentInterfaceTest extends CommentTestBase {
   /**
    * Tests the comment formatter configured with a custom comment view mode.
    */
-  public function testViewMode() {
+  public function testViewMode(): void {
     $this->drupalLogin($this->webUser);
     $this->drupalGet($this->node->toUrl());
     $comment_text = $this->randomMachineName();

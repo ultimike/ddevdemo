@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
- * Tests multilanguage fields logic that require a full environment.
+ * Tests multilingual fields logic that require a full environment.
  *
  * @group field
  */
@@ -94,7 +95,7 @@ class TranslationWebTest extends FieldTestBase {
   /**
    * Tests field translations when creating a new revision.
    */
-  public function testFieldFormTranslationRevisions() {
+  public function testFieldFormTranslationRevisions(): void {
     $web_user = $this->drupalCreateUser([
       'view test entity',
       'administer entity_test content',
@@ -145,7 +146,7 @@ class TranslationWebTest extends FieldTestBase {
     $entity = $storage->loadRevision($revision_id);
     foreach ($available_langcodes as $langcode => $value) {
       $passed = $entity->getTranslation($langcode)->{$field_name}->value == $value + 1;
-      $this->assertTrue($passed, new FormattableMarkup('The @language translation for revision @revision was correctly stored', ['@language' => $langcode, '@revision' => $entity->getRevisionId()]));
+      $this->assertTrue($passed, "The $langcode translation for revision {$entity->getRevisionId()} was correctly stored");
     }
   }
 

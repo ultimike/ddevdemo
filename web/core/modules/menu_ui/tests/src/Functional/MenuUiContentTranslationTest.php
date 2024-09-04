@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\menu_ui\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\language\Traits\LanguageTestTrait;
 
 /**
  * Tests Menu UI and Content Translation integration for content entities.
@@ -12,6 +14,8 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * @group menu_ui
  */
 class MenuUiContentTranslationTest extends BrowserTestBase {
+
+  use LanguageTestTrait;
 
   /**
    * {@inheritdoc}
@@ -49,7 +53,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
     ]);
 
     // Add a second language.
-    ConfigurableLanguage::createFromLangcode('de')->save();
+    static::createLanguageFromLangcode('de');
 
     // Create an account and login.
     $user = $this->drupalCreateUser([
@@ -68,18 +72,8 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
     $this->drupalLogin($user);
 
     // Enable translation for page nodes and menu link content.
-    $edit = [
-      'entity_types[node]' => TRUE,
-      'settings[node][page][translatable]' => TRUE,
-      'settings[node][page][settings][language][language_alterable]' => TRUE,
-      'entity_types[menu_link_content]' => TRUE,
-      'settings[menu_link_content][menu_link_content][translatable]' => TRUE,
-      'settings[menu_link_content][menu_link_content][settings][language][language_alterable]' => TRUE,
-    ];
-    $this->drupalGet('admin/config/regional/content-language');
-    $this->assertSession()->statusCodeEquals(200);
-    $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->statusCodeEquals(200);
+    static::enableBundleTranslation('node', 'page');
+    static::enableBundleTranslation('menu_link_content', 'menu_link_content');
   }
 
   /**
@@ -109,7 +103,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
    * @return array
    *   Data sets to test keyed by data set label.
    */
-  public function provideChangeContentToPseudoLanguageData() {
+  public static function provideChangeContentToPseudoLanguageData() {
     return [
       'und' => ['langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED],
       'zxx' => ['langcode' => LanguageInterface::LANGCODE_NOT_APPLICABLE],
@@ -126,7 +120,7 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
    *
    * @dataProvider provideChangeContentToPseudoLanguageData
    */
-  public function testChangeContentToPseudoLanguage($langcode) {
+  public function testChangeContentToPseudoLanguage($langcode): void {
     $node_title = 'Test node';
     $menu_link_title_en = 'Test menu link EN';
     $menu_link_title_pseudo = 'Test menu link PSEUDO';

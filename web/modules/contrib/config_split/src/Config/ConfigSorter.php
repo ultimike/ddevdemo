@@ -41,7 +41,7 @@ class ConfigSorter {
   }
 
   /**
-   * Cast and sort the config data in a normalised way depending on its schema.
+   * Cast and sort the config data in a normalized way depending on its schema.
    *
    * @param string $name
    *   The config name.

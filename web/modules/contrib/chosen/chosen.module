@@ -89,6 +89,7 @@ function chosen_attach_library(array &$element) {
     'disable_search' => (bool) $chosen_conf->get('disable_search'),
     'disable_search_threshold' => (int) $chosen_conf->get('disable_search_threshold'),
     'allow_single_deselect' => (bool) $chosen_conf->get('allow_single_deselect'),
+    'add_helper_buttons' => (bool) $chosen_conf->get('add_helper_buttons'),
     'search_contains' => (bool) $chosen_conf->get('search_contains'),
     'placeholder_text_multiple' => $chosen_conf->get('placeholder_text_multiple'),
     'placeholder_text_single' => $chosen_conf->get('placeholder_text_single'),
@@ -105,6 +106,11 @@ function chosen_attach_library(array &$element) {
     'use_relative_width' => (bool) $chosen_conf->get('use_relative_width'),
     'options' => $options,
   ];
+
+  // Add support for Better Exposed Filters integration.
+  if (\Drupal::moduleHandler()->moduleExists('better_exposed_filters')) {
+    $element['#attached']['library'][] = 'chosen/chosen.bef';
+  }
 }
 
 /**

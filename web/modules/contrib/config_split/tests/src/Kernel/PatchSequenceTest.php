@@ -114,6 +114,7 @@ class PatchSequenceTest extends KernelTestBase {
       ],
     ];
 
+    // cSpell:disable
     $patch = ConfigPatch::fromArray([
       'added' => [
         'nested' => [
@@ -142,6 +143,7 @@ class PatchSequenceTest extends KernelTestBase {
         ],
       ],
     ]);
+    // cSpell:enable
 
     yield 'first test' => [
       'name' => 'config_split_sequence_test.nested_sequences',

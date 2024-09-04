@@ -17,6 +17,7 @@ class ReadOnlyConfigWhitelistTest extends ReadOnlyConfigTest {
     'config_readonly',
     'node',
     'config_readonly_whitelist_test',
+    'block',
   ];
 
   /**
@@ -69,6 +70,17 @@ class ReadOnlyConfigWhitelistTest extends ReadOnlyConfigTest {
 
     $this->drupalGet('admin/config/development/performance');
     // Warning not shown on performance config page.
+    $assert_session->pageTextNotContains('This form will not be saved because the configuration active store is read-only.');
+  }
+
+  /**
+   * Test ConfigEntityListBuilder form with whitelisted entity type.
+   */
+  public function testConfigEntityListBuilder() {
+    $assert_session = $this->assertSession();
+    $this->turnOnReadOnlySetting();
+    $this->drupalGet('admin/structure/block');
+    // Warning not shown on admin block listing form.
     $assert_session->pageTextNotContains('This form will not be saved because the configuration active store is read-only.');
   }
 

@@ -24,7 +24,7 @@ class AjaxTest extends WebDriverTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  public function testAjaxWithAdminRoute() {
+  public function testAjaxWithAdminRoute(): void {
     \Drupal::service('theme_installer')->install(['stable9', 'claro']);
     $theme_config = \Drupal::configFactory()->getEditable('system.theme');
     $theme_config->set('admin', 'claro');
@@ -55,7 +55,7 @@ class AjaxTest extends WebDriverTestBase {
    *
    * @see https://www.drupal.org/node/2647916
    */
-  public function testDrupalSettingsCachingRegression() {
+  public function testDrupalSettingsCachingRegression(): void {
     $this->drupalGet('ajax-test/dialog');
     $assert = $this->assertSession();
     $session = $this->getSession();
@@ -100,7 +100,7 @@ class AjaxTest extends WebDriverTestBase {
    * reattached and all top-level elements of type Node.ELEMENT_NODE need to be
    * part of the context.
    */
-  public function testInsertAjaxResponse() {
+  public function testInsertAjaxResponse(): void {
     $render_single_root = [
       'pre-wrapped-div' => '<div class="pre-wrapped">pre-wrapped<script> var test;</script></div>',
       'pre-wrapped-span' => '<span class="pre-wrapped">pre-wrapped<script> var test;</script></span>',
@@ -111,7 +111,7 @@ class AjaxTest extends WebDriverTestBase {
       'svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect x="0" y="0" height="10" width="10" fill="green"></rect></svg>',
       'empty' => '',
     ];
-    $render_multiple_root_unwrapper = [
+    $render_multiple_root_unwrap = [
       'mixed' => ' foo <!-- COMMENT -->  foo bar<div class="a class"><p>some string</p></div> additional not wrapped strings, <!-- ANOTHER COMMENT --> <p>final string</p>',
       'top-level-only' => '<div>element #1</div><div>element #2</div>',
       'top-level-only-pre-whitespace' => ' <div>element #1</div><div>element #2</div> ',
@@ -121,14 +121,14 @@ class AjaxTest extends WebDriverTestBase {
 
     // This is temporary behavior for BC reason.
     $render_multiple_root_wrapper = [];
-    foreach ($render_multiple_root_unwrapper as $key => $render) {
+    foreach ($render_multiple_root_unwrap as $key => $render) {
       $render_multiple_root_wrapper["$key--effect"] = '<div>' . $render . '</div>';
     }
 
     $expected_renders = array_merge(
       $render_single_root,
       $render_multiple_root_wrapper,
-      $render_multiple_root_unwrapper
+      $render_multiple_root_unwrap
     );
 
     // Checking default process of wrapping Ajax content.
@@ -162,7 +162,7 @@ JS;
   /**
    * Tests that jQuery's global Ajax events are triggered at the correct time.
    */
-  public function testGlobalEvents() {
+  public function testGlobalEvents(): void {
     $session = $this->getSession();
     $assert = $this->assertSession();
     $expected_event_order = implode('', ['ajaxSuccess', 'ajaxComplete', 'ajaxStop']);
@@ -260,7 +260,7 @@ JS;
   /**
    * Tests that Ajax errors are visible in the UI.
    */
-  public function testUiAjaxException() {
+  public function testUiAjaxException(): void {
     $themes = [
       'olivero',
       'claro',
@@ -300,7 +300,8 @@ JS;
   /**
    * Tests ajax focus handling.
    */
-  public function testAjaxFocus() {
+  public function testAjaxFocus(): void {
+    $this->markTestSkipped("Skipped due to frequent random test failures. See https://www.drupal.org/project/drupal/issues/3396536");
     $this->drupalGet('/ajax_forms_test_get_form');
 
     $this->assertNotNull($select = $this->assertSession()->elementExists('css', '#edit-select'));
@@ -322,6 +323,14 @@ JS;
     // Test textfield with 'blur' event listener.
     $textfield1->setValue('Kittens say purr');
     $textfield2->focus();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
+    $this->assertEquals('edit-textfield-2', $has_focus_id);
+
+    // Test textfield with 'change' event listener with refocus-blur set to
+    // FALSE.
+    $textfield2->setValue('Llamas say hi');
+    $textfield3->focus();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-textfield-2', $has_focus_id);

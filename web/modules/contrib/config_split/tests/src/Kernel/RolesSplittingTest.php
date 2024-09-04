@@ -77,7 +77,7 @@ class RolesSplittingTest extends KernelTestBase {
     $empty->save();
     $empty->toArray();
 
-    // Create a split for the shourtcut module.
+    // Create a split for the shortcut module.
     $this->createSplitConfig('test_split', [
       // We use the collection storage so that we can read the patch directly.
       'storage' => 'collection',
@@ -139,14 +139,14 @@ class RolesSplittingTest extends KernelTestBase {
     $role->save();
 
 
-    // Create a split for the shourtcut module.
+    // Create a split for the shortcut module.
     $this->createSplitConfig('feature_shortcut', [
       // We use the collection storage so that we can read the patch directly.
       'storage' => 'collection',
       'module' => ['shortcut' => 0],
     ]);
 
-    // Create a split for the shourtcut module.
+    // Create a split for the shortcut module.
     $this->createSplitConfig('feature_block', [
       // We use the collection storage so that we can read the patch directly.
       'storage' => 'collection',

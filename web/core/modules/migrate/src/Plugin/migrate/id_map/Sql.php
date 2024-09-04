@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\id_map;
 
+use Drupal\Component\Plugin\Attribute\PluginID;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
@@ -30,9 +31,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * It creates one map and one message table per migration entity to store the
  * relevant information.
- *
- * @PluginID("sql")
  */
+#[PluginID('sql')]
 class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryPluginInterface, HighestIdInterface {
 
   /**
@@ -170,7 +170,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, ?MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
     $this->eventDispatcher = $event_dispatcher;
@@ -198,7 +198,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,
@@ -590,14 +590,23 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   public function lookupSourceId(array $destination_id_values) {
     $source_id_fields = $this->sourceIdFields();
     $query = $this->getDatabase()->select($this->mapTableName(), 'map');
+    // To allow source field names to be defined with spaces and special
+    // characters, create an alias map of column alias to source field name,
+    // since SQL column aliases do not support spaces or special characters.
+    $alias_map = [];
     foreach ($source_id_fields as $source_field_name => $id_map_field_name) {
-      $query->addField('map', $id_map_field_name, $source_field_name);
+      $alias = $query->addField('map', $id_map_field_name);
+      $alias_map[$alias] = $source_field_name;
     }
     foreach ($this->destinationIdFields() as $field_name => $destination_id) {
       $query->condition("map.$destination_id", $destination_id_values[$field_name], '=');
     }
-    $result = $query->execute();
-    return $result->fetchAssoc() ?: [];
+    $result = $query->execute()->fetchAssoc() ?: [];
+    $source_ids = [];
+    foreach ($result as $alias => $id) {
+      $source_ids[$alias_map[$alias]] = $id;
+    }
+    return $source_ids;
   }
 
   /**

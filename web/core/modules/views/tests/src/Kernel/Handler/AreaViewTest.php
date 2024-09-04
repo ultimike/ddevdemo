@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
@@ -30,7 +32,7 @@ class AreaViewTest extends ViewsKernelTestBase {
   /**
    * Tests the view area handler.
    */
-  public function testViewArea() {
+  public function testViewArea(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $view = Views::getView('test_area_view');
@@ -40,14 +42,14 @@ class AreaViewTest extends ViewsKernelTestBase {
 
     $this->executeView($view);
     $output = $view->render();
-    $output = $renderer->renderRoot($output);
+    $output = (string) $renderer->renderRoot($output);
     $this->assertStringContainsString('js-view-dom-id-' . $view->dom_id, $output, 'The test view is correctly embedded.');
     $view->destroy();
 
     $view->setArguments([27]);
     $this->executeView($view);
     $output = $view->render();
-    $output = $renderer->renderRoot($output);
+    $output = (string) $renderer->renderRoot($output);
     $this->assertStringNotContainsString('John', $output, 'The test view is correctly embedded with inherited arguments.');
     $this->assertStringContainsString('George', $output, 'The test view is correctly embedded with inherited arguments.');
     $view->destroy();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional;
 
 use Drupal\field\Entity\FieldConfig;
@@ -48,9 +50,13 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
       ]);
     }
 
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer node fields',
+    ]));
+
   }
 
-  public function testDefaultValueCallbackForm() {
+  public function testDefaultValueCallbackForm(): void {
     // Create a field and storage for checking.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     FieldStorageConfig::create([
@@ -65,8 +71,6 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
       'bundle' => 'article',
     ]);
     $field_config->save();
-
-    $this->drupalLogin($this->rootUser);
 
     // Check that the default field form is visible when no callback is set.
     $this->drupalGet('/admin/structure/types/manage/article/fields/node.article.field_test');

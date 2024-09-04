@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -60,7 +62,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
   /**
    * Tests views data for entity area handlers.
    */
-  public function testEntityAreaData() {
+  public function testEntityAreaData(): void {
     $data = $this->container->get('views.views_data')->get('views');
     $entity_types = $this->container->get('entity_type.manager')->getDefinitions();
 
@@ -88,7 +90,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the area handler.
    */
-  public function testEntityArea() {
+  public function testEntityArea(): void {
     /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
     $entities = [];
     for ($i = 0; $i < 3; $i++) {
@@ -172,7 +174,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
     $this->setRawContent($renderer->renderRoot($preview));
     $view_class = 'js-view-dom-id-' . $view->dom_id;
     $result = $this->xpath('//div[@class = "' . $view_class . '"]/footer[1]');
-    $this->assertStringNotContainsString($entities[2]->label(), $result[0], 'The rendered entity does not appear in the footer of the view.');
+    $this->assertStringNotContainsString($entities[2]->label(), (string) $result[0], 'The rendered entity does not appear in the footer of the view.');
 
     // Test the available view mode options.
     $form = [];

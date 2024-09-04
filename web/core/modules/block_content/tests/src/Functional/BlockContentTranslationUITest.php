@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block_content\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
@@ -51,6 +53,7 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
     $this->bundle = 'basic';
     $this->testLanguageSelector = FALSE;
     parent::setUp();
+    $this->doSetup();
 
     $this->drupalPlaceBlock('page_title_block');
   }

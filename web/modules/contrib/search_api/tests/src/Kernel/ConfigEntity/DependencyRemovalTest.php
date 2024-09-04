@@ -4,13 +4,19 @@ namespace Drupal\Tests\search_api\Kernel\ConfigEntity;
 
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
 use Drupal\search_api_test\PluginTestTrait;
+
+// Workaround to support tests against both Drupal 10.1 and Drupal 11.0.
+// @todo Remove once we depend on Drupal 10.2.
+if (!trait_exists(EntityReferenceFieldCreationTrait::class)) {
+  class_alias('\Drupal\Tests\field\Traits\EntityReferenceTestTrait', EntityReferenceFieldCreationTrait::class);
+}
 
 /**
  * Tests what happens when an index's or a server's dependencies are removed.
@@ -19,7 +25,7 @@ use Drupal\search_api_test\PluginTestTrait;
  */
 class DependencyRemovalTest extends KernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
   use PluginTestTrait;
 
   /**
@@ -457,7 +463,7 @@ class DependencyRemovalTest extends KernelTestBase {
    * @return array
    *   An array of argument arrays for this class's test methods.
    */
-  public function dependencyTestDataProvider() {
+  public static function dependencyTestDataProvider() {
     return [
       'Remove dependency' => [TRUE],
       'Keep dependency' => [FALSE],
@@ -617,7 +623,7 @@ class DependencyRemovalTest extends KernelTestBase {
    *   An array of argument arrays for
    *   \Drupal\Tests\search_api\Kernel\DependencyRemovalTest::testDataTypeDependency().
    */
-  public function dataTypeDependencyTestDataProvider() {
+  public static function dataTypeDependencyTestDataProvider() {
     return [
       'Module dependency' => ['module'],
       'Config dependency' => ['config'],

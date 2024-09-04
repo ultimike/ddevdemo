@@ -126,6 +126,7 @@ tr .form-item,
 @media screen and (min-width: 37.5625rem) {
   .form-item__suffix {
     margin-inline-start: var(--space-xs);
+    white-space: nowrap;
   }
 }
 
@@ -139,6 +140,13 @@ tr .form-item,
   flex-wrap: wrap;
   align-items: flex-start;
   margin-block: var(--space-xs);
+}
+
+.form-actions .form-wrapper,
+.field-actions .form-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) 0;
 }
 
 .form-actions .button,

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\config_readonly\Functional;
 
 use Behat\Mink\Element\NodeElement;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Url;
 
 /**
@@ -11,14 +10,7 @@ use Drupal\Core\Url;
  *
  * @group ConfigReadOnly
  */
-class ReadOnlyConfigTest extends BrowserTestBase {
-
-  /**
-   * User account with administrative permissions.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $adminUser;
+class ReadOnlyConfigTest extends ReadOnlyConfigTestBase {
 
   /**
    * Modules to enable.
@@ -28,46 +20,12 @@ class ReadOnlyConfigTest extends BrowserTestBase {
   protected static $modules = ['config', 'config_readonly'];
 
   /**
-   * Read-only message.
-   *
-   * @var string
-   */
-  protected $message = 'This form will not be saved because the configuration active store is read-only.';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
-
-  /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
     $this->adminUser = $this->createUser([], NULL, TRUE);
     $this->drupalLogin($this->adminUser);
-  }
-
-  /**
-   * Turn on read-only mode.
-   */
-  protected function turnOnReadOnlySetting() {
-    $settings['settings']['config_readonly'] = (object) [
-      'value' => TRUE,
-      'required' => TRUE,
-    ];
-    $this->writeSettings($settings);
-  }
-
-  /**
-   * Turn off read-only mode.
-   */
-  protected function turnOffReadOnlySetting() {
-    $settings['settings']['config_readonly'] = (object) [
-      'value' => FALSE,
-      'required' => TRUE,
-    ];
-    $this->writeSettings($settings);
   }
 
   /**
@@ -161,6 +119,46 @@ class ReadOnlyConfigTest extends BrowserTestBase {
     $this->drupalGet($import_url);
     // The single import form is read-only.
     $this->assertSession()->pageTextContains($this->message);
+  }
+
+  /**
+   * Tests switching the File System config page to readonly.
+   *
+   * @see https://www.drupal.org/project/config_readonly/issues/3452833
+   */
+  public function testFileSystemConfig() {
+    // Verify if we can successfully access file system route.
+    $file_system_url = Url::fromRoute('system.file_system_settings');
+    $this->drupalGet($file_system_url);
+    $this->assertSession()->statusCodeEquals(200);
+    // The file system config form is not read-only.
+    $this->assertSession()->pageTextNotContains($this->message);
+
+    // Switch forms to read-only.
+    $this->turnOnReadOnlySetting();
+    $this->drupalGet($file_system_url);
+    // The file system config form is read-only.
+    $this->assertSession()->pageTextContains($this->message);
+  }
+
+  /**
+   * Test the status page to ensure the correct message is displayed.
+   *
+   * @see https://www.drupal.org/project/config_readonly/issues/2910445
+   */
+  public function testModuleStatusPage() {
+    // Verify if we can successfully access file system route.
+    $status_url = Url::fromRoute('system.status');
+    $this->drupalGet($status_url);
+    $this->assertSession()->statusCodeEquals(200);
+    // Status page displays REQUIREMENT_WARNING because read-only is disabled.
+    $this->assertSession()->pageTextContains("The Config Read-only module is enabled but not active.");
+
+    // Switch forms to read-only.
+    $this->turnOnReadOnlySetting();
+    $this->drupalGet($status_url);
+    // Status page displays REQUIREMENT_INFO because read-only is enabled.
+    $this->assertSession()->pageTextContains("The Config Read-only module is enabled and active.");
   }
 
 }

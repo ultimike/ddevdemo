@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
@@ -50,6 +52,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
     $this->entityTypeId = 'taxonomy_term';
     $this->bundle = 'tags';
     parent::setUp();
+    $this->doSetup();
   }
 
   /**
@@ -105,7 +108,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  public function testTranslationUI() {
+  public function testTranslationUI(): void {
     parent::testTranslationUI();
 
     // Make sure that no row was inserted for taxonomy vocabularies which do
@@ -125,7 +128,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests translate link on vocabulary term list.
    */
-  public function testTranslateLinkVocabularyAdminPage() {
+  public function testTranslateLinkVocabularyAdminPage(): void {
     $this->drupalLogin($this->drupalCreateUser(array_merge(parent::getTranslatorPermissions(), ['access administration pages', 'administer taxonomy'])));
 
     $values = [

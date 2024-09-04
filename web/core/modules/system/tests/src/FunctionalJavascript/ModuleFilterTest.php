@@ -10,6 +10,7 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
  * Tests the JavaScript functionality of the module filter.
  *
  * @group system
+ * @group #slow
  */
 class ModuleFilterTest extends WebDriverTestBase {
 
@@ -38,7 +39,7 @@ class ModuleFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
-  public function testModuleFilter() {
+  public function testModuleFilter(): void {
 
     // Find the module filter field.
     $this->drupalGet('admin/modules');

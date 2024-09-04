@@ -2,11 +2,10 @@
 
 namespace Drupal\config_readonly;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Overrides CMI storage.

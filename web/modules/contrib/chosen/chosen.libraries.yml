@@ -23,3 +23,6 @@ chosen.claro:
   css:
     component:
       css/chosen.claro.css: {}
+chosen.bef:
+  js:
+    js/chosen-bef.js: {}

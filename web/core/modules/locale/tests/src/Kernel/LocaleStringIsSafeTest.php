@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -21,7 +23,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
   /**
    * Tests for locale_string_is_safe().
    */
-  public function testLocaleStringIsSafe() {
+  public function testLocaleStringIsSafe(): void {
     // Check a translatable string without HTML.
     $string = 'Hello world!';
     $result = locale_string_is_safe($string);
@@ -32,8 +34,8 @@ class LocaleStringIsSafeTest extends KernelTestBase {
     $result = locale_string_is_safe($string);
     $this->assertTrue($result);
 
-    // Check an untranslatable string which includes untrustable HTML (according
-    // to the locale_string_is_safe() function definition).
+    // Check an untranslatable string which includes unsafe HTML (according to
+    // the locale_string_is_safe() function definition).
     $string = 'Hello <img src="world.png" alt="world" />!';
     $result = locale_string_is_safe($string);
     $this->assertFalse($result);
@@ -50,7 +52,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
    * In each assert* call we add a new line at the expected result to match the
    * newline at the end of the template file.
    */
-  public function testLocalizedTokenizedString() {
+  public function testLocalizedTokenizedString(): void {
     $tests_to_do = [
       1 => [
         'original' => 'Go to the <a href="[locale_test:security_test1]">frontpage</a>',

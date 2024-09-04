@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\demo_umami\Functional;
 
 use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
@@ -10,7 +12,6 @@ use Drupal\editor\Entity\Editor;
 use Drupal\KernelTests\AssertConfigTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Symfony\Component\Validator\ConstraintViolation;
 
@@ -41,7 +42,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
   /**
    * Tests some features specific to being a demonstration profile.
    */
-  public function testDemoSpecificFeatures() {
+  public function testDemoSpecificFeatures(): void {
     // This test coverage is organized into separate protected methods rather
     // than individual test methods to avoid having to reinstall Umami for
     // a handful of assertions each.
@@ -66,7 +67,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
   /**
    * Tests the profile supplied configuration is the same after installation.
    */
-  public function testConfig() {
+  public function testConfig(): void {
     // Just connect directly to the config table so we don't need to worry about
     // the cache layer.
     $active_config_storage = $this->container->get('config.storage');
@@ -159,7 +160,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
   /**
    * Tests the successful editing of nodes by admin.
    */
-  public function testEditNodesByAdmin() {
+  public function testEditNodesByAdmin(): void {
     $permissions = [
       'administer nodes',
       'edit any recipe content',
@@ -175,10 +176,10 @@ class DemoUmamiProfileTest extends BrowserTestBase {
       ->loadByProperties(['title' => 'Deep mediterranean quiche']);
     $node = reset($nodes);
     $this->drupalGet($node->toUrl('edit-form'));
-    $webassert->statusCodeEquals('200');
+    $webassert->statusCodeEquals(200);
 
     $this->submitForm([], 'Preview');
-    $webassert->statusCodeEquals('200');
+    $webassert->statusCodeEquals(200);
     $this->assertSession()->elementsCount('css', 'h1', 1);
     $this->clickLink('Back to content editing');
 
@@ -222,27 +223,27 @@ class DemoUmamiProfileTest extends BrowserTestBase {
 
     // Check when editing a node, the warning is visible.
     $this->drupalGet($recipe_node->toUrl('edit-form'));
-    $web_assert->statusCodeEquals('200');
+    $web_assert->statusCodeEquals(200);
     $web_assert->pageTextContains('This site is intended for demonstration purposes.');
 
     // Check when adding a node, the warning is visible.
     $this->drupalGet('node/add/recipe');
-    $web_assert->statusCodeEquals('200');
+    $web_assert->statusCodeEquals(200);
     $web_assert->pageTextContains('This site is intended for demonstration purposes.');
 
     // Check when looking at admin/content, the warning is visible.
     $this->drupalGet('admin/content');
-    $web_assert->statusCodeEquals('200');
+    $web_assert->statusCodeEquals(200);
     $web_assert->pageTextContains('This site is intended for demonstration purposes.');
 
     // Check when viewing a node, the warning is not visible.
     $this->drupalGet($recipe_node->toUrl());
-    $web_assert->statusCodeEquals('200');
+    $web_assert->statusCodeEquals(200);
     $web_assert->pageTextNotContains('This site is intended for demonstration purposes.');
 
     // Check when viewing the homepage, the warning is not visible.
     $this->drupalGet('<front>');
-    $web_assert->statusCodeEquals('200');
+    $web_assert->statusCodeEquals(200);
     $web_assert->pageTextNotContains('This site is intended for demonstration purposes.');
   }
 
@@ -260,7 +261,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
    * For example:
    * @code
    *   // Create a user.
-   *   $account = $this->drupalCreateUser(array());
+   *   $account = $this->drupalCreateUser([]);
    *   $this->drupalLogin($account);
    *   // Load real user object.
    *   $pass_raw = $account->passRaw;
@@ -288,7 +289,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
 
     // @see ::drupalUserIsLoggedIn()
     $account->sessionId = $this->getSession()->getCookie(\Drupal::service('session_configuration')->getOptions(\Drupal::request())['name']);
-    $this->assertTrue($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', ['%name' => $account->getAccountName()]));
+    $this->assertTrue($this->drupalUserIsLoggedIn($account), "User {$account->getAccountName()} successfully logged in.");
 
     $this->loggedInUser = $account;
     $this->container->get('current_user')->setAccount($account);

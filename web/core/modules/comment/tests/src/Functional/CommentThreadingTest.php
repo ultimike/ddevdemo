@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentManagerInterface;
@@ -19,7 +21,7 @@ class CommentThreadingTest extends CommentTestBase {
   /**
    * Tests the comment threading.
    */
-  public function testCommentThreading() {
+  public function testCommentThreading(): void {
     // Set comments to have a subject with preview disabled.
     $this->setCommentPreview(DRUPAL_DISABLED);
     $this->setCommentForm(TRUE);
@@ -125,14 +127,14 @@ class CommentThreadingTest extends CommentTestBase {
   /**
    * Asserts that the link to the specified parent comment is present.
    *
-   * @param int $cid
+   * @param string $cid
    *   The comment ID to check.
-   * @param int $pid
+   * @param string $pid
    *   The expected parent comment ID.
    *
    * @internal
    */
-  protected function assertParentLink(int $cid, int $pid): void {
+  protected function assertParentLink(string $cid, string $pid): void {
     // This pattern matches a markup structure like:
     // @code
     // <article id="comment-2">
@@ -156,12 +158,12 @@ class CommentThreadingTest extends CommentTestBase {
   /**
    * Asserts that the specified comment does not have a link to a parent.
    *
-   * @param int $cid
+   * @param string $cid
    *   The comment ID to check.
    *
    * @internal
    */
-  protected function assertNoParentLink(int $cid): void {
+  protected function assertNoParentLink(string $cid): void {
     $pattern = "//article[@id='comment-$cid']";
     // A parent link is always accompanied by the text "In reply to".
     $this->assertSession()->elementTextNotContains('xpath', $pattern, 'In reply to');

@@ -5,9 +5,9 @@
  * Contains config_readonly.module.
  */
 
+use Drupal\config_readonly\ReadOnlyFormEvent;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\config_readonly\ReadOnlyFormEvent;
 
 /**
  * Implements hook_form_alter().
@@ -17,14 +17,35 @@ function config_readonly_form_alter(array &$form, FormStateInterface &$form_stat
     return;
   }
 
-  $event = new ReadOnlyFormEvent($form_state);
-  \Drupal::service('event_dispatcher')->dispatch($event, ReadOnlyFormEvent::NAME );
+  $event = new ReadOnlyFormEvent($form_state, $form);
+  \Drupal::service('event_dispatcher')->dispatch($event, ReadOnlyFormEvent::NAME);
 
   if ($event->isFormReadOnly()) {
-    \Drupal::messenger()->addWarning('This form will not be saved because the configuration active store is read-only.');
+    $config_names = [
+      '#theme' => 'item_list',
+      '#items' => $event->getEditableConfigNames(),
+    ];
+    $config_names = \Drupal::service('renderer')->render($config_names);
+    $generic_message = t('This form will not be saved because the configuration active store is read-only.');
+    $config_message = $config_names ? '<br />' . t('You can override by whitelisting the configs used on this page: %config', ['%config' => $config_names]) : '';
+    \Drupal::messenger()->addWarning($generic_message . $config_message);
     $form['#validate'][] = '_config_readonly_validate_failure';
-    if (isset($form['actions']['submit'])) {
-      $form['actions']['submit']['#disabled'] = TRUE;
+    // Check if an action button is within a fieldset.
+    foreach ($form as $key => $value) {
+      if (is_array($value) && isset($value['#type']) && $value['#type'] === 'fieldset' && isset($value['actions'])) {
+        foreach ($value['actions'] as $name => $button) {
+          if (isset($button['#type']) && $button['#type'] === 'submit') {
+            $form[$key]['actions'][$name]['#disabled'] = TRUE;
+          }
+        }
+      }
+    }
+    if (isset($form['actions'])) {
+      foreach ($form['actions'] as $name => $button) {
+        if (isset($button['#type']) && $button['#type'] === 'submit') {
+          $form['actions'][$name]['#disabled'] = TRUE;
+        }
+      }
     }
   }
 }

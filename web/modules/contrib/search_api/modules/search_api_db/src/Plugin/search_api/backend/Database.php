@@ -198,7 +198,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     if (isset($configuration['database'])) {
-      list($key, $target) = explode(':', $configuration['database'], 2);
+      [$key, $target] = explode(':', $configuration['database'], 2);
       // @todo Can we somehow get the connection in a dependency-injected way?
       $this->database = CoreDatabase::getConnection($target, $key);
     }
@@ -538,7 +538,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
         '#description' => $this->t('Ignore quotes in searches and just look for the individual words separately. For instance, <em>"blue house"</em> matches any item that contains the words “blue” and “house” somewhere in its indexed text, no matter where and in what order.'),
       ],
       'bigram' => [
-        '#description' => $this->t('Treat a quoted phrase in a search like it is generally expected, matching only items that contain those words in the exact same order, consecutively. For instance, <em>"blue house"</em> would match only items that contain the word “blue” immediately followed by the word “house”. Please make sure that the associated increase in database size (about 5x) and indexing time (about 2x) is acceptable for your site.'),
+        '#description' => $this->t('Treat a quoted phrase in a search like it is generally expected, matching only items that contain those words in the exact same order, consecutively. For instance, <em>"blue house"</em> would match only items that contain the word “blue” immediately followed by the word “house”. Make sure that the associated increase in database size (about 5x) and indexing time (about 2x) is acceptable for your site.'),
       ],
     ];
 
@@ -768,7 +768,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
   protected function findFreeTable($prefix, $name) {
     // A DB prefix might further reduce the maximum length of the table name.
     $max_bytes = 62;
-    if ($db_prefix = $this->database->tablePrefix()) {
+    if ($db_prefix = $this->database->getPrefix()) {
       // Use strlen() instead of mb_strlen() since we want to measure bytes, not
       // characters.
       $max_bytes -= strlen($db_prefix);
@@ -801,15 +801,15 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
    *   A column name that isn't in use in the specified table yet.
    */
   protected function findFreeColumn($table, $column) {
-    $maxbytes = 62;
+    $max_bytes = 62;
 
-    $base = $name = Unicode::truncateBytes(mb_strtolower(preg_replace('/[^a-z0-9]/i', '_', $column)), $maxbytes);
+    $base = $name = Unicode::truncateBytes(mb_strtolower(preg_replace('/[^a-z0-9]/i', '_', $column)), $max_bytes);
     // If the table does not exist yet, the initial name is not taken.
     if ($this->database->schema()->tableExists($table)) {
       $i = 0;
       while ($this->database->schema()->fieldExists($table, $name)) {
         $suffix = '_' . ++$i;
-        $name = Unicode::truncateBytes($base, $maxbytes - strlen($suffix)) . $suffix;
+        $name = Unicode::truncateBytes($base, $max_bytes - strlen($suffix)) . $suffix;
       }
     }
     return $name;
@@ -1064,15 +1064,15 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
               $multiplier = $new_fields[$field_id]->getBoost() / $field['boost'];
               // Postgres doesn't allow multiplying an integer column with a
               // float literal, so we have to work around that.
-              $expression = 'score * :mult';
+              $expression = 'score * :multiplier';
               $args = [
-                ':mult' => $multiplier,
+                ':multiplier' => $multiplier,
               ];
               if (is_float($multiplier) && $pos = strpos("$multiplier", '.')) {
                 $expression .= ' / :div';
                 $after_point_digits = strlen("$multiplier") - $pos - 1;
                 $args[':div'] = pow(10, min(3, $after_point_digits));
-                $args[':mult'] = (int) round($args[':mult'] * $args[':div']);
+                $args[':multiplier'] = (int) round($args[':multiplier'] * $args[':div']);
               }
               $this->database->update($text_table)
                 ->expression('score', $expression, $args)
@@ -1458,7 +1458,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
           // Log an error, but only once per field. Since a superfluous field is
           // not too serious, we just index the rest of the item normally.
           $field_errors[$field_id] = TRUE;
-          $this->getLogger()->warning("Unknown field @field: please check (and re-save) the index's fields settings.", ['@field' => $field_id]);
+          $this->getLogger()->warning("Unknown field @field: check (and re-save) the index's fields settings.", ['@field' => $field_id]);
           continue;
         }
 
@@ -1632,7 +1632,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
           foreach (static::splitIntoWords($text) as $word) {
             if ($word) {
               if (mb_strlen($word) > static::TOKEN_LENGTH_MAX) {
-                $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, please make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
+                $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
                   '@token_length_max' => static::TOKEN_LENGTH_MAX,
                   '%word' => $word,
                   '%index' => $index->label(),
@@ -1653,7 +1653,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
                 $new_tokens = [];
                 foreach (static::splitIntoWords($word) as $word) {
                   if (mb_strlen($word) > static::TOKEN_LENGTH_MAX) {
-                    $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, please make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
+                    $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
                       '@token_length_max' => static::TOKEN_LENGTH_MAX,
                       '%word' => $word,
                       '%index' => $index->label(),
@@ -2002,7 +2002,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
     $this->getEventDispatcher()->dispatch($event, $event_base_name);
     $db_query = $event->getDbQuery();
 
-    $description = 'This hook is deprecated in search_api:8.x-1.16 and is removed from search_api:2.0.0. Please use the "search_api_db.query_pre_execute" event instead. See https://www.drupal.org/node/3103591';
+    $description = 'This hook is deprecated in search_api:8.x-1.16 and is removed from search_api:2.0.0. Use the "search_api_db.query_pre_execute" event instead. See https://www.drupal.org/node/3103591';
     $this->getModuleHandler()->alterDeprecated($description, 'search_api_db_query', $db_query, $query);
     $this->preQuery($db_query, $query);
 
@@ -2041,8 +2041,8 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
         if (is_array($nested) && $neg == !empty($nested['#negation'])) {
           if ($nested['#conjunction'] == $conj) {
             unset($nested['#conjunction'], $nested['#negation']);
-            foreach ($nested as $renested) {
-              $keys[] = $renested;
+            foreach ($nested as $nested_key) {
+              $keys[] = $nested_key;
             }
             unset($keys[$i]);
           }
@@ -2880,11 +2880,6 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
     $orderBy = &$db_query->getOrderBy();
     $orderBy = [];
 
-    // If there's a GROUP BY for item_id, we leave that, all others need to be
-    // discarded.
-    $group_by = &$db_query->getGroupBy();
-    $group_by = array_intersect_key($group_by, ['t.item_id' => TRUE]);
-
     // In case there are any expressions left (like a computed distance column),
     // we nest the query to get rid of them.
     if ($expressions) {
@@ -3053,9 +3048,9 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
         ->having('COUNT(DISTINCT [t].[item_id]) <= :max', [':max' => $max_occurrences])
         ->orderBy('results', 'DESC')
         ->range(0, $limit);
-      $incomp_len = strlen($incomplete_key);
+      $incomplete_key_len = strlen($incomplete_key);
       foreach ($db_query->execute() as $row) {
-        $suffix = ($pass == 1) ? substr($row->word, $incomp_len) : ' ' . $row->word;
+        $suffix = ($pass == 1) ? substr($row->word, $incomplete_key_len) : ' ' . $row->word;
         $suggestions[] = $factory->createFromSuggestionSuffix($suffix, $row->results);
       }
     }
@@ -3142,7 +3137,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
    *
    * Prevents the database connection and logger from being serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     $properties = array_flip(parent::__sleep());
     unset($properties['database']);
     return array_keys($properties);
@@ -3153,11 +3148,11 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
    *
    * Reloads the database connection and logger.
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     parent::__wakeup();
 
     if (isset($this->configuration['database'])) {
-      list($key, $target) = explode(':', $this->configuration['database'], 2);
+      [$key, $target] = explode(':', $this->configuration['database'], 2);
       $this->database = CoreDatabase::getConnection($target, $key);
     }
   }

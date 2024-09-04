@@ -84,12 +84,14 @@ class ConfigSplitDeactivateForm extends FormBase {
    *
    * @param \Drupal\Core\Session\AccountInterface $account
    *   Run access checks for this account.
+   * @param string $config_split
+   *  The split name form the route.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function access(AccountInterface $account) {
-    $split = $this->getSplit();
+  public function access(AccountInterface $account, string $config_split) {
+    $split = $this->manager->getSplitConfig($config_split);
     return AccessResult::allowedIfHasPermission($account, 'administer configuration split')
       ->andIf(AccessResult::allowedIf($split->get('status')))
       ->addCacheableDependency($split);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
@@ -21,19 +23,20 @@ class HelpTest extends BrowserTestBase {
    *
    * @var array
    */
-  protected static $modules = ['help_test', 'help_page_test'];
+  protected static $modules = [
+    'block_content',
+    'breakpoint',
+    'editor',
+    'help',
+    'help_page_test',
+    'help_test',
+    'history',
+  ];
 
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
-
-  /**
-   * Use the Standard profile to test help implementations of many core modules.
-   *
-   * @var string
-   */
-  protected $profile = 'standard';
+  protected $defaultTheme = 'claro';
 
   /**
    * The admin user that will be created.
@@ -63,10 +66,13 @@ class HelpTest extends BrowserTestBase {
   /**
    * Logs in users, tests help pages.
    */
-  public function testHelp() {
+  public function testHelp(): void {
     // Log in the root user to ensure as many admin links appear as possible on
     // the module overview pages.
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser([
+      'access help pages',
+      'access administration pages',
+    ]));
     $this->verifyHelp();
 
     // Log in the regular user.
@@ -94,8 +100,9 @@ class HelpTest extends BrowserTestBase {
 
     // Ensure a module which does not provide a module overview page is handled
     // correctly.
-    $this->clickLink(\Drupal::moduleHandler()->getName('help_test'));
-    $this->assertSession()->pageTextContains('No help is available for module ' . \Drupal::moduleHandler()->getName('help_test'));
+    $module_name = \Drupal::service('extension.list.module')->getName('help_test');
+    $this->clickLink($module_name);
+    $this->assertSession()->pageTextContains('No help is available for module ' . $module_name);
 
     // Verify that the order of topics is alphabetical by displayed module
     // name, by checking the order of some modules, including some that would

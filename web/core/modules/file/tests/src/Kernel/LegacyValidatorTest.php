@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Kernel;
 
 use Drupal\file\Entity\File;
@@ -37,6 +39,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $this->image->setFilename($file_system->basename($this->image->getFileUri()));
+    $this->image->setSize(@filesize($this->image->getFileUri()));
 
     $this->nonImage = File::create();
     $this->nonImage->setFileUri('core/assets/vendor/jquery/jquery.min.js');
@@ -46,7 +49,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
   /**
    * Tests the file_validate_extensions() function.
    */
-  public function testFileValidateExtensions() {
+  public function testFileValidateExtensions(): void {
     $file = File::create(['filename' => 'asdf.txt']);
     $this->expectDeprecation('file_validate_extensions() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'file.validator\' service instead. See https://www.drupal.org/node/3363700');
     $errors = file_validate_extensions($file, 'asdf txt pork');
@@ -69,7 +72,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
    *
    * @dataProvider providerTestFileValidateExtensionsOnUri
    */
-  public function testFileValidateExtensionsOnUri(array $file_properties, array $extensions, array $expected_errors) {
+  public function testFileValidateExtensionsOnUri(array $file_properties, array $extensions, array $expected_errors): void {
     $file = File::create($file_properties);
     $this->expectDeprecation('file_validate_extensions() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'file.validator\' service instead. See https://www.drupal.org/node/3363700');
     $actual_errors = file_validate_extensions($file, implode(' ', $extensions));
@@ -85,7 +88,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
    * @return array[][]
    *   The test cases.
    */
-  public function providerTestFileValidateExtensionsOnUri(): array {
+  public static function providerTestFileValidateExtensionsOnUri(): array {
     $temporary_txt_file_properties = [
       'filename' => 'asdf.txt',
       'uri' => 'temporary://asdf',
@@ -144,7 +147,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
   /**
    * This ensures a specific file is actually an image.
    */
-  public function testFileValidateIsImage() {
+  public function testFileValidateIsImage(): void {
     $this->assertFileExists($this->image->getFileUri());
     $this->expectDeprecation('file_validate_is_image() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'file.validator\' service instead. See https://www.drupal.org/node/3363700');
     $errors = file_validate_is_image($this->image);
@@ -160,7 +163,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
    *
    * The image will be resized if it's too large.
    */
-  public function testFileValidateImageResolution() {
+  public function testFileValidateImageResolution(): void {
     // Non-images.
     $this->expectDeprecation('file_validate_image_resolution() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'file.validator\' service instead. See https://www.drupal.org/node/3363700');
     $errors = file_validate_image_resolution($this->nonImage);
@@ -191,6 +194,8 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
       // Verify that the image was scaled to the correct width and height.
       $this->assertLessThanOrEqual(10, $image->getWidth());
       $this->assertLessThanOrEqual(5, $image->getHeight());
+      // Verify that the file size has been updated after resizing.
+      $this->assertEquals($this->image->getSize(), $image->getFileSize());
 
       // Once again, now with negative width and height to force an error.
       copy('core/misc/druplicon.png', 'temporary://druplicon.png');
@@ -201,7 +206,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
       \Drupal::service('file_system')->unlink('temporary://druplicon.png');
     }
     else {
-      // TODO: should check that the error is returned if no toolkit is available.
+      // @todo should check that the error is returned if no toolkit is available.
       $errors = file_validate_image_resolution($this->image, '5x10');
       $this->assertCount(1, $errors, 'Oversize images that cannot be scaled get an error.');
     }
@@ -210,7 +215,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
   /**
    * This will ensure the filename length is valid.
    */
-  public function testFileValidateNameLength() {
+  public function testFileValidateNameLength(): void {
     // Create a new file entity.
     $file = File::create();
 
@@ -235,7 +240,7 @@ class LegacyValidatorTest extends FileManagedUnitTestBase {
   /**
    * Tests file_validate_size().
    */
-  public function testFileValidateSize() {
+  public function testFileValidateSize(): void {
     // Create a file with a size of 1000 bytes, and quotas of only 1 byte.
     $file = File::create(['filesize' => 1000]);
     $this->expectDeprecation('file_validate_size() is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use the \'file.validator\' service instead. See https://www.drupal.org/node/3363700');

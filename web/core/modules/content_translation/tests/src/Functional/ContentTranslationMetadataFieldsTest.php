@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Functional;
 
 /**
@@ -44,9 +46,17 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+    $this->doSetup();
+  }
+
+  /**
    * Tests skipping setting non translatable metadata fields.
    */
-  public function testSkipUntranslatable() {
+  public function testSkipUntranslatable(): void {
     $this->drupalLogin($this->translator);
     $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($this->entityTypeId, $this->bundle);
 
@@ -102,7 +112,7 @@ class ContentTranslationMetadataFieldsTest extends ContentTranslationTestBase {
   /**
    * Tests setting translatable metadata fields.
    */
-  public function testSetTranslatable() {
+  public function testSetTranslatable(): void {
     $this->drupalLogin($this->translator);
     $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions($this->entityTypeId, $this->bundle);
 

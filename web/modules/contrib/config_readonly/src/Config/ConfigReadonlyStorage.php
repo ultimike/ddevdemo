@@ -2,17 +2,16 @@
 
 namespace Drupal\config_readonly\Config;
 
+use Drupal\config_readonly\ConfigReadonlyWhitelistTrait;
 use Drupal\config_readonly\Exception\ConfigReadonlyStorageException;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\CachedStorage;
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\Site\Settings;
-use Drupal\config_readonly\ConfigReadonlyWhitelistTrait;
-
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -130,7 +129,7 @@ class ConfigReadonlyStorage extends CachedStorage {
       if ($request && $request->attributes->get(RouteObjectInterface::ROUTE_NAME) === 'system.db_update') {
         // We seem to be in the middle of running update.php.
         // @see \Drupal\Core\Update\UpdateKernel::setupRequestMatch()
-        // @todo - always allow or support a flag for blocking it?
+        // always allow or support a flag for blocking it?
         return;
       }
 

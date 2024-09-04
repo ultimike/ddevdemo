@@ -8,6 +8,8 @@
  * used for navigation.
  */
 
+use Drupal\block\BlockInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -29,9 +31,9 @@ function menu_ui_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.menu_ui':
       $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('The Menu UI module provides an interface for managing menus. A menu is a hierarchical collection of links, which can be within or external to the site, generally used for navigation. For more information, see the <a href=":menu">online documentation for the Menu UI module</a>.', [':menu' => 'https://www.drupal.org/documentation/modules/menu/']) . '</p>';
-      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<h2>' . t('About') . '</h2>';
+      $output .= '<p>' . t('The Menu UI module provides an interface for managing menus. A menu is a hierarchical collection of links, which can be within or external to the site, generally used for navigation. For more information, see the <a href=":menu">online documentation for the Menu UI module</a>.', [':menu' => 'https://www.drupal.org/docs/core-modules-and-themes/core-modules/menu-ui-module']) . '</p>';
+      $output .= '<h2>' . t('Uses') . '</h2>';
       $output .= '<dl>';
       $output .= '<dt>' . t('Managing menus') . '</dt>';
       $output .= '<dd>' . t('Users with the <em>Administer menus and menu links</em> permission can add, edit, and delete custom menus on the <a href=":menu">Menus page</a>. Custom menus can be special site menus, menus of external links, or any combination of internal and external links. You may create an unlimited number of additional menus, each of which will automatically have an associated block (if you have the <a href=":block_help">Block module</a> installed). By selecting <em>Edit menu</em>, you can add, edit, or delete links for a given menu. The links listing page provides a drag-and-drop interface for controlling the order of links, and creating a hierarchy within the menu.', [':block_help' => (\Drupal::moduleHandler()->moduleExists('block')) ? Url::fromRoute('help.page', ['name' => 'block'])->toString() : '#', ':menu' => Url::fromRoute('entity.menu.collection')->toString()]) . '</dd>';
@@ -454,4 +456,37 @@ function menu_ui_system_breadcrumb_alter(Breadcrumb $breadcrumb, RouteMatchInter
       $breadcrumb->addLink(Link::createFromRoute($menu->label(), 'entity.menu.edit_form', ['menu' => $menu->id()]));
     }
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function menu_ui_theme(): array {
+  return [
+    'menu_link_form' => [
+      'render element' => 'form',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function menu_ui_entity_operation(EntityInterface $entity): array {
+  $operations = [];
+  if ($entity instanceof BlockInterface) {
+    $plugin = $entity->getPlugin();
+    if ($plugin->getBaseId() === 'system_menu_block') {
+      $menu = Menu::load($plugin->getDerivativeId());
+      if ($menu && $menu->access('edit')) {
+        $operations['menu-edit'] = [
+          'title' => t('Edit menu'),
+          'url' => $menu->toUrl('edit-form'),
+          'weight' => 50,
+        ];
+      }
+    }
+  }
+
+  return $operations;
 }

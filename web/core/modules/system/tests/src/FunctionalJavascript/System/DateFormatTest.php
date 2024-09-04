@@ -40,7 +40,7 @@ class DateFormatTest extends WebDriverTestBase {
   /**
    * Tests XSS via date format configuration.
    */
-  public function testDateFormatXss() {
+  public function testDateFormatXss(): void {
     $page = $this->getSession()->getPage();
     $assert = $this->assertSession();
 
@@ -51,9 +51,9 @@ class DateFormatTest extends WebDriverTestBase {
     ]);
     $date_format->save();
     $this->drupalGet('admin/config/regional/date-time');
-    $assert->assertEscaped('<script>alert("XSS");</script>', 'The date format was properly escaped');
+    $assert->assertEscaped('<script>alert("XSS");</script>');
     $this->drupalGet('admin/config/regional/date-time/formats/manage/xss_short');
-    $assert->assertEscaped('<script>alert("XSS");</script>', 'The date format was properly escaped');
+    $assert->assertEscaped('<script>alert("XSS");</script>');
 
     // Add a new date format with HTML in it.
     $this->drupalGet('admin/config/regional/date-time/formats/add');

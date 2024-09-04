@@ -33,7 +33,7 @@ function chosen_requirements($phase) {
         $requirements['chosen_js'] = [
           'title' => t('Chosen JavaScript file'),
           'severity' => REQUIREMENT_OK,
-          'value' => t('Installed'),
+          'value' => t('Installed <br/>The chosen.jquery.js is under %path.', ['%path' => $chosen_path]),
         ];
       }
       break;

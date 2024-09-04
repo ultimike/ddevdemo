@@ -93,9 +93,9 @@
    */
   Drupal.behaviors.states = {
     attach(context, settings) {
+      // Uses once to avoid duplicates if attach is called multiple times.
       const elements = once('states', '[data-drupal-states]', context);
       const il = elements.length;
-
       for (let i = 0; i < il; i++) {
         const config = JSON.parse(
           elements[i].getAttribute('data-drupal-states'),
@@ -121,7 +121,7 @@
    *
    * @constructor Drupal.states.Dependent
    *
-   * @param {{state: Drupal.states.state, constraints: *, element: (*|jQuery|HTMLElement)}} args
+   * @param {object} args
    *   Object with the following keys (all of which are required)
    * @param {jQuery} args.element
    *   A jQuery object of the dependent element
@@ -150,6 +150,7 @@
    *
    * @prop {function} RegExp
    * @prop {function} Function
+   * @prop {function} Array
    * @prop {function} Number
    */
   states.Dependent.comparisons = {
@@ -159,6 +160,15 @@
     Function(reference, value) {
       // The "reference" variable is a comparison function.
       return reference(value);
+    },
+    Array(reference, value) {
+      // Make sure value is an array.
+      if (!Array.isArray(value)) {
+        return false;
+      }
+
+      // The arrays values should match.
+      return JSON.stringify(reference.sort()) === JSON.stringify(value.sort());
     },
     Number(reference, value) {
       // If "reference" is a number and "value" is a string, then cast
@@ -305,7 +315,7 @@
      */
     verifyConstraints(constraints, selector) {
       let result;
-      if ($.isArray(constraints)) {
+      if (Array.isArray(constraints)) {
         // This constraint is an array (OR or XOR).
         const hasXor = $.inArray('xor', constraints) === -1;
         const len = constraints.length;
@@ -682,11 +692,14 @@
   $document.on('state:disabled', (e) => {
     // Only act when this change was triggered by a dependency and not by the
     // element monitoring itself.
+    const tagsSupportDisable =
+      'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
         .toggleClass('form-disabled', e.value)
-        .find('select, input, textarea')
+        .find(tagsSupportDisable)
+        .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
     }
   });

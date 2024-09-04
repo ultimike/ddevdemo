@@ -3,7 +3,7 @@ type: module
 description: 'Support module for Chosen tests.'
 package: Testing
 
-# Information added by Drupal.org packaging script on 2023-04-07
-version: '4.0.0'
+# Information added by Drupal.org packaging script on 2024-09-02
+version: '4.0.3'
 project: 'chosen'
-datestamp: 1680859405
+datestamp: 1725307448

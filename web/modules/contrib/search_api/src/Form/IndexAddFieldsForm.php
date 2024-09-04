@@ -208,7 +208,7 @@ class IndexAddFieldsForm extends EntityForm {
           '#theme' => 'item_list',
           '#items' => $unmapped_fields,
           '#prefix' => $this->t('The following fields cannot be indexed since there is no type mapping for them:'),
-          '#suffix' => $this->t("If you think one of these fields should be available for indexing, please report this in the module's <a href=':url'>issue queue</a>. (Make sure to first search for an existing issue for this field.) Please note that entity-valued fields generally can be indexed by either indexing their parent reference field, or their child entity ID field.", [':url' => Url::fromUri('https://www.drupal.org/project/issues/search_api')->toString()]),
+          '#suffix' => $this->t("If you think one of these fields should be available for indexing, report this in the module's <a href=':url'>issue queue</a>. (Make sure to first search for an existing issue for this field.) Note that entity-valued fields generally can be indexed by either indexing their parent reference field, or their child entity ID field.", [':url' => Url::fromUri('https://www.drupal.org/project/issues/search_api')->toString()]),
         ],
       ];
     }
@@ -275,7 +275,7 @@ class IndexAddFieldsForm extends EntityForm {
 
     $active_item = '';
     if ($active_property_path) {
-      list($active_item, $active_property_path) = explode(':', $active_property_path, 2) + [1 => ''];
+      [$active_item, $active_property_path] = explode(':', $active_property_path, 2) + [1 => ''];
     }
 
     $type_mapping = $this->dataTypeHelper->getFieldTypeMapping();
@@ -481,7 +481,7 @@ class IndexAddFieldsForm extends EntityForm {
     /** @var \Drupal\Core\TypedData\DataDefinitionInterface $property */
     $property = $button['#property'];
 
-    list($datasource_id, $property_path) = Utility::splitCombinedId($button['#name']);
+    [$datasource_id, $property_path] = Utility::splitCombinedId($button['#name']);
     $field = $this->fieldsHelper->createFieldFromProperty($this->entity, $property, $datasource_id, $property_path, NULL, $button['#data_type']);
     $field->setLabel($button['#prefixed_label']);
     $this->entity->addField($field);

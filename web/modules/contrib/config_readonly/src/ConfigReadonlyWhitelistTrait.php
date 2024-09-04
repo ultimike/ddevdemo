@@ -5,9 +5,9 @@ namespace Drupal\config_readonly;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
- * Trait ConfigReadonlyWhitelistTrait.
+ * Trait for Config Readonly Whitelists.
  *
- * @package Drupal\config_readonly
+ * @package config_readonly
  */
 trait ConfigReadonlyWhitelistTrait {
 

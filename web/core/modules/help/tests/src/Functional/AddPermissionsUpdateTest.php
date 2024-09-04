@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
@@ -10,6 +12,7 @@ use Drupal\user\Entity\Role;
  *
  * @group help
  * @group legacy
+ * @group #slow
  *
  * @see help_post_update_add_permissions_to_roles()
  */

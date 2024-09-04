@@ -3,19 +3,23 @@
 namespace Drupal\system_test\Controller;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableRedirectResponse;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\LocalRedirectResponse;
+use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\Core\Lock\LockBackendInterface;
 
 /**
  * Controller routines for system_test routes.
@@ -70,6 +74,12 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    *   The renderer.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
+   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch
+   *   The page cache kill switch. This is here to test nullable types with
+   *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
+   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch2
+   *   The page cache kill switch. This is here to test nullable types with
+   *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
    */
   public function __construct(
     #[Autowire(service: 'lock')]
@@ -79,6 +89,8 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
     AccountInterface $current_user,
     RendererInterface $renderer,
     MessengerInterface $messenger,
+    public ?KillSwitch $killSwitch = NULL,
+    public KillSwitch|null $killSwitch2 = NULL,
   ) {
     $this->lock = $lock;
     $this->persistentLock = $persistent_lock;
@@ -254,7 +266,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Set cache max-age on the returned render array.
    */
-  public function system_test_cache_maxage_page() {
+  public function system_test_cache_max_age_page() {
     $build['main'] = [
       '#cache' => ['max-age' => 90],
       'message' => [
@@ -413,6 +425,27 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    */
   public function getCacheableResponseWithCustomCacheControl() {
     return new CacheableResponse('Foo', 200, ['Cache-Control' => 'bar']);
+  }
+
+  /**
+   * Returns a CacheableRedirectResponse with the given status code.
+   */
+  public function respondWithCacheableRedirectResponse(int $status_code): CacheableRedirectResponse {
+    return new CacheableRedirectResponse('/llamas', $status_code);
+  }
+
+  /**
+   * Returns a LocalRedirectResponse with the given status code.
+   */
+  public function respondWithLocalRedirectResponse(int $status_code): LocalRedirectResponse {
+    return new LocalRedirectResponse('/llamas', $status_code);
+  }
+
+  /**
+   * Returns a TrustedRedirectResponse with the given status code.
+   */
+  public function respondWithTrustedRedirectResponse(int $status_code): TrustedRedirectResponse {
+    return new TrustedRedirectResponse('/llamas', $status_code);
   }
 
   /**

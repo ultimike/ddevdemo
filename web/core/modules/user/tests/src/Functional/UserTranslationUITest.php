@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
@@ -54,6 +56,7 @@ class UserTranslationUITest extends ContentTranslationUITestBase {
     $this->testLanguageSelector = FALSE;
     $this->name = $this->randomMachineName();
     parent::setUp();
+    $this->doSetup();
 
     \Drupal::entityTypeManager()->getStorage('user')->resetCache();
   }
@@ -97,7 +100,7 @@ class UserTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests translated user deletion.
    */
-  public function testTranslatedUserDeletion() {
+  public function testTranslatedUserDeletion(): void {
     $this->drupalLogin($this->administrator);
     $entity_id = $this->createEntity($this->getNewEntityValues('en'), 'en');
 

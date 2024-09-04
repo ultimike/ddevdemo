@@ -66,7 +66,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
   /**
    * Tests the 'Add more' functionality.
    */
-  public function testFieldMultipleValueWidget() {
+  public function testFieldMultipleValueWidget(): void {
     $this->drupalGet('entity_test/add');
 
     $assert_session = $this->assertSession();
@@ -112,7 +112,7 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
     $this->assertGreaterThan($field_weight_1->getValue(), $field_weight_2->getValue());
 
     // Drag the first row after the third row.
-    $dragged = $field_0->find('xpath', 'ancestor::tr[contains(@class, "draggable")]//a[@class="tabledrag-handle"]');
+    $dragged = $field_0->find('xpath', 'ancestor::tr[contains(@class, "draggable")]//a[starts-with(@class, "tabledrag-handle")]');
     $target = $field_2->find('xpath', 'ancestor::tr[contains(@class, "draggable")]');
     $dragged->dragTo($target);
 
@@ -167,6 +167,47 @@ class MultipleValueWidgetTest extends WebDriverTestBase {
     $add_more_button->click();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSame('', $field_1->getValue());
+  }
+
+  /**
+   * Tests that no validation occurs on field on "Add more" click.
+   */
+  public function testFieldMultipleValueWidgetAddMoreNoValidation(): void {
+    // Set unlimited field to be required.
+    $field_name = 'field_unlimited';
+    $field = FieldConfig::loadByName('entity_test', 'entity_test', $field_name);
+    $field->setRequired(TRUE);
+    $field->save();
+
+    $this->drupalGet('entity_test/add');
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // Add another item with the first item being empty, even though the field
+    // is required.
+    $add_more_button = $page->findButton('field_unlimited_add_more');
+    $add_more_button->click();
+    $field_1 = $assert_session->waitForField('field_unlimited[1][value]');
+    $this->assertNotEmpty($field_1, 'Successfully added another item.');
+    // Confirm the new item has focus.
+    $this->assertHasFocusByAttribute('name', 'field_unlimited[1][value]');
+    // The first item should not be in error state.
+    $assert_session->elementNotExists('css', 'input[name="field_unlimited[0][value]"].error');
+  }
+
+  /**
+   * Asserts an element specified by an attribute value has focus.
+   *
+   * @param string $name
+   *   The attribute name.
+   * @param string $value
+   *   The attribute value.
+   *
+   * @todo Replace with assertHasFocus() in https://drupal.org/i/3041768.
+   */
+  private function assertHasFocusByAttribute(string $name, string $value): void {
+    $active_element = $this->getSession()->evaluateScript('document.activeElement');
+    $this->assertSame($value, $active_element->attribute($name));
   }
 
 }

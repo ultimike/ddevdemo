@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\EntityReference;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\Tests\BrowserTestBase;
@@ -70,7 +71,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
   /**
    * Tests the entity reference field with all its supported field widgets.
    */
-  public function testSupportedEntityTypesAndWidgets() {
+  public function testSupportedEntityTypesAndWidgets(): void {
     foreach ($this->getTestEntities() as $key => $referenced_entities) {
       $this->fieldName = 'field_test_' . $referenced_entities[0]->getEntityTypeId();
 
@@ -172,7 +173,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
       // Ensure the configuration has the expected dependency on the entity that
       // is being used a default value.
       $field = FieldConfig::loadByName($this->entityType, $this->bundle, $this->fieldName);
-      $this->assertContains($referenced_entities[0]->getConfigDependencyName(), $field->getDependencies()[$key], new FormattableMarkup('Expected @type dependency @name found', ['@type' => $key, '@name' => $referenced_entities[0]->getConfigDependencyName()]));
+      $this->assertContains($referenced_entities[0]->getConfigDependencyName(), $field->getDependencies()[$key], 'Expected ' . $key . ' dependency ' . $referenced_entities[0]->getConfigDependencyName() . ' found');
       // Ensure that the field can be imported without change even after the
       // default value deleted.
       $referenced_entities[0]->delete();
@@ -186,7 +187,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
       $field = FieldConfig::loadByName($this->entityType, $this->bundle, $this->fieldName);
       $field->save();
       $dependencies = $field->getDependencies();
-      $this->assertFalse(isset($dependencies[$key]) && in_array($referenced_entities[0]->getConfigDependencyName(), $dependencies[$key]), new FormattableMarkup('@type dependency @name does not exist.', ['@type' => $key, '@name' => $referenced_entities[0]->getConfigDependencyName()]));
+      $this->assertFalse(isset($dependencies[$key]) && in_array($referenced_entities[0]->getConfigDependencyName(), $dependencies[$key]), $key . ' dependency ' . $referenced_entities[0]->getConfigDependencyName() . ' does not exist.');
     }
   }
 
@@ -204,7 +205,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
     $entity = current($this->container->get('entity_type.manager')->getStorage(
     $this->entityType)->loadByProperties(['name' => $entity_name]));
 
-    $this->assertNotEmpty($entity, new FormattableMarkup('%entity_type: Entity found in the database.', ['%entity_type' => $this->entityType]));
+    $this->assertNotEmpty($entity, "$this->entityType: Entity found in the database.");
 
     $this->assertEquals($referenced_entities[0]->id(), $entity->{$this->fieldName}->target_id);
     $this->assertEquals($referenced_entities[0]->id(), $entity->{$this->fieldName}->entity->id());

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestNoBundle;
@@ -83,7 +85,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Tests the content moderation state filter.
    */
-  public function testStateFilterViewsRelationship() {
+  public function testStateFilterViewsRelationship(): void {
     $workflow = Workflow::load('editorial');
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->getTypePlugin()->addState('translated_draft', 'Bar');
@@ -178,7 +180,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Tests the moderation filter with a non-translatable entity type.
    */
-  public function testNonTranslatableEntityType() {
+  public function testNonTranslatableEntityType(): void {
     $workflow = Workflow::load('editorial');
     $workflow->getTypePlugin()->addEntityTypeAndBundle('entity_test_no_bundle', 'entity_test_no_bundle');
     $workflow->save();
@@ -199,7 +201,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Tests the moderation state filter on an entity added via a relationship.
    */
-  public function testModerationStateFilterOnJoinedEntity() {
+  public function testModerationStateFilterOnJoinedEntity(): void {
     $workflow = Workflow::load('editorial');
     $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'example');
     $workflow->save();
@@ -240,12 +242,40 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     ]);
     $view->execute();
     $this->assertIdenticalResultset($view, [], ['name' => 'name']);
+
+    // Revision Data Table Relationship: Filtering by the published state will
+    // filter out the sample content.
+    $view = Views::getView('test_content_moderation_filter_via_revision_relationship');
+    $view->setExposedInput([
+      'moderation_state' => 'editorial-published',
+    ]);
+    $view->execute();
+    $this->assertIdenticalResultset($view, [
+      [
+        'name' => 'Test user',
+        'title' => 'Test node',
+        'moderation_state' => 'published',
+      ],
+    ], [
+      'name' => 'name',
+      'title' => 'title',
+      'moderation_state' => 'moderation_state',
+    ]);
+
+    // Revision Data Table Relationship: Filtering by the draft state will
+    // filter out the sample content.
+    $view = Views::getView('test_content_moderation_filter_via_revision_relationship');
+    $view->setExposedInput([
+      'moderation_state' => 'editorial-draft',
+    ]);
+    $view->execute();
+    $this->assertIdenticalResultset($view, [], ['name' => 'name']);
   }
 
   /**
    * Tests the list of states in the filter plugin.
    */
-  public function testStateFilterStatesList() {
+  public function testStateFilterStatesList(): void {
     // By default a view of nodes will not have states to filter.
     $workflow = Workflow::load('editorial');
     $workflow->getTypePlugin()->removeEntityTypeAndBundle('node', 'example');

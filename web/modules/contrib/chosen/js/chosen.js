@@ -6,6 +6,17 @@
 (function($, Drupal, drupalSettings, once) {
   'use strict';
 
+  // Define a fallback for jQuery.trim using String.prototype.trim
+  // as it has been removed from jQuery 4.0.0.
+  if (typeof $ !== "undefined" && typeof $.trim === "undefined") {
+    $.trim = function(text) {
+      if (text == null) {
+        return "";
+      }
+      return String.prototype.trim.call(String(text));
+    };
+  }
+
   // Temporal workaround while  https://github.com/harvesthq/chosen/issues/515
   // is fixed. This fix was taken from:
   // https://github.com/harvesthq/chosen/issues/515#issuecomment-104602031
@@ -77,6 +88,18 @@
     attach: function(context, settings) {
       this.settings = this.getSettings(settings);
       $(once('chosen', this.getElements(context))).each(function (i, element) {
+        var $element = $(element);
+        // If inside a drupal dialog, resize the dialog on open & close event.
+        if ($element.parents('#drupal-modal').length) {
+          $element.on('chosen:showing_dropdown', function (e) {
+            $element.next().find('.chosen-drop').css('position', 'static');
+            $element.trigger('dialogContentResize');
+          })
+          .on('chosen:hiding_dropdown', function (e) {
+            $element.next().find('.chosen-drop').css('position', '');
+            $element.trigger('dialogContentResize');
+          });
+        }
         this.createChosen(element);
       }.bind(this));
     },
@@ -89,7 +112,29 @@
      */
     createChosen: function(element) {
       var $element = $(element);
-      $element.chosen(this.getElementOptions($element));
+      var options = this.getElementOptions($element);
+      $element.chosen(options)
+      if (options.add_helper_buttons || $element.attr('chosen_add_helper_buttons')) {
+        if ($element.attr('multiple')) {
+          var $all = $('<button/>',
+            {
+              type: 'button',
+              class: 'button chosen-helper-btn',
+              text: 'All',
+              click: function () { $element.find('option').prop('selected', true); $element.trigger('chosen:updated', true); }
+            });
+          $element.parent().append($all);
+          var $none = $('<button/>',
+            {
+              type: 'button',
+              class: 'button chosen-helper-btn',
+              text: 'None',
+              click: function () { $element.find('option').prop('selected', false); $element.trigger('chosen:updated', true); }
+            });
+          $element.parent().append($none);
+        }
+      }
+
     },
 
     /**

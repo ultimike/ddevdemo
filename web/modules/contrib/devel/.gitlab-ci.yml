@@ -1,59 +1,39 @@
 include:
-  # This remote project centralize our CI "golden path" https://docs.gitlab.com/ee/ci/yaml/#includefile
-  - remote: 'https://gitlab.com/drupalspoons/composer-plugin/-/raw/$DCI_REF/templates/.gitlab-ci.yml'
-    rules:
-      - if: $DCI_REF != null
-  # This is here just to satisfy local CI lint with `glab`.
-  - remote: 'https://gitlab.com/drupalspoons/composer-plugin/-/raw/master/templates/.gitlab-ci.yml'
-    rules:
-      - if: $DCI_REF == null
+  # Use CI from drupal.org https://git.drupalcode.org/project/gitlab_templates/
+  # This include centralizes our CI "golden path" https://docs.gitlab.com/ee/ci/yaml/#includefile
+  - remote: https://git.drupalcode.org/project/gitlab_templates/-/raw/default-ref/includes/include.drupalci.main.yml
+  - remote: https://git.drupalcode.org/project/gitlab_templates/-/raw/default-ref/includes/include.drupalci.variables.yml
+  - remote: https://git.drupalcode.org/project/gitlab_templates/-/raw/default-ref/includes/include.drupalci.hidden-variables.yml
+  - remote: https://git.drupalcode.org/project/gitlab_templates/-/raw/default-ref/includes/include.drupalci.workflows.yml
 
-#
-# Projects may override anything in the template above.
-# The code below is specific to devel project. Comment it out or delete it when
-# copying this file to your new project.
-#
+# Start custom overrides.
 
 variables:
-  PHP_TAG: "8.2"
-  # Disable default phpunit job in favor of the d9/10 variants below.
-  DCI_SKIP_PHPUNIT: 1
+  # Needed in order to get our Drupal 10 testing to use a Drush 13 compatible PHP.
+  _TARGET_PHP: 8.3
+  OPT_IN_TEST_NEXT_MAJOR: 1
+  SKIP_CSPELL: 1
+  # Show more log output.
+  # _PHPUNIT_EXTRA: --debug
+  # Convenient, and we have no secrets.
+  _SHOW_ENVIRONMENT_VARIABLES: 1
 
-# Set allow_failure to false so that the test fails for coding standards faults.
 phpcs:
   allow_failure: false
+eslint:
+  allow_failure: false
+stylelint:
+  allow_failure: false
 
-composer:
-  parallel:
-    matrix:
-      - PHP_TAG: [ "7.4" ]
-        DRUPAL_CORE_CONSTRAINT: [ "^9" ]
-      - PHP_TAG: [ "8.2" ]
-        DRUPAL_CORE_CONSTRAINT: [ "^10" ]
-
-.phpunit-local:
-  variables:
-    DCI_SKIP_PHPUNIT: 0
-  parallel:
-    matrix:
-      # Run test groups in parallel for better dev velocity.
-      - DCI_PHPUNIT_EXTRA: [ "--group devel", "--group devel_generate" ]
-
-phpunit-d9:
-  dependencies:
-    # This syntax comes from https://gitlab.com/gitlab-org/gitlab/-/merge_requests/82734/diffs
-    - "composer: [7.4, ^9]"
-  variables:
-    PHP_TAG: "7.4"
-  extends:
-    - .phpunit-base
-    - .phpunit-local
-
-phpunit-d10:
-  dependencies:
-    - "composer: [8.2, ^10]"
-  variables:
-    PHP_TAG: "8.2"
-  extends:
-    - .phpunit-base
-    - .phpunit-local
+# Disable not needed jobs.
+# We rely on 'phpstan (max PHP version)' job instead.
+phpstan:
+  rules:
+    - when: never
+phpstan (next major):
+  rules:
+    - when: never
+# We rely on 'phpunit' and 'phpunit (next major)' jobs instead.
+phpunit (max PHP version):
+  rules:
+    - when: never

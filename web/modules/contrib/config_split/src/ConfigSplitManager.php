@@ -179,7 +179,7 @@ final class ConfigSplitManager {
    *   The storage to consider when listing splits.
    *
    * @return string[]
-   *   The split names from the active storage and the given stoage.
+   *   The split names from the active storage and the given storage.
    */
   public function listAll(StorageInterface $storage = NULL): array {
     $names = [];

@@ -5,7 +5,7 @@ package: Testing
 dependencies:
   - config_readonly
 
-# Information added by Drupal.org packaging script on 2023-01-13
-version: '8.x-1.0-beta5'
+# Information added by Drupal.org packaging script on 2024-07-02
+version: '8.x-1.0'
 project: 'config_readonly'
-datestamp: 1673648601
+datestamp: 1719963460

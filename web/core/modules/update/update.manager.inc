@@ -6,7 +6,7 @@
  *
  * This allows site administrators with the 'administer software updates'
  * permission to either upgrade existing projects, or download and install new
- * ones, so long as the killswitch setting ('allow_authorize_operations') is
+ * ones, so long as the kill switch setting ('allow_authorize_operations') is
  * not FALSE.
  *
  * To install new code, the administrator is prompted for either the URL of an
@@ -38,9 +38,9 @@
 
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\Url;
-use GuzzleHttp\Exception\TransferException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -193,7 +193,7 @@ function update_manager_archive_extract($file, $directory) {
  * @param string $project
  *   The short name of the project to download.
  * @param string $archive_file
- *   The filename of the unextracted archive.
+ *   The filename of the un-extracted archive.
  * @param string $directory
  *   The directory that the archive was extracted into.
  *
@@ -231,9 +231,9 @@ function update_manager_file_get($url) {
   if (!file_exists($local) || update_delete_file_if_stale($local)) {
     try {
       $data = (string) \Drupal::httpClient()->get($url)->getBody();
-      return \Drupal::service('file_system')->saveData($data, $local, FileSystemInterface::EXISTS_REPLACE);
+      return \Drupal::service('file_system')->saveData($data, $local, FileExists::Replace);
     }
-    catch (TransferException $exception) {
+    catch (ClientExceptionInterface $exception) {
       \Drupal::messenger()->addError(t('Failed to fetch file due to error "%error"', ['%error' => $exception->getMessage()]));
     }
     catch (FileException | InvalidStreamWrapperException $e) {

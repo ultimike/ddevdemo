@@ -18,12 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a form for the Index entity.
  *
- * When altering this form via hook_form_FORM_ID_alter(), please be aware that
- * this form's form ID ("search_api_index_form") is also the base form ID of
- * several other forms, which will therefore trigger the same hook
- * implementation via hook_form_BASE_FORM_ID_alter(). In cases where this isn't
- * desired you should therefore make sure to explicitly check the form ID within
- * the hook's body.
+ * When altering this form via hook_form_FORM_ID_alter(), be aware that this
+ * form's form ID ("search_api_index_form") is also the base form ID of several
+ * other forms, which will therefore trigger the same hook implementation via
+ * hook_form_BASE_FORM_ID_alter(). In cases where this isn't desired you should
+ * therefore make sure to explicitly check the form ID within the hook's body.
  */
 class IndexForm extends EntityForm {
 
@@ -179,7 +178,7 @@ class IndexForm extends EntityForm {
         'trigger_as' => ['name' => 'datasources_configure'],
         'callback' => '::buildAjaxDatasourceConfigForm',
         'wrapper' => 'search-api-datasources-config-form',
-        'method' => 'replace',
+        'method' => 'replaceWith',
         'effect' => 'fade',
       ],
     ];
@@ -227,7 +226,7 @@ class IndexForm extends EntityForm {
         'trigger_as' => ['name' => 'tracker_configure'],
         'callback' => '::buildAjaxTrackerConfigForm',
         'wrapper' => 'search-api-tracker-config-form',
-        'method' => 'replace',
+        'method' => 'replaceWith',
         'effect' => 'fade',
       ],
     ];
@@ -311,7 +310,7 @@ class IndexForm extends EntityForm {
     // it to the correct place in the form values.
     $form['options']['read_only'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Read only'),
+      '#title' => $this->t('Read-only'),
       '#description' => $this->t('Do not write to this index or track the status of items in this index.'),
       '#default_value' => $index->isReadOnly(),
       '#parents' => ['read_only'],
@@ -383,7 +382,7 @@ class IndexForm extends EntityForm {
     // If the user changed the datasources and there is at least one datasource
     // config form, show a message telling the user to configure it.
     if ($selected_datasources && $show_message) {
-      $this->messenger->addWarning($this->t('Please configure the used datasources.'));
+      $this->messenger->addWarning($this->t('Configure the used datasources.'));
     }
   }
 
@@ -437,7 +436,7 @@ class IndexForm extends EntityForm {
       // If the user changed the tracker and the new one has a config form, show
       // a message telling the user to configure it.
       if ($selected_tracker && $selected_tracker != $tracker->getPluginId()) {
-        $this->messenger->addWarning($this->t('Please configure the used tracker.'));
+        $this->messenger->addWarning($this->t('Configure the used tracker.'));
       }
     }
   }
@@ -622,7 +621,7 @@ class IndexForm extends EntityForm {
       try {
         /** @var \Drupal\search_api\IndexInterface $index */
         $index = $this->getEntity();
-        $index->save();
+        $return = $index->save();
         $this->messenger->addStatus($this->t('The index was successfully saved.'));
         $button = $form_state->getTriggeringElement();
         if (!empty($button['#redirect_to_url'])) {
@@ -631,6 +630,7 @@ class IndexForm extends EntityForm {
         else {
           $form_state->setRedirect('entity.search_api_index.canonical', ['search_api_index' => $index->id()]);
         }
+        return $return;
       }
       catch (EntityStorageException $e) {
         $form_state->setRebuild();
@@ -642,6 +642,7 @@ class IndexForm extends EntityForm {
         $this->messenger->addError($this->t('The index could not be saved.'));
       }
     }
+    return 0;
   }
 
 }

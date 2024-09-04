@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\field\Entity\FieldConfig;
@@ -7,6 +9,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\link\LinkItemInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 
 /**
  * Tests that route lookup is cached by the current language.
@@ -14,6 +17,8 @@ use Drupal\Tests\BrowserTestBase;
  * @group routing
  */
 class RouteCachingLanguageTest extends BrowserTestBase {
+
+  use ContentTranslationTestTrait;
 
   /**
    * Modules to enable.
@@ -68,18 +73,10 @@ class RouteCachingLanguageTest extends BrowserTestBase {
     $this->drupalLogin($this->webUser);
 
     // Enable French language.
-    ConfigurableLanguage::createFromLangcode('fr')->save();
+    static::createLanguageFromLangcode('fr');
 
     // Enable translation for page node.
-    $edit = [
-      'entity_types[node]' => 1,
-      'settings[node][page][translatable]' => 1,
-      'settings[node][page][fields][path]' => 1,
-      'settings[node][page][fields][body]' => 1,
-      'settings[node][page][settings][language][language_alterable]' => 1,
-    ];
-    $this->drupalGet('admin/config/regional/content-language');
-    $this->submitForm($edit, 'Save configuration');
+    static::enableContentTranslation('node', 'page');
 
     // Create a field with settings to validate.
     $field_storage = FieldStorageConfig::create([
@@ -132,7 +129,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
    *
    * @dataProvider providerLanguage
    */
-  public function testLinkTranslationWithAlias($source_langcode) {
+  public function testLinkTranslationWithAlias($source_langcode): void {
     $source_url_options = [
       'language' => ConfigurableLanguage::load($source_langcode),
     ];
@@ -195,7 +192,7 @@ class RouteCachingLanguageTest extends BrowserTestBase {
   /**
    * Data provider for testFromUri().
    */
-  public function providerLanguage() {
+  public static function providerLanguage() {
     return [
       ['en'],
       ['fr'],

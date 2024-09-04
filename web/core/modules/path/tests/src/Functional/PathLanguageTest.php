@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Functional;
+
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 
 /**
  * Confirm that paths work with translated nodes.
@@ -8,6 +12,8 @@ namespace Drupal\Tests\path\Functional;
  * @group path
  */
 class PathLanguageTest extends PathTestBase {
+
+  use ContentTranslationTestTrait;
 
   /**
    * Modules to enable.
@@ -56,11 +62,7 @@ class PathLanguageTest extends PathTestBase {
     $this->drupalLogin($this->webUser);
 
     // Enable French language.
-    $edit = [];
-    $edit['predefined_langcode'] = 'fr';
-
-    $this->drupalGet('admin/config/regional/language/add');
-    $this->submitForm($edit, 'Add language');
+    static::createLanguageFromLangcode('fr');
 
     // Enable URL language detection and selection.
     $edit = ['language_interface[enabled][language-url]' => 1];
@@ -68,15 +70,8 @@ class PathLanguageTest extends PathTestBase {
     $this->submitForm($edit, 'Save settings');
 
     // Enable translation for page node.
-    $edit = [
-      'entity_types[node]' => 1,
-      'settings[node][page][translatable]' => 1,
-      'settings[node][page][fields][path]' => 1,
-      'settings[node][page][fields][body]' => 1,
-      'settings[node][page][settings][language][language_alterable]' => 1,
-    ];
-    $this->drupalGet('admin/config/regional/content-language');
-    $this->submitForm($edit, 'Save configuration');
+    static::enableContentTranslation('node', 'page');
+    static::setFieldTranslatable('node', 'page', 'body', TRUE);
 
     $definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', 'page');
     $this->assertTrue($definitions['path']->isTranslatable(), 'Node path is translatable.');
@@ -86,7 +81,7 @@ class PathLanguageTest extends PathTestBase {
   /**
    * Tests alias functionality through the admin interfaces.
    */
-  public function testAliasTranslation() {
+  public function testAliasTranslation(): void {
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
     $english_node = $this->drupalCreateNode(['type' => 'page', 'langcode' => 'en']);
     $english_alias = $this->randomMachineName();

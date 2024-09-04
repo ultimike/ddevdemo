@@ -21,7 +21,7 @@ class IndividualExportImportTest extends KernelTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var string[]
    */
   protected static $modules = [
     'system',
@@ -90,7 +90,7 @@ class IndividualExportImportTest extends KernelTestBase {
        *
        * @var array
        */
-      public $calls;
+      public $calls = [];
 
       /**
        * {@inheritdoc}
@@ -195,6 +195,7 @@ class IndividualExportImportTest extends KernelTestBase {
     // The data was imported.
     static::assertEquals($data, $this->getActiveStorage()->read('config_test.system'));
 
+    // @phpstan-ignore-next-line
     static::assertCount(2, $this->io->calls);
     // @phpstan-ignore-next-line
     static::assertEquals(['confirm'], array_keys($this->io->calls[0]));
@@ -228,7 +229,7 @@ class IndividualExportImportTest extends KernelTestBase {
    * Get random data in a config storage.
    *
    * @return \Drupal\Core\Config\StorageInterface
-   *   The storage witrh random data.
+   *   The storage with random data.
    */
   protected function getRandomDataStorage(): StorageInterface {
     $random = new MemoryStorage();

@@ -93,14 +93,17 @@ class ConfigSplitCommands extends DrushCommands {
    *
    * @command config-split:deactivate
    *
+   * @option override
+   *   Allows the deactivation via override.
+   *
    * @usage drush config-split:deactivate development
    *   Deactivate configuration of the "development" split
    *
    * Propose an alias at:
    *   https://www.drupal.org/project/config_split/issues/3181368
    */
-  public function splitDeactivate($split) {
-    return $this->cliService->ioDeactivate($split, $this->io(), 'dt') ? DrushCommands::EXIT_SUCCESS : DrushCommands::EXIT_FAILURE;
+  public function splitDeactivate($split, $options = ['override' => FALSE]) {
+    return $this->cliService->ioDeactivate($split, $this->io(), 'dt', FALSE, $options['override']) ? DrushCommands::EXIT_SUCCESS : DrushCommands::EXIT_FAILURE;
   }
 
   /**

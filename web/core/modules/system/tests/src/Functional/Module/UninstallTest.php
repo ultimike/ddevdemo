@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -33,7 +34,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the hook_modules_uninstalled() of the user module.
    */
-  public function testUserPermsUninstalled() {
+  public function testUserPermsUninstalled(): void {
     // Uninstalls the module_test module, so hook_modules_uninstalled()
     // is executed.
     $this->container->get('module_installer')->uninstall(['module_test']);
@@ -46,7 +47,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests the Uninstall page and Uninstall confirmation page.
    */
-  public function testUninstallPage() {
+  public function testUninstallPage(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
@@ -158,7 +159,7 @@ class UninstallTest extends BrowserTestBase {
     // cleared during the uninstall.
     \Drupal::cache()->set('uninstall_test', 'test_uninstall_page', Cache::PERMANENT);
     $cached = \Drupal::cache()->get('uninstall_test');
-    $this->assertEquals('test_uninstall_page', $cached->data, new FormattableMarkup('Cache entry found: @bin', ['@bin' => $cached->data]));
+    $this->assertEquals('test_uninstall_page', $cached->data, "Cache entry found: $cached->data");
 
     $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains('The selected modules have been uninstalled.');
@@ -188,7 +189,7 @@ class UninstallTest extends BrowserTestBase {
   /**
    * Tests that a module which fails to install can still be uninstalled.
    */
-  public function testFailedInstallStatus() {
+  public function testFailedInstallStatus(): void {
     $account = $this->drupalCreateUser(['administer modules']);
     $this->drupalLogin($account);
 
