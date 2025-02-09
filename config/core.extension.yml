@@ -2,19 +2,13 @@ _core:
   default_config_hash: R4IF-ClDHXxblLcG0L7MgsLvfBIMAvi_skumNFQwkDc
 module:
   admin_toolbar: 0
-  admin_toolbar_search: 0
   admin_toolbar_tools: 0
   automated_cron: 0
   big_pipe: 0
   block: 0
   block_content: 0
   breakpoint: 0
-  chosen: 0
-  chosen_lib: 0
   ckeditor5: 0
-  comment: 0
-  config: 0
-  contact: 0
   contextual: 0
   ctools: 0
   datetime: 0
@@ -25,8 +19,6 @@ module:
   field_ui: 0
   file: 0
   filter: 0
-  help: 0
-  history: 0
   image: 0
   link: 0
   menu_ui: 0
@@ -36,16 +28,14 @@ module:
   page_cache: 0
   path: 0
   path_alias: 0
+  phpass: 0
   redirect: 0
-  search: 0
-  select2_all: 0
   shortcut: 0
   system: 0
   taxonomy: 0
   text: 0
   token: 0
   toolbar: 0
-  tour: 0
   update: 0
   user: 0
   views_ui: 0
