@@ -15,7 +15,6 @@ use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
  * Tests load, save and delete for taxonomy terms.
  *
  * @group taxonomy
- * @group #slow
  */
 class TermTest extends TaxonomyTestBase {
 
@@ -36,9 +35,7 @@ class TermTest extends TaxonomyTestBase {
   protected $field;
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['block'];
 

@@ -11,14 +11,11 @@ use Drupal\Tests\BrowserTestBase;
  * Tests form processing and alteration via form validation handlers.
  *
  * @group Form
- * @group #slow
  */
 class ValidationTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test'];
 

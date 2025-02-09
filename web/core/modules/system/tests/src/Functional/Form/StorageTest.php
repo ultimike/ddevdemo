@@ -18,14 +18,11 @@ use Drupal\Tests\BrowserTestBase;
  * values are not lost due to a wrong form rebuild.
  *
  * @group Form
- * @group #slow
  */
 class StorageTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['form_test', 'dblog'];
 

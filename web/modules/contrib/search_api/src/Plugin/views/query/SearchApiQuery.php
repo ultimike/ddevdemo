@@ -1359,7 +1359,7 @@ class SearchApiQuery extends QueryPluginBase {
         }
       }
       else {
-        $variables['%server'] = $server->label();
+        $variables['%server'] = $server->label() ?? $server->id();
         $this->getLogger()->warning('Tried to sort results randomly on server %server which does not support random sorting.', $variables);
       }
     }

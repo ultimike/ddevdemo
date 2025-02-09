@@ -126,7 +126,7 @@ class ChosenConfigForm extends ConfigFormBase {
     $form['jquery_selector'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Apply Chosen to the following elements'),
-      '#description' => $this->t('A comma-separated list of jQuery selectors to apply Chosen to, such as <code>select#edit-operation, select#edit-type</code> or <code>.chosen-select</code>. Defaults to <code>select</code> to apply Chosen to all <code>&lt;select&gt;</code> elements.'),
+      '#description' => $this->t('A comma-separated list of selectors to apply Chosen to, such as <code>select#edit-operation, select#edit-type</code> or <code>.chosen-select</code>. Defaults to <code>select</code> to apply Chosen to all <code>&lt;select&gt;</code> elements.'),
       '#default_value' => $chosen_conf->get('jquery_selector'),
     ];
 
@@ -156,6 +156,13 @@ class ChosenConfigForm extends ConfigFormBase {
       '#title' => $this->t('Allow Deselect on Single Selects'),
       '#default_value' => $chosen_conf->get('allow_single_deselect'),
       '#description' => $this->t('Enable or disable the deselect on single selects. Requires an empty default option.'),
+    ];
+
+    $form['options']['allow_mobile'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow mobile devices'),
+      '#default_value' => $chosen_conf->get('allow_mobile'),
+      '#description' => $this->t('Enable or disable the mobile user agents.'),
     ];
 
     $form['options']['add_helper_buttons'] = [
@@ -244,6 +251,7 @@ class ChosenConfigForm extends ConfigFormBase {
       ->set('search_contains', $form_state->getValue('search_contains'))
       ->set('disable_search', $form_state->getValue('disable_search'))
       ->set('allow_single_deselect', $form_state->getValue('allow_single_deselect'))
+      ->set('allow_mobile', $form_state->getValue('allow_mobile'))
       ->set('add_helper_buttons', $form_state->getValue('add_helper_buttons'))
       ->set('disabled_themes', $form_state->getValue('disabled_themes'))
       ->set('chosen_include', $form_state->getValue('chosen_include'))

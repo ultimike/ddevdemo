@@ -283,7 +283,12 @@ class CommandHelper implements LoggerAwareInterface {
 
     $batchSet = FALSE;
     foreach ($indexes as $index) {
-      if (!$index->status() || $index->isReadOnly()) {
+      if (!$index->status()) {
+        $this->logger->warning($this->t("The index @index is disabled.", ['@index' => $index->label()]));
+        continue;
+      }
+      if ($index->isReadOnly()) {
+        $this->logger->warning($this->t("The index @index is read-only.", ['@index' => $index->label()]));
         continue;
       }
       $tracker = $index->getTrackerInstance();

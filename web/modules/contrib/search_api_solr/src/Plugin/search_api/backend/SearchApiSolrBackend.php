@@ -771,6 +771,7 @@ class SearchApiSolrBackend extends BackendPluginBase implements SolrBackendInter
     $built_in_support = [
       'location',
       'rpt',
+      'solr_date_range',
       'solr_string_storage',
       'solr_string_docvalues',
       'solr_text_omit_norms',
@@ -780,7 +781,6 @@ class SearchApiSolrBackend extends BackendPluginBase implements SolrBackendInter
       'solr_text_wstoken',
       'solr_text_custom',
       'solr_text_custom_omit_norms',
-      'solr_date_range',
     ];
     if (in_array($type, $built_in_support)) {
       return TRUE;

@@ -464,9 +464,9 @@ function _search_api_views_handler_adjustments($type, FieldInterface $field, arr
       // If this is a normal Field API field, dynamically retrieve the options
       // list at query time.
       $field_definition = $data_definition->getFieldDefinition();
-      $bundle = $field_definition->getTargetBundle();
-      $field_name = $field_definition->getName();
       $entity_type = $field_definition->getTargetEntityTypeId();
+      $bundle = $field_definition->getTargetBundle() ?? $entity_type;
+      $field_name = $field_definition->getName();
       $definitions['filter']['options callback'] = '_search_api_views_get_allowed_values';
       $definitions['filter']['options arguments'] = [$entity_type, $bundle, $field_name];
     }

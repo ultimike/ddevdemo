@@ -15,11 +15,11 @@ function chosen_lib_library_info_alter(array &$libraries, $module) {
     if (isset($libraries['chosen'])) {
       // Set chosen library path.
       $chosen_js_path = _chosen_lib_get_chosen_path();
-      $minified = file_exists($chosen_js_path . '/chosen.jquery.min.js');
+      $minified = file_exists($chosen_js_path . '/chosen.min.js');
       $chosen_js_path = '/' . $chosen_js_path;
       $chosen_js = $minified
-        ? $chosen_js_path . '/chosen.jquery.min.js'
-        : $chosen_js_path . '/chosen.jquery.js';
+        ? $chosen_js_path . '/chosen.min.js'
+        : $chosen_js_path . '/chosen.js';
       $libraries['chosen']['js'][$chosen_js] = [
         'minified' => $minified,
       ];
@@ -52,8 +52,8 @@ function _chosen_lib_get_chosen_path() {
   $searchdir[] = DrupalKernel::findSitePath(\Drupal::request()) . '/libraries/';
 
   foreach ($searchdir as $dir) {
-    foreach (['chosen', 'chosen/docs', 'chosen-js', 'jquery.chosen'] as $sub) {
-      if (file_exists($dir . $sub . '/chosen.jquery.min.js') || file_exists($dir . $sub . '/chosen.jquery.js')) {
+    foreach (['chosen'] as $sub) {
+      if (file_exists($dir . $sub . '/chosen.min.js') || file_exists($dir . $sub . '/chosen.js')) {
         return $dir . $sub;
       }
     }

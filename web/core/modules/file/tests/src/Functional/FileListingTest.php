@@ -13,14 +13,11 @@ use Drupal\user\Entity\Role;
  * Tests file listing page functionality.
  *
  * @group file
- * @group #slow
  */
 class FileListingTest extends FileFieldTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views', 'file', 'image', 'entity_test'];
 

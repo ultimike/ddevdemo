@@ -61,8 +61,8 @@ parameters:
 
     - # Method will never be called in the context of that class.
       message: "#^Call to an undefined method Drupal\\\\search_api\\\\Plugin\\\\views\\\\filter\\\\SearchApiBoolean::operatorValues\\(\\).$#"
-      count: 1
       path: src/Plugin/views/filter/SearchApiFilterTrait.php
+      reportUnmatched: false
 
     - # Method will never be called in the context of that class.
       message: "#^Call to an undefined static method Drupal\\\\views\\\\Plugin\\\\views\\\\filter\\\\BooleanOperator::opSimple\\(\\).$#"

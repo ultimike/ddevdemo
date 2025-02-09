@@ -2,25 +2,33 @@
  * @file
  * Add support for Better Exposed Filters integration.
  */
-(function ($, Drupal) {
+(function (Drupal, once) {
   'use strict';
 
-  function applyChosenBef($select) {
-    $select.next('.chosen-container').find('.chosen-search-input').attr('data-bef-auto-submit-exclude', true);
+  function applyChosenBef(select) {
+    const chosenContainer = select.nextElementSibling;
+    if (chosenContainer && chosenContainer.classList.contains('chosen-container')) {
+      const chosenSearchInput = chosenContainer.querySelector('.chosen-search-input');
+      if (chosenSearchInput) {
+        chosenSearchInput.setAttribute('data-bef-auto-submit-exclude', 'true');
+      }
+    }
   }
 
   Drupal.behaviors.chosenBef = {
     attach: function (context, settings) {
-      $(once('chosenBef', 'select')).each(function () {
-        const $select = $(this);
-        if ($select.next('.chosen-container').length) {
-          applyChosenBef($select);
+      once('chosenBef', 'select', context).forEach(function (select) {
+        if (
+          select.nextElementSibling &&
+          select.nextElementSibling.classList.contains('chosen-container')
+        ) {
+          applyChosenBef(select);
         } else {
-          $select.on('chosen:ready', function () {
-            applyChosenBef($select);
+          select.addEventListener('chosen:ready', function () {
+            applyChosenBef(select);
           });
         }
       });
-    }
+    },
   };
-})(jQuery, Drupal);
+})(Drupal, once);

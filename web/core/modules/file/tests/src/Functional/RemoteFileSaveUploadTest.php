@@ -8,14 +8,11 @@ namespace Drupal\Tests\file\Functional;
  * Tests the file uploading functions.
  *
  * @group file
- * @group #slow
  */
 class RemoteFileSaveUploadTest extends SaveUploadTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test'];
 

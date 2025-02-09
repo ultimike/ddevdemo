@@ -125,30 +125,6 @@ function template_preprocess_search_api_admin_data_type_table(array &$variables)
 }
 
 /**
- * Prepares variables for search_api_form_item_list form templates.
- *
- * Default template: search-api-form-item-list.html.twig.
- *
- * @param array &$variables
- *   Associative array of template variables, with the following structure:
- *   - element: The element to be rendered, as an array, potentially containing
- *     a "#title" key, plus the list items as its children.
- */
-function template_preprocess_search_api_form_item_list(array &$variables) {
-  $element = $variables['element'];
-
-  $variables['items'] = [
-    '#theme' => 'item_list',
-  ];
-  if (!empty($element['#title'])) {
-    $variables['items']['#title'] = $element['#title'];
-  }
-  foreach (Element::children($element) as $key) {
-    $variables['items']['#items'][$key] = $element[$key];
-  }
-}
-
-/**
  * Prepares variables for search_api_server form templates.
  *
  * Default template: search-api-server.html.twig.

@@ -525,9 +525,9 @@
  * Note that the base theme's form alterations will be run before any sub-theme
  * alterations.
  *
- * @param $form
+ * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param $form_state
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   The current state of the form.
  */
 function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -1251,13 +1251,29 @@ function hook_page_bottom(array &$page_bottom) {
 function hook_theme($existing, $type, $theme, $path) {
   return [
     'my_module_display' => [
-      'variables' => ['my_modules' => NULL, 'topics' => NULL, 'parents' => NULL, 'tid' => NULL, 'sortby' => NULL, 'my_module_per_page' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'topics' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+        'sortby' => NULL,
+        'my_module_per_page' => NULL,
+      ],
     ],
     'my_module_list' => [
-      'variables' => ['my_modules' => NULL, 'parents' => NULL, 'tid' => NULL],
+      'variables' => [
+        'my_modules' => NULL,
+        'parents' => NULL,
+        'tid' => NULL,
+      ],
     ],
     'my_module_icon' => [
-      'variables' => ['new_posts' => NULL, 'num_posts' => 0, 'comment_mode' => 0, 'sticky' => 0],
+      'variables' => [
+        'new_posts' => NULL,
+        'num_posts' => 0,
+        'comment_mode' => 0,
+        'sticky' => 0,
+      ],
     ],
     'status_report' => [
       'render element' => 'requirements',

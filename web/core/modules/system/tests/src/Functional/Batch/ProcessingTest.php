@@ -11,14 +11,11 @@ use Drupal\Tests\BrowserTestBase;
  * Tests batch processing in form and non-form workflow.
  *
  * @group Batch
- * @group #slow
  */
 class ProcessingTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['batch_test', 'test_page_test'];
 

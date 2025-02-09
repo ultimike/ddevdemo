@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\File;
 
+// cspell:ignore garply tarz
+
 /**
  * Tests filename mimetype detection.
  *
@@ -12,9 +14,7 @@ namespace Drupal\KernelTests\Core\File;
 class MimeTypeTest extends FileTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test'];
 
@@ -32,13 +32,20 @@ class MimeTypeTest extends FileTestBase {
       'test.jar.jpg' => 'image/jpeg',
       'test.jpg.jar' => 'application/java-archive',
       'test.pcf.Z' => 'application/x-font',
-      'pcf.z' => 'application/octet-stream',
+      'test.garply.waldo' => 'application/x-garply-waldo',
+      'pcf.z' => 'application/x-compress',
       'jar' => 'application/octet-stream',
+      'garply.waldo' => 'application/octet-stream',
       'some.junk' => 'application/octet-stream',
       'foo.file_test_1' => 'made_up/file_test_1',
       'foo.file_test_2' => 'made_up/file_test_2',
       'foo.doc' => 'made_up/doc',
       'test.ogg' => 'audio/ogg',
+      'foobar.z' => 'application/x-compress',
+      'foobar.tar' => 'application/x-tar',
+      'foobar.tar.z' => 'application/x-tarz',
+      'foobar.0.zip' => 'application/zip',
+      'foobar..zip' => 'application/zip',
     ];
 
     $guesser = $this->container->get('file.mime_type.guesser');
@@ -74,13 +81,18 @@ class MimeTypeTest extends FileTestBase {
       'test.jar.jpg' => 'image/jpeg',
       'test.jpg.jar' => 'application/java-archive',
       'test.pcf.z' => NULL,
+      'test.garply.waldo' => NULL,
       'pcf.z' => NULL,
       'jar' => NULL,
+      'garply.waldo' => NULL,
       'some.junk' => NULL,
       'foo.file_test_1' => NULL,
       'foo.file_test_2' => NULL,
       'foo.doc' => NULL,
       'test.ogg' => NULL,
+      'foobar.z' => NULL,
+      'foobar.tar' => NULL,
+      'foobar.tar.z' => NULL,
     ];
     $extension_guesser = $this->container->get('file.mime_type.guesser.extension');
     $extension_guesser->setMapping($mapping);

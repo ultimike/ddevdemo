@@ -466,7 +466,13 @@ class FieldsHelper implements FieldsHelperInterface {
       if (!isset($datasource)) {
         throw new \InvalidArgumentException('Need either an item ID or the datasource to create a search item from an object.');
       }
-      $id = Utility::createCombinedId($datasource->getPluginId(), $datasource->getItemId($originalObject));
+
+      $item_id = $datasource->getItemId($originalObject);
+      if (!$item_id) {
+        throw new \InvalidArgumentException('Object does not belong to the datasource.');
+      }
+
+      $id = Utility::createCombinedId($datasource->getPluginId(), $item_id);
     }
     $item = $this->createItem($index, $id, $datasource);
     $item->setOriginalObject($originalObject);

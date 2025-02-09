@@ -677,10 +677,27 @@ class ContentEntity extends DatasourcePluginBase implements PluginFormInterface 
       $langcode = $entity->language()->getId();
       if (isset($this->getBundles()[$entity->bundle()])
           && isset($this->getLanguages()[$langcode])) {
-        return $entity->id() . ':' . $langcode;
+        return static::formatItemId($entity->getEntityTypeId(), $entity->id(), $langcode);
       }
     }
     return NULL;
+  }
+
+  /**
+   * Computes the item ID for the given entity and language.
+   *
+   * @param string $entity_type
+   *   The entity type ID.
+   * @param string|int $entity_id
+   *   The entity ID.
+   * @param string $langcode
+   *   The language ID of the entity.
+   *
+   * @return string
+   *   The datasource-specific item ID.
+   */
+  public static function formatItemId(string $entity_type, string|int $entity_id, string $langcode): string {
+    return $entity_id . ':' . $langcode;
   }
 
   /**
@@ -939,7 +956,7 @@ class ContentEntity extends DatasourcePluginBase implements PluginFormInterface 
         $translations = array_intersect($translations, $languages);
       }
       foreach ($translations as $langcode) {
-        $item_ids[] = "$entity_id:$langcode";
+        $item_ids[] = static::formatItemId($entity->getEntityTypeId(), $entity_id, $langcode);
       }
     }
 
@@ -1172,7 +1189,7 @@ class ContentEntity extends DatasourcePluginBase implements PluginFormInterface 
             throw $e;
           }
           $vars = [
-            '%index' => $this->index->label(),
+            '%index' => $this->index->label() ?? $this->index->id(),
             '%entity_type' => $entity->getEntityType()->getLabel(),
             '@entity_id' => $entity->id(),
           ];
@@ -1190,7 +1207,7 @@ class ContentEntity extends DatasourcePluginBase implements PluginFormInterface 
         }
         foreach ($entity_ids as $entity_id) {
           foreach ($this->getLanguages() as $language) {
-            $ids_to_reindex["$entity_id:{$language->getId()}"] = 1;
+            $ids_to_reindex[static::formatItemId($this->getEntityTypeId(), $entity_id, $language->getId())] = 1;
           }
         }
       }

@@ -16,14 +16,11 @@ use Drupal\Tests\BrowserTestBase;
  * Tests that the block configuration UI exists and stores data correctly.
  *
  * @group block
- * @group #slow
  */
 class BlockUiTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',

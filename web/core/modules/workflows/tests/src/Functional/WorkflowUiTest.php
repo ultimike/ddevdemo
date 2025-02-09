@@ -12,14 +12,11 @@ use Drupal\workflows\Entity\Workflow;
  * Tests workflow creation UI.
  *
  * @group workflows
- * @group #slow
  */
 class WorkflowUiTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['workflows', 'workflow_type_test', 'block'];
 

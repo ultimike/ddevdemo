@@ -1,15 +1,8 @@
 chosen:
-  remote: https://github.com/JJJ/chosen
-  version: 2.2.1
-  license:
-      name: MIT
-      url: https://github.com/JJJ/chosen/blob/master/LICENSE.md
-      gpl-compatible: true
+  version: 0.0.4
   js: {}
-  dependencies:
-    - core/jquery
 
 chosen.css:
-  version: 2.2.1
+  version: 0.0.4
   css:
     component: {}

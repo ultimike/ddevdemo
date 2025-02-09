@@ -17,6 +17,8 @@ class DrupalSqlBaseTest extends MigrateTestCase {
 
   /**
    * Define bare minimum migration configuration.
+   *
+   * @var string[]
    */
   protected $migrationConfiguration = [
     'id' => 'DrupalSqlBase',
@@ -50,6 +52,8 @@ class DrupalSqlBaseTest extends MigrateTestCase {
 
   /**
    * Minimum database contents needed to test DrupalSqlBase.
+   *
+   * @var string[]
    */
   protected $databaseContents = [
     'system' => [
@@ -121,6 +125,7 @@ class DrupalSqlBaseTest extends MigrateTestCase {
     $this->databaseContents['system'][0]['schema_version'] = $schema_version;
     $plugin = new TestDrupalSqlBase([], 'test', $this->pluginDefinition, $this->getMigration(), $this->state, $this->entityTypeManager);
     $plugin->setDatabase($this->getDatabase($this->databaseContents));
+    $this->assertSame([], $plugin->fields());
 
     if (!$success) {
       $this->expectException(RequirementsException::class);

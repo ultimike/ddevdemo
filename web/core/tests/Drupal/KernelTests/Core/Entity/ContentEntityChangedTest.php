@@ -12,13 +12,12 @@ use Drupal\language\Entity\ConfigurableLanguage;
  * Tests basic EntityChangedInterface functionality.
  *
  * @group Entity
+ * @group #slow
  */
 class ContentEntityChangedTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'language',

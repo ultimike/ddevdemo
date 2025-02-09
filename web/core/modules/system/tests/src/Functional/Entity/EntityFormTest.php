@@ -14,14 +14,11 @@ use Drupal\Tests\BrowserTestBase;
  * Tests the entity form.
  *
  * @group Entity
- * @group #slow
  */
 class EntityFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'language'];
 

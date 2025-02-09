@@ -17,9 +17,7 @@ use Drupal\Tests\BrowserTestBase;
 class LocaleExportTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale'];
 
@@ -30,6 +28,8 @@ class LocaleExportTest extends BrowserTestBase {
 
   /**
    * A user able to create languages and export translations.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser = NULL;
 

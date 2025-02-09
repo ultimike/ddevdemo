@@ -92,7 +92,9 @@
  *   matches the base route, that will be the default/first tab shown.
  *
  * Local tasks from other modules can be altered using
- * hook_menu_local_tasks_alter().
+ * hook_local_tasks_alter().
+ * Additionally, hook_menu_local_tasks_alter() can be used to dynamically alter
+ * local tasks before they are rendered.
  *
  * @todo Derivatives are in flux for these; when they are more stable, add
  *   documentation here.
@@ -222,8 +224,8 @@
  * Alters all the menu links discovered by the menu link plugin manager.
  *
  * @param array &$links
- *   The link definitions to be altered. Each link has a key that is the machine
- *   name, which must be unique. By default, use the route name as the
+ *   The discovered menu links to be altered. Each link has a key that is the
+ *   machine name, which must be unique. By default, use the route name as the
  *   machine name. In cases where multiple links use the same route name, such
  *   as two links to the same page in different menus, or two links using the
  *   same route name but different route parameters, the suggested machine name

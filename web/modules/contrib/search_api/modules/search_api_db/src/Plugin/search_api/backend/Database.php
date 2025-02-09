@@ -851,13 +851,17 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
           ],
         ],
       ];
-      // For the denormalized index table, add a primary key right away. For
-      // newly created field tables we first need to add the "value" column.
+      // For the denormalized index table, create the table right away. For
+      // newly created field tables we need to first determine what column to
+      // add, as this will be part of the primary key. (Creating a table without
+      // primary key, or later changing the primary key, leads to errors on
+      // specific setups, so it's easier to just do it this way.)
       if ($type === 'index') {
         $table['primary key'] = ['item_id'];
+        $this->database->schema()->createTable($db['table'], $table);
+        $this->dbmsCompatibility->alterNewTable($db['table'], $type);
+        unset($table);
       }
-      $this->database->schema()->createTable($db['table'], $table);
-      $this->dbmsCompatibility->alterNewTable($db['table'], $type);
     }
 
     // Stop here if we want to create a table with just the 'item_id' column.
@@ -870,10 +874,20 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
     $db_field += [
       'description' => "The field's value for this item",
     ];
-    if ($new_table || $type === 'field') {
+    if ($type === 'field') {
       $db_field['not null'] = TRUE;
     }
-    $this->database->schema()->addField($db['table'], $column, $db_field);
+    // If this is a new field table, we create it now, already complete with
+    // the value column. Otherwise, we just add the new column.
+    if (!empty($table)) {
+      $table['fields'][$column] = $db_field;
+      $table['primary key'] = ['item_id', $column];
+      $this->database->schema()->createTable($db['table'], $table);
+      $this->dbmsCompatibility->alterNewTable($db['table'], $type);
+    }
+    else {
+      $this->database->schema()->addField($db['table'], $column, $db_field);
+    }
     if ($db_field['type'] === 'varchar') {
       $index_spec = [[$column, 10]];
     }
@@ -916,11 +930,6 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
       $variables['%column'] = $column;
       $variables['%table'] = $db['table'];
       $this->logException($e, '%type while trying to add a database index for column %column to table %table: @message in %function (line %line of %file).', $variables, RfcLogLevel::WARNING);
-    }
-
-    // Add a covering index for field tables.
-    if ($new_table && $type == 'field') {
-      $this->database->schema()->addPrimaryKey($db['table'], ['item_id', $column]);
     }
   }
 
@@ -1635,7 +1644,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
                 $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
                   '@token_length_max' => static::TOKEN_LENGTH_MAX,
                   '%word' => $word,
-                  '%index' => $index->label(),
+                  '%index' => $index->label() ?? $index->id(),
                 ]);
                 $word = mb_substr($word, 0, static::TOKEN_LENGTH_MAX);
               }
@@ -1656,7 +1665,7 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
                     $this->getLogger()->warning('An overlong word (more than @token_length_max characters) was encountered while indexing: %word.<br />Since database search servers currently cannot index words of more than @token_length_max characters, the word was truncated for indexing. If this should not be a single word, make sure the "Tokenizer" processor is enabled and configured correctly for index %index.', [
                       '@token_length_max' => static::TOKEN_LENGTH_MAX,
                       '%word' => $word,
-                      '%index' => $index->label(),
+                      '%index' => $index->label() ?? $index->id(),
                     ]);
                     $word = mb_substr($word, 0, static::TOKEN_LENGTH_MAX);
                   }
@@ -2761,13 +2770,8 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
         // For OR facets, we need to build a different base query that excludes
         // the facet filters applied to the facet.
         $or_query = clone $query;
-        $conditions = &$or_query->getConditionGroup()->getConditions();
         $tag = 'facet:' . $facet['field'];
-        foreach ($conditions as $i => $condition) {
-          if ($condition instanceof ConditionGroupInterface && $condition->hasTag($tag)) {
-            unset($conditions[$i]);
-          }
-        }
+        $this->removeTagFromConditionGroup($or_query->getConditionGroup(), $tag);
         try {
           $or_db_query = $this->createDbQuery($or_query, $fields);
         }
@@ -2901,6 +2905,32 @@ class Database extends BackendPluginBase implements AutocompleteBackendInterface
       return FALSE;
     }
     return $result;
+  }
+
+  /**
+   * Removes all nested condition groups with the given tag.
+   *
+   * @param \Drupal\search_api\Query\ConditionGroupInterface $condition_group
+   *   The condition group to process.
+   * @param string $tag
+   *   The tag to look for.
+   */
+  protected static function removeTagFromConditionGroup(ConditionGroupInterface $condition_group, string $tag): void {
+    $conditions = &$condition_group->getConditions();
+    foreach ($conditions as $i => $nested) {
+      if (!$nested instanceof ConditionGroupInterface) {
+        continue;
+      }
+      if ($nested->hasTag($tag)) {
+        unset($conditions[$i]);
+      }
+      else {
+        static::removeTagFromConditionGroup($nested, $tag);
+      }
+    }
+    // To be on the safe side, make sure the array is still sequentially
+    // indexed.
+    $conditions = array_values($conditions);
   }
 
   /**

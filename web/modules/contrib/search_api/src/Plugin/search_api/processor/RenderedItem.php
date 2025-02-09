@@ -197,25 +197,30 @@ class RenderedItem extends ProcessorPluginBase {
       $datasource_id = $item->getDatasourceId();
       $datasource = $item->getDatasource();
       $bundle = $datasource->getItemBundle($item->getOriginalObject());
+      $datasource_config = $configuration['view_mode'][$datasource_id] ?? [];
+      // If the view mode was not set, or explicitly set to ":default", try to
+      // get the global value.
+      if (($datasource_config[$bundle] ?? ':default') === ':default') {
+        $datasource_config[$bundle] = $datasource_config[':default'] ?? NULL;
+      }
       // When no view mode has been set for the bundle, or it has been set to
       // "Don't include the rendered item", skip this item.
-      if (empty($configuration['view_mode'][$datasource_id][$bundle])) {
+      if (empty($datasource_config[$bundle])) {
         // If it was really not set, also notify the user through the log.
-        if (!isset($configuration['view_mode'][$datasource_id][$bundle])) {
-          $unset_view_modes[$field->getFieldIdentifier()] = $field->getLabel();
+        if (!isset($datasource_config[$bundle])) {
+          $unset_view_modes[$field->getFieldIdentifier()] = $field->getLabel() ?? $field->getFieldIdentifier();
         }
-
         // Restore the original user.
         $this->getAccountSwitcher()->switchBack();
-
         continue;
       }
-      $view_mode = (string) $configuration['view_mode'][$datasource_id][$bundle];
+      $view_mode = (string) $datasource_config[$bundle];
 
       try {
         $build = $datasource->viewItem($item->getOriginalObject(), $view_mode);
         if ($build) {
-          // Add the excerpt to the render array to allow adding it to view modes.
+          // Add the excerpt to the render array to allow adding it to view
+          // modes.
           $build['#search_api_excerpt'] = $item->getExcerpt();
           $value = (string) DeprecationHelper::backwardsCompatibleCall(
             \Drupal::VERSION, '10.3.0',
@@ -235,7 +240,7 @@ class RenderedItem extends ProcessorPluginBase {
         $variables = [
           '%item_id' => $item->getId(),
           '%view_mode' => $view_mode,
-          '%index' => $this->index->label(),
+          '%index' => $this->index->label() ?? $this->index->id(),
         ];
         $this->logException($e, '%type while trying to render item %item_id with view mode %view_mode for search index %index: @message in %function (line %line of %file).', $variables);
       }

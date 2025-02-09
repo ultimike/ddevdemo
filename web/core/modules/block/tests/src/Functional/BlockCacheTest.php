@@ -15,9 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class BlockCacheTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'block_test', 'test_page_test'];
 
@@ -87,7 +85,7 @@ class BlockCacheTest extends BrowserTestBase {
 
     // Enable our test block. Set some content for it to display.
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
     $this->drupalLogin($this->normalUser);
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($current_content);
@@ -95,7 +93,7 @@ class BlockCacheTest extends BrowserTestBase {
     // Change the content, but the cached copy should still be served.
     $old_content = $current_content;
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($old_content);
 
@@ -109,7 +107,7 @@ class BlockCacheTest extends BrowserTestBase {
     // Test whether the cached data is served for the correct users.
     $old_content = $current_content;
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
     $this->drupalLogout();
     $this->drupalGet('');
     // Anonymous user does not see content cached per-role for normal user.
@@ -140,14 +138,14 @@ class BlockCacheTest extends BrowserTestBase {
     \Drupal::state()->set('block_test.cache_contexts', []);
 
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     $this->drupalGet('');
     $this->assertSession()->pageTextContains($current_content);
 
     $old_content = $current_content;
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     // Block content served from cache.
     $this->drupalGet('user');
@@ -166,7 +164,7 @@ class BlockCacheTest extends BrowserTestBase {
     \Drupal::state()->set('block_test.cache_max_age', 0);
 
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     // If max_age = 0 has no effect, the next request would be cached.
     $this->drupalGet('');
@@ -174,7 +172,7 @@ class BlockCacheTest extends BrowserTestBase {
 
     // A cached copy should not be served.
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
     $this->drupalGet('');
     // Maximum age of zero prevents blocks from being cached.
     $this->assertSession()->pageTextContains($current_content);
@@ -187,7 +185,7 @@ class BlockCacheTest extends BrowserTestBase {
     \Drupal::state()->set('block_test.cache_contexts', ['user']);
 
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
     $this->drupalLogin($this->normalUser);
 
     $this->drupalGet('');
@@ -195,7 +193,7 @@ class BlockCacheTest extends BrowserTestBase {
 
     $old_content = $current_content;
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     // Block is served from per-user cache.
     $this->drupalGet('');
@@ -219,14 +217,14 @@ class BlockCacheTest extends BrowserTestBase {
     \Drupal::state()->set('block_test.cache_contexts', ['url']);
 
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     $this->drupalGet('test-page');
     $this->assertSession()->pageTextContains($current_content);
 
     $old_content = $current_content;
     $current_content = $this->randomMachineName();
-    \Drupal::state()->set('block_test.content', $current_content);
+    \Drupal::keyValue('block_test')->set('content', $current_content);
 
     $this->drupalGet('user');
     $this->assertSession()->statusCodeEquals(200);

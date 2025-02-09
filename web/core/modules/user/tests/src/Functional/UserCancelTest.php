@@ -17,16 +17,13 @@ use Drupal\user\Entity\User;
  * Ensure that account cancellation methods work as expected.
  *
  * @group user
- * @group #slow
  */
 class UserCancelTest extends BrowserTestBase {
 
   use CommentTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'comment'];
 

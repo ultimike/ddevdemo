@@ -17,14 +17,11 @@ use Drupal\KernelTests\KernelTestBase;
  * Tests installing and uninstalling of themes.
  *
  * @group Extension
- * @group #slow
  */
 class ThemeInstallerTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -90,8 +87,8 @@ class ThemeInstallerTest extends KernelTestBase {
    * Tests installing a sub-theme.
    */
   public function testInstallSubTheme(): void {
-    $name = 'test_subtheme';
-    $base_name = 'test_basetheme';
+    $name = 'test_child_theme';
+    $base_name = 'test_parent_theme';
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertEmpty(array_keys($themes));
@@ -101,6 +98,12 @@ class ThemeInstallerTest extends KernelTestBase {
     $themes = $this->themeHandler()->listInfo();
     $this->assertTrue(isset($themes[$name]));
     $this->assertTrue(isset($themes[$base_name]));
+
+    $expectedOrder = [
+      $base_name,
+      $name,
+    ];
+    $this->assertEquals($expectedOrder, array_keys($themes));
 
     $this->themeInstaller()->uninstall([$name]);
 

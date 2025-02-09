@@ -1,13 +1,13 @@
 ## SUMMARY
 
-  Chosen uses the Chosen jQuery plugin to make your \<select\> elements
+  Chosen uses the Chosen js plugin to make your \<select\> elements
   more user-friendly.
 
 
 ## INSTALLATION
 
-  1. Download the Chosen jQuery plugin
-     (https://github.com/JJJ/chosen)
+  1. Download the Chosen js plugin
+     (https://github.com/noli42/chosen)
      and extract the file under "libraries".
   2. Download and enable the module.
   3. Configure at Administer > Configuration > User interface > Chosen
@@ -25,13 +25,12 @@
 {
     "type": "package",
     "package": {
-        "name": "jjj/chosen",
-        "version": "2.2.1",
+        "name": "noli42/chosen",
+        "version": "3.0.0",
         "type": "drupal-library",
-        "source": {
-            "url": "https://github.com/JJJ/chosen.git",
-            "type": "git",
-            "reference": "2.2.1"
+        "dist": {
+            "url": "https://github.com/noli42/chosen/releases/download/3.0.0/chosen-assets-v3.0.0.zip",
+            "type": "zip"
         }
     }
 },
@@ -40,7 +39,7 @@
   Now you can run the following command to install chosen in the right folder:
 
 ```
-composer require jjj/chosen:2.2.1
+composer require noli42/chosen:3.0.0
 ```
 
 ### Installation with merge plugin:
@@ -109,7 +108,7 @@ composer require drupal/chosen
 ## TROUBLE SHOOTING
 
   How to exclude a select field from becoming a chosen select.
-  - go to the configuration page and add your field using the jquery "not"
+  - go to the configuration page and add your field using the "not"
     operator to the textarea with the comma separated values.
     For date fields this could look like:
     select:not([name*='day'],[name*='year'],[name*='month'])

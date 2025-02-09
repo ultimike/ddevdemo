@@ -10,7 +10,7 @@ use Psr\Log\LogLevel;
 /**
  * The Chosen plugin URI.
  */
-define('CHOSEN_DOWNLOAD_URI', 'https://github.com/JJJ/chosen/archive/refs/tags/2.2.1.zip');
+define('CHOSEN_DOWNLOAD_URI', 'https://github.com/noli42/chosen/releases/download/3.0.0/chosen-assets-v3.0.0.zip');
 
 /**
  * A Drush commandfile.

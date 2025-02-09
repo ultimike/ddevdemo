@@ -67,10 +67,19 @@ class ThemeHandler implements ThemeHandlerInterface {
   public function listInfo() {
     if (!isset($this->list)) {
       $this->list = [];
-      $installed_themes = $this->configFactory->get('core.extension')->get('theme');
+      $installed_themes = array_keys($this->configFactory->get('core.extension')->get('theme'));
       if (!empty($installed_themes)) {
-        $installed_themes = array_intersect_key($this->themeList->getList(), $installed_themes);
-        array_map([$this, 'addTheme'], $installed_themes);
+        $list = $this->themeList->getList();
+        foreach ($installed_themes as $theme) {
+          // Do not add installed themes that cannot be found by the
+          // extension.list.theme service. If a theme does go missing from the
+          // file system any call to ::getTheme() will result in an exception
+          // and an error being logged. Ignoring the problem here allows the
+          // theme system to fix itself while updating.
+          if (isset($list[$theme])) {
+            $this->addTheme($list[$theme]);
+          }
+        }
       }
     }
     return $this->list;

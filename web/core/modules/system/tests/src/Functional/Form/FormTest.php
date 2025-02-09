@@ -20,14 +20,11 @@ use Behat\Mink\Element\NodeElement;
  * Tests various form element validation mechanisms.
  *
  * @group Form
- * @group #slow
  */
 class FormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['filter', 'form_test', 'file', 'datetime'];
 

@@ -18,7 +18,6 @@ use PHPUnit\Framework\AssertionFailedError;
  * Tests the new entity API for the date field type.
  *
  * @group datetime
- * @group #slow
  */
 class DateTimeItemTest extends FieldKernelTestBase {
 
@@ -37,9 +36,7 @@ class DateTimeItemTest extends FieldKernelTestBase {
   protected $field;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['datetime'];
 

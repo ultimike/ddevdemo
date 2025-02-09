@@ -12,14 +12,11 @@ use Drupal\Tests\BrowserTestBase;
  * Tests the user interface for importing configuration.
  *
  * @group config
- * @group #slow
  */
 class ConfigImportUITest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'config',

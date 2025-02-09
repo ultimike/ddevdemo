@@ -94,7 +94,7 @@ class PostRequestIndexing implements PostRequestIndexingInterface, DestructableI
         }
       }
       catch (SearchApiException $e) {
-        $vars['%index'] = $index->label();
+        $vars['%index'] = $index->label() ?? $index->id();
         $this->logException($e, '%type while trying to index items on %index: @message in %function (line %line of %file).', $vars);
       }
 

@@ -15,7 +15,7 @@ use Drupal\Tests\BrowserTestBase;
 class HelpTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The help_test module implements hook_help() but does not provide a module
    * overview page. The help_page_test module has a page section plugin that
@@ -40,11 +40,15 @@ class HelpTest extends BrowserTestBase {
 
   /**
    * The admin user that will be created.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $adminUser;
 
   /**
    * The anonymous user that will be created.
+   *
+   * @var \Drupal\user\Entity\User|false
    */
   protected $anyUser;
 

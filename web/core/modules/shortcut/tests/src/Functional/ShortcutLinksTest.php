@@ -17,7 +17,6 @@ use Drupal\views\Entity\View;
  * Create, view, edit, delete, and change shortcut links.
  *
  * @group shortcut
- * @group #slow
  */
 class ShortcutLinksTest extends ShortcutTestBase {
 
@@ -25,9 +24,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['router_test', 'views', 'block'];
 

@@ -1,3 +1,51 @@
+Search API 1.37 (2024-11-27):
+-----------------------------
+- #3483584 by drunken monkey: Fixed Index::setDatasources() to match its
+  contract.
+- #3484811 by scott_euser, drunken monkey, borisson_, rajdip_755: Improved the
+  Search API admin UI for adding fields.
+
+Search API 1.36 (2024-11-24):
+-----------------------------
+- #3483366 by a.dmitriiev, drunken monkey, borisson_: Added a "default view
+  mode" option to the "Rendered HTML output" field and "Rendered entity" Views
+  row.
+- #3484686 by drunken monkey: Fixed error when trying to boost on numeric field
+  with negative value.
+- #2471184 by scott_euser, drunken monkey, borisson_: Improved UX of the
+  Add/Edit Index form.
+- #3484304 by a.dmitriiev, drunken monkey: Added config actions for several
+  Index and Server methods.
+- #3483581 by drunken monkey: Fixed NULL placeholders in log entries.
+- #3481967 by drunken monkey: Fixed test/CI failures.
+- #3477020 by strykaizer, drunken monkey: Fixed bug in database backend
+  regarding nested conditions for OR facets.
+- #3473897 by drunken monkey: Fixed error in HTML Filter processor when removing
+  invisible HTML elements.
+- #3480294 by drunken monkey: Fixed test failures against Drupal 11.
+- #3470199 by tr, drunken monkey: Updated Drush commands for Drush 12+.
+- #3471987 by mkalkbrenner, drunken monkey: Adapted the ContentEntity datasource
+  plugin to simplify subclassing it.
+- #3470166 by drunken monkey, berdir, catch, mstrelan: Fixed test failures
+  against Drupal 11/PHP 8.3.
+- #3466996 by v.koval, drunken monkey: Fixed Views data for bundle-less entity
+  types.
+- #3456728 by narendrar, drunken monkey: Added a config action for adding a
+  datasource to a search index.
+- #3465288 by prudloff, drunken monkey: Fixed Views date filters to not add "+1
+  day" to offset values.
+- #3462628 by Extatic, drunken monkey: Fixed call to deprecated
+  Renderer::renderPlain() method.
+- #3445973 by Knurg, drunken monkey: Added hidden setting for not deleting items
+  from search index when loading fails.
+- #3445978 by drunken monkey, Rajeshreeputra: Updated minimum requirement to
+  10.2.
+- #3456418 by drunken monkey: Fixed test failures against Drupal 10.3.
+- #3195994 by drunken monkey, ostry.sn, smulvih2: Fixed error when creating
+  database tables if "sql_require_primary_key" is set.
+- #3454631 by codebymikey, drunken monkey: Fixed inconsistent sorting of
+  dependencies in config exports.
+
 Search API 1.35 (2024-06-16):
 -----------------------------
 - #3454923 by drunken monkey: Disabled the "views_test_data" module in most

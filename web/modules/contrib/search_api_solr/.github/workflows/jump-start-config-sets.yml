@@ -13,7 +13,7 @@ on:
 
 jobs:
     generate-config-sets:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         name: Generate Solr jump-start config-sets
 
@@ -155,7 +155,7 @@ jobs:
                 path: search_api_solr/jump-start
 
     run-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         needs: generate-config-sets
 
@@ -163,9 +163,9 @@ jobs:
 
         strategy:
             matrix:
-                drupal: ['10.2', '10.3']
+                drupal: ['10.3']
                 solr: ['4', '5', '6', '7', '8', '9']
-                php: ['8.2']
+                php: ['8.2', '8.3']
                 solarium: ['solarium/solarium:"dev-master as 6.3.99"']
                 experimental: [false]
                 include:
@@ -174,11 +174,6 @@ jobs:
                     php: '8.3'
                     solarium: 'solarium/solarium'
                     experimental: true
-                  - drupal: '10.3'
-                    solr: '9'
-                    php: '8.3'
-                    solarium: 'solarium/solarium'
-                    experimental: false
 
         name: Drupal ${{ matrix.drupal }}, Solr ${{ matrix.solr }}, PHP ${{ matrix.php }}
 
@@ -208,7 +203,7 @@ jobs:
               run: |
                 cd solr/solr${{ matrix.solr }}
                 cat docker-compose.yml
-                docker-compose up -d
+                docker compose up -d
 
             - name: Checkout drupal
               uses: actions/checkout@v4
@@ -245,10 +240,10 @@ jobs:
             - name: Create Solr collections
               run: |
                 docker ps
-                docker exec solr${{ matrix.solr }}_solr${{ matrix.solr }}_1 wait-for-solr.sh
-                docker exec solr${{ matrix.solr }}_solr${{ matrix.solr }}_1 bin/solr create -c techproducts -s 2 -rf 2 -d server/solr/configsets/sample_techproducts_configs/conf -n sample_techproducts_configs
-                docker exec solr${{ matrix.solr }}_solr${{ matrix.solr }}_1 bash -c "bin/post -c techproducts example/exampledocs/*.xml"
-                docker exec solr${{ matrix.solr }}_solr${{ matrix.solr }}_1 bin/solr create -c checkpoints -s 1 -rf 2
+                docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 wait-for-solr.sh
+                docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c techproducts -s 2 -rf 1 -d server/solr/configsets/sample_techproducts_configs/conf -n sample_techproducts_configs
+                docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bash -c "bin/post -c techproducts example/exampledocs/*.xml"
+                docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c checkpoints -s 1 -rf 1
 
             - name: Run tests
               env:
@@ -347,9 +342,9 @@ jobs:
           run: |
             docker ps
             docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 wait-for-solr.sh
-            docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c techproducts -s 2 -rf 2 -d server/solr/configsets/sample_techproducts_configs/conf -n sample_techproducts_configs
+            docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c techproducts -s 1 -rf 1 -d server/solr/configsets/sample_techproducts_configs/conf -n sample_techproducts_configs
             docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bash -c "bin/post -c techproducts example/exampledocs/*.xml"
-            docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c checkpoints -s 1 -rf 2
+            docker exec solr${{ matrix.solr }}-solr${{ matrix.solr }}-1 bin/solr create -c checkpoints -s 1 -rf 1
 
         - name: Run tests
           env:
@@ -372,7 +367,7 @@ jobs:
             vendor/bin/drush -v cron
 
     run-legacy-tests:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-24.04
 
       needs: generate-config-sets
 
@@ -380,9 +375,9 @@ jobs:
 
       strategy:
         matrix:
-          drupal: ['10.2', '10.3']
+          drupal: ['10.3']
           solr: ['3']
-          php: ['8.2']
+          php: ['8.2', '8.3']
           experimental: [false]
 
       name: Drupal ${{ matrix.drupal }}, Solr ${{ matrix.solr }}, PHP ${{ matrix.php }}
@@ -412,7 +407,7 @@ jobs:
         - name: Start Solr ${{ matrix.solr }}
           run: |
             cd solr/solr${{ matrix.solr }}
-            docker-compose up -d
+            docker compose up -d
 
         - name: Checkout drupal
           uses: actions/checkout@v4

@@ -28,7 +28,6 @@ use Drupal\user\RoleInterface;
  * menu subtrees is compared to the new hash.
  *
  * @group toolbar
- * @group #slow
  */
 class ToolbarAdminMenuTest extends BrowserTestBase {
 
@@ -54,9 +53,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
   protected $hash;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',

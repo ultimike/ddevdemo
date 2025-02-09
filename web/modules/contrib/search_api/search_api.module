@@ -118,7 +118,7 @@ function search_api_cron() {
           if ($num) {
             $variables = [
               '@num' => $num,
-              '%name' => $index->label(),
+              '%name' => $index->label() ?? $index->id(),
             ];
             \Drupal::service('logger.channel.search_api')->info('Indexed @num items for index %name.', $variables);
           }

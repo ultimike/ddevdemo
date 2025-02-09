@@ -14,7 +14,6 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
  * Ensures that node type functions work correctly.
  *
  * @group node
- * @group #slow
  */
 class NodeTypeTest extends NodeTestBase {
 
@@ -22,9 +21,7 @@ class NodeTypeTest extends NodeTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field_ui', 'block'];
 

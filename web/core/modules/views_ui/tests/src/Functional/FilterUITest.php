@@ -8,10 +8,8 @@ namespace Drupal\Tests\views_ui\Functional;
  * Tests for the filters from the UI.
  *
  * @group views_ui
- * @group #slow
  */
 class FilterUITest extends UITestBase {
-
 
   /**
    * Views used by this test.
@@ -21,9 +19,7 @@ class FilterUITest extends UITestBase {
   public static $testViews = ['test_filter_in_operator_ui', 'test_filter_groups'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['views_ui', 'node'];
 
