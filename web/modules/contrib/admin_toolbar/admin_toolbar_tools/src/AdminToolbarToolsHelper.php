@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\admin_toolbar_tools;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -70,8 +72,8 @@ class AdminToolbarToolsHelper {
   /**
    * Generate the toolbar tab and item for primary local tasks.
    *
-   * @return array
-   *   The toolbar render array.
+   * @return array<string, mixed>
+   *   The toolbar item render array.
    */
   public function buildLocalTasksToolbar() {
     $build = [];
@@ -141,7 +143,7 @@ class AdminToolbarToolsHelper {
   /**
    * Gets a list of content entities.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of metadata about content entities.
    */
   public function getBundleableEntitiesList() {
@@ -161,11 +163,22 @@ class AdminToolbarToolsHelper {
   /**
    * Gets an array of entity types that should trigger a menu rebuild.
    *
-   * @return array
+   * @return array<int, mixed>
    *   An array of entity machine names.
+   *
+   * @see admin_toolbar_tools_entity_insert()
+   * @see admin_toolbar_tools_entity_update()
+   * @see admin_toolbar_tools_entity_delete()
    */
   public function getRebuildEntityTypes() {
-    $types = ['menu'];
+    // The entity types that should trigger a menu rebuild when created,
+    // updated or deleted. Add supported config entity types which will get
+    // merged with bundleable entity types.
+    $types = [
+      'menu',
+      'user_role',
+      'view',
+    ];
     $content_entities = $this->getBundleableEntitiesList();
     $types = array_merge($types, array_column($content_entities, 'content_entity_bundle'));
     return $types;

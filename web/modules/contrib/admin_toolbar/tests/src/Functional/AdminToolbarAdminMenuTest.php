@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\admin_toolbar\Functional;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
@@ -13,9 +15,7 @@ use Drupal\Tests\toolbar\Functional\ToolbarAdminMenuTest;
 class AdminToolbarAdminMenuTest extends ToolbarAdminMenuTest {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'admin_toolbar',
