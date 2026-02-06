@@ -9,3 +9,5 @@ workshop presented by DrupalEasy.
 
 This project includes all Composer dependencies, support for hosting on Pantheon, as well as both a
 database backup and a files/ directory backup.
+
+Just a small change.
