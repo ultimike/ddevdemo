@@ -3,7 +3,7 @@
         'name' => 'drupaleasy/ddevdemo',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'e9ae1020d8ceae25d7ee2b4d6b3399ae962f292e',
+        'reference' => '33554c6c331e167ed84d897846eb1ae2c24b28e3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -361,6 +361,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'drupal/stage_file_proxy' => array(
+            'pretty_version' => '3.1.6',
+            'version' => '3.1.6.0',
+            'reference' => '3.1.6',
+            'type' => 'drupal-module',
+            'install_path' => __DIR__ . '/../../web/modules/contrib/stage_file_proxy',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'drupal/token' => array(
             'pretty_version' => '1.17.0',
             'version' => '1.17.0.0',
@@ -373,7 +382,7 @@
         'drupaleasy/ddevdemo' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'e9ae1020d8ceae25d7ee2b4d6b3399ae962f292e',
+            'reference' => '33554c6c331e167ed84d897846eb1ae2c24b28e3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

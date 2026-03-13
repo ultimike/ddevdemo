@@ -7,6 +7,7 @@ dependencies:
   module:
     - file
     - filter
+    - media
     - shortcut
     - system
 _core:
@@ -20,3 +21,4 @@ permissions:
   - 'access shortcuts'
   - 'delete own files'
   - 'use text format basic_html'
+  - 'view media'
