@@ -4,7 +4,7 @@ langcode: en
 uuid: 5f84b51e-cf13-4ccb-8299-191ce7e95bb7
 name: 'Delicious Desserts'
 mail: test@example.com
-slogan: 'Yummmmm, I love cupcakes.'
+slogan: ''
 page:
   403: ''
   404: ''
