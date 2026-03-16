@@ -1,0 +1,21 @@
+uuid: d2fbf40f-739c-4034-a0b4-451d6bb9e359
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_date
+    - node.type.temporary_content_type
+  module:
+    - datetime
+id: node.temporary_content_type.field_date
+field_name: field_date
+entity_type: node
+bundle: temporary_content_type
+label: Date
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

@@ -1,0 +1,21 @@
+uuid: 58a5d0f1-c87c-4328-bdc9-c97976665b5a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_boolean
+    - node.type.temporary_content_type
+id: node.temporary_content_type.field_boolean
+field_name: field_boolean
+entity_type: node
+bundle: temporary_content_type
+label: Boolean
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

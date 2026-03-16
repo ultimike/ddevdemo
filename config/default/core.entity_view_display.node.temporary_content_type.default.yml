@@ -1,0 +1,58 @@
+uuid: 5af005c1-1096-4c77-aa7f-8c5dd6042cbb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.temporary_content_type.body
+    - field.field.node.temporary_content_type.field_boolean
+    - field.field.node.temporary_content_type.field_date
+    - field.field.node.temporary_content_type.field_email
+    - node.type.temporary_content_type
+  module:
+    - datetime
+    - text
+    - user
+id: node.temporary_content_type.default
+targetEntityType: node
+bundle: temporary_content_type
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_boolean:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  field_email:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 104
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden: {  }
